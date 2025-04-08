@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Code, Monitor, Play, Users, Video } from "lucide-react";
 import { SignInButton } from "@clerk/nextjs";
+import landingPage1 from "@/app/assest/LandingPage1.png";
 
 export default function LandingPage() {
   return (
@@ -101,7 +102,7 @@ export default function LandingPage() {
                     <div className="h-3 w-3 rounded-full bg-green-500"></div>
                   </div>
                   <Image
-                    src="/placeholder.svg?height=600&width=800"
+                    src={landingPage1}
                     width={800}
                     height={600}
                     alt="CodeProctor platform screenshot showing split-screen with video and code editor"
@@ -119,24 +120,6 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="border-y bg-muted/40">
-          <div className="container py-12">
-            <div className="grid grid-cols-2 gap-8 md:grid-cols-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="flex items-center justify-center">
-                  <Image
-                    src={`/placeholder-logo.svg?text=Company${i}`}
-                    alt={`Company ${i} logo`}
-                    width={120}
-                    height={60}
-                    className="opacity-70 grayscale transition-all hover:opacity-100 hover:grayscale-0"
-                  />
-                </div>
-              ))}
             </div>
           </div>
         </section>
