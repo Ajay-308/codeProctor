@@ -11,9 +11,9 @@ export default function LandingPage() {
     <div className="flex flex-col min-h-screen">
       <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center ml-4 gap-2">
             <Code className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">CodeProctor</span>
+            <span className="text-xl font-bold ">CodeProctor</span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <Link
