@@ -41,13 +41,12 @@ export default function LandingPage() {
               Testimonials
             </Link>
           </nav>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center mt-2 gap-4 cursor-grab">
             <SignInButton mode="modal">
-              <Button variant="outline">Log In</Button>
+              <Button className="cursor-pointer" variant="outline">
+                Log In
+              </Button>
             </SignInButton>
-            <Link href="/signup">
-              <Button>Sign Up Free</Button>
-            </Link>
           </div>
         </div>
       </header>
