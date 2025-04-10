@@ -30,6 +30,7 @@
     "react": "^19.0.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2",
     "react-resizable-panels": "^2.1.7",
     "svix": "^1.63.1",
     "tailwind-merge": "^3.2.0",
