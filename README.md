@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+landing page
+![image](https://github.com/user-attachments/assets/a1da778b-2160-4ae8-953e-ebb87ff9c0e3)
+![image](https://github.com/user-attachments/assets/9ee2e82c-9103-4568-8604-e3aec2a4bd51)
+![image](https://github.com/user-attachments/assets/8ad7283b-3966-480e-9683-06f91c7e067b)
 
-## Getting Started
+![image](https://github.com/user-attachments/assets/055c118d-b78e-4113-bfce-7a1ad8f6d04c)
+![image](https://github.com/user-attachments/assets/277722ee-a934-4faa-97b6-6eef28cfc905)
+![image](https://github.com/user-attachments/assets/02730a7d-d840-4cef-8155-54316b4122fb)
+![image](https://github.com/user-attachments/assets/b595e068-9763-4039-bc48-f35ed1b37b79)
+![image](https://github.com/user-attachments/assets/50d5aa56-eafb-43de-9658-3f283d262ea9)
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+
+
+#.env setup
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+CONVEX_DEPLOYMENT=
+NEXT_PUBLIC_CONVEX_URL=
+NEXT_PUBLIC_STREAM_API_KEY=
+STREAM_SECRET_KEY=
