@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const syncUser = mutation({
@@ -21,5 +21,25 @@ export const syncUser = mutation({
       ...args,
       role: "candidate",
     });
+  },
+});
+
+export const getUser = query({
+  handler: async (ctx) => {
+    const userIdentity = await ctx.auth.getUserIdentity();
+    if (!userIdentity) throw new Error("user not authenticated");
+    const user = await ctx.db.query("users").collect();
+    return user;
+  },
+});
+
+export const getUserByClerkId = query({
+  args: { clerkId: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+    return user;
   },
 });
