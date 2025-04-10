@@ -75,7 +75,6 @@ export type QuickActionType = (typeof quickActions)[number];
 
 export const languages = [
   { id: "javascript", name: "JavaScript", icon: "/javascript.png" },
-  { id: "typescript", name: "TypeScript", icon: "/typescript.png" },
   { id: "python", name: "Python", icon: "/python.png" },
   { id: "java", name: "Java", icon: "/java.png" },
   { id: "cpp", name: "C++", icon: "/cpp.png" },
