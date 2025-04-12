@@ -21,8 +21,8 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import EndCallButton from "./EndCallButton";
-import CodeEditor from "./CodeEditor";
+import EndCallButton from "./endCallButton";
+import CodeEditor from "./codeditor";
 import { motion, AnimatePresence } from "framer-motion";
 
 function MeetingRoom() {
