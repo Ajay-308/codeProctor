@@ -19,6 +19,7 @@ export default function EndCallButton() {
 
   // check karna hai ki jo user hai wahi owner hia ki nhi
   const isMeetingOwner = localParticipant?.userId === call?.state.createdBy?.id;
+  // agar user is not owner to call ko kaise end kar sakta hai
   if (!isMeetingOwner) {
     toast.error("you are not the owner of this meeting");
     return null;

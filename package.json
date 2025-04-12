@@ -24,6 +24,7 @@
     "clsx": "^2.1.1",
     "convex": "^1.23.0",
     "date-fns": "^3.6.0",
+    "framer-motion": "^12.6.5",
     "lucide-react": "^0.487.0",
     "monaco-editor": "^0.52.2",
     "next": "15.2.4",

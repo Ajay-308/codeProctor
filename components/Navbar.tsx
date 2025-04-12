@@ -3,15 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Code, Menu, X, Bell, Settings, User } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { UserButton } from "@clerk/nextjs";
+import { Code, Menu, X, Bell, Settings } from "lucide-react";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -66,31 +59,16 @@ export default function Navbar() {
                 <Bell className="h-5 w-5" />
               </Button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-600 hover:text-black"
-                  >
-                    <User className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer">
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer">
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: {
+                      width: "2.7rem",
+                      height: "2.7rem",
+                    },
+                  },
+                }}
+              />
             </div>
 
             {/* Mobile Menu Button */}

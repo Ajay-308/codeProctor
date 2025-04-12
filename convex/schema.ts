@@ -15,11 +15,7 @@ export default defineSchema({
     description: v.optional(v.string()),
     startTime: v.number(),
     endTime: v.optional(v.number()), // kuch log dalte hai end time kuch log nhi dalte
-    status: v.union(
-      v.literal("scheduled"),
-      v.literal("completed"),
-      v.literal("cancelled")
-    ),
+    status: v.string(),
     streamCallId: v.string(),
     candidateId: v.string(),
     interviwersId: v.array(v.string()), // ek interview me multiple interviewers ho sakte hai

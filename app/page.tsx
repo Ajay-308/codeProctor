@@ -1,12 +1,23 @@
+"use client";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Code, Monitor, Play, Users, Video } from "lucide-react";
 import { SignInButton } from "@clerk/nextjs";
 import landingPage1 from "@/app/assest/LandingPage1.png";
+import { useAuth } from "@clerk/nextjs";
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { userId, isLoaded } = useAuth();
+  useEffect(() => {
+    if (userId) {
+      router.push("/home");
+    }
+  }, [isLoaded, userId, router]);
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

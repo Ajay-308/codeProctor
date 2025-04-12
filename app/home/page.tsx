@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import useUserRole from "@/hooks/useUserRole";
+import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import LoaderUI from "@/components/LoaderUI";
@@ -22,7 +23,14 @@ export default function HomePage() {
   const router = useRouter();
   const { isInterviewer, isLoading } = useUserRole();
   const interviews = useQuery(api.interviews.getInterview);
-
+  // Remove invalid runtime check for 'User' as it is a type
+  // if user is not authenticated go back to landing page
+  const { userId, isLoaded } = useAuth();
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      router.push("/");
+    }
+  }, [isLoaded, userId, router]);
   const [, setShowModal] = useState(false);
   const [, setModalType] = useState<"start" | "join">("start");
 
