@@ -59,7 +59,7 @@ export const createInterview = mutation({
 
     return await ctx.db.insert("interviews", {
       ...args,
-      interviwersId: args.interviewerIds,
+      interviewerIds: args.interviewerIds,
     });
   },
 });

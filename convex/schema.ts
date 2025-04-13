@@ -18,7 +18,7 @@ export default defineSchema({
     status: v.string(),
     streamCallId: v.string(),
     candidateId: v.string(),
-    interviwersId: v.array(v.string()), // ek interview me multiple interviewers ho sakte hai
+    interviewerIds: v.array(v.string()), // ✅ Corrected spelling
   })
     .index("by_candidate_id", ["candidateId"])
     .index("by_stream_id", ["streamCallId"]),
@@ -26,7 +26,7 @@ export default defineSchema({
   comments: defineTable({
     content: v.string(),
     rating: v.number(),
-    interviwerId: v.string(),
+    interviewerId: v.string(),
     interviewId: v.id("interviews"),
   }).index("by_interview_id", ["interviewId"]),
 });

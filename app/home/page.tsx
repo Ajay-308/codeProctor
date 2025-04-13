@@ -49,11 +49,22 @@ export default function HomePage() {
   if (isLoading) return <LoaderUI />;
 
   // Function to format date in a readable way
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string | null): string => {
+    if (!dateString) {
+      console.warn("Date string is missing or null.");
+      return "Date not available";
+    }
+
     const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+      console.warn("Invalid date:", dateString);
+      return "Invalid date";
+    }
+
     return new Intl.DateTimeFormat("en-US", {
-      weekday: "short",
-      month: "short",
+      weekday: "long", // You can use "short" if you prefer
+      month: "long", // Or "short" for abbreviated month names
       day: "numeric",
       hour: "numeric",
       minute: "numeric",

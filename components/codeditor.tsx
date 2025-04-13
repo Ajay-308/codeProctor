@@ -100,6 +100,8 @@ export default function CodeEditor() {
                       <SelectValue placeholder="select language">
                         <div className="flex items-center gap-2">
                           <Image
+                            height={20}
+                            width={20}
                             src={`/${selectedLanguage}.png`}
                             alt={selectedLanguage}
                             className="w-5 h-5 object-contain"
@@ -118,6 +120,8 @@ export default function CodeEditor() {
                         <SelectItem key={lang.id} value={lang.id}>
                           <div className="flex items-center gap-2">
                             <Image
+                              width={20}
+                              height={20}
                               src={`/${lang.id}.png`}
                               alt={lang.id}
                               className="w-5 h-5 object-contain"

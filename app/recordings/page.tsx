@@ -45,10 +45,18 @@ function RecordingsPage() {
 
   // Filter recordings based on search query
   const filteredRecordings = recordings.filter((recording) => {
-    // This is a placeholder - you'll need to adjust based on what properties are available in your recording object
-    return true; // Replace with actual filtering logic when you know what to search by
-  });
+    if (!searchQuery) return true;
 
+    const searchLower = searchQuery.toLowerCase();
+    const recordingName = (recording.filename || "").toLowerCase();
+    const recordingDate = new Date(recording.end_time)
+      .toLocaleDateString()
+      .toLowerCase();
+
+    return (
+      recordingName.includes(searchLower) || recordingDate.includes(searchLower)
+    );
+  });
   // Sort recordings based on selected order
   const sortedRecordings = [...filteredRecordings].sort((a, b) => {
     if (sortOrder === "newest") {

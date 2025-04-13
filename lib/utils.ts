@@ -26,21 +26,20 @@ type Interview = Doc<"interviews"> & {
 };
 type User = Doc<"users">;
 
-export const getCandiateInfo = (users: User[], interview: Interview) => {
-  const candidate = users.find(
-    (user) => user.clerkId === interview.candidateId
-  );
+export const getCandiateInfo = (users: User[], candidateId: string) => {
+  const candidate = users.find((user) => user.clerkId === candidateId);
   if (!candidate) return null;
   return {
-    name: candidate?.name,
-    image: candidate?.image,
-    initails:
-      candidate?.name
-        .split("")
-        .map((name) => name[0])
+    name: candidate.name,
+    image: candidate.image,
+    initials:
+      candidate.name
+        .split(" ")
+        .map((n) => n[0])
         .join("") || "Uc",
   };
 };
+
 export const getInterviewerInfo = (users: User[], interviewerId: string) => {
   const interviewer = users?.find((user) => user.clerkId === interviewerId);
   return {

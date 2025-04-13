@@ -92,54 +92,60 @@ function MeetingRoom() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="absolute bottom-4 left-0 right-0"
+            className="absolute bottom-4 -margin-2  left-0 right-0"
           >
-            <div className="flex flex-col items-center gap-4">
-              <div className="flex items-center gap-2 flex-wrap justify-center px-4">
-                <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-2 rounded-full border border-border/50 shadow-lg">
-                  <div className="flex items-center gap-2">
-                    <CallControls onLeave={() => router.push("/")} />
+            <div className="w-full max-w-md flex flex-col items-center  px-4">
+              {/* Top Controls Container */}
+              <div className="w-full flex flex-wrap items-center justify-center h-32 shadow-xl rounded-xl bg-slate-900/80 backdrop-blur-md">
+                <CallControls onLeave={() => router.push("/")} />
+                <div className="w-px h-4 bg-slate-700/50 " />
 
-                    <div className="flex items-center gap-2 ml-2 border-l border-border/50 pl-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="size-10 hover:bg-primary hover:text-primary-foreground transition-colors"
-                          >
-                            <LayoutListIcon className="size-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => setLayout("grid")}>
-                            Grid View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => setLayout("speaker")}
-                          >
-                            Speaker View
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                {/* Layout Toggle Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-lg hover:bg-slate-800/80 hover:text-blue-400 transition-all duration-200"
+                    >
+                      <LayoutListIcon className="size-4 " />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="center"
+                    className="bg-slate-900 border border-slate-800 shadow-md rounded-md"
+                  >
+                    <DropdownMenuItem
+                      onClick={() => setLayout("grid")}
+                      className="hover:bg-slate-800 rounded mt-8"
+                    >
+                      Grid View
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setLayout("speaker")}
+                      className="hover:bg-slate-800 rounded"
+                    >
+                      Speaker View
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className={`size-10 transition-colors ${
-                          showParticipants
-                            ? "bg-primary text-primary-foreground"
-                            : "hover:bg-primary hover:text-primary-foreground"
-                        }`}
-                        onClick={() => setShowParticipants(!showParticipants)}
-                      >
-                        <UsersIcon className="size-4" />
-                      </Button>
+                {/* Participants Toggle */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`rounded-lg transition-all duration-200 ${
+                    showParticipants
+                      ? "bg-blue-500/20 text-blue-400"
+                      : "hover:bg-slate-800/80 hover:text-blue-400"
+                  }`}
+                  onClick={() => setShowParticipants(!showParticipants)}
+                >
+                  <UsersIcon className="size-4" />
+                </Button>
 
-                      <EndCallButton />
-                    </div>
-                  </div>
-                </div>
+                {/* End Call Button */}
+                <EndCallButton />
               </div>
             </div>
           </motion.div>

@@ -40,7 +40,11 @@ export default function EndCallButton() {
     }
   };
   return (
-    <Button variant={"destructive"} className="w-full" onClick={handleEndCall}>
+    <Button
+      variant={"destructive"}
+      className="w-full -mt-[4rem]"
+      onClick={handleEndCall}
+    >
       End Call
     </Button>
   );

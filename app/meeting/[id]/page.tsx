@@ -12,12 +12,13 @@ import MeetingRoom from "@/components/MeetingRoom";
 export default function MeetingPage() {
   const { id } = useParams();
   const { isLoaded, user } = useUser();
-
   const { call, isCallLoading } = useGetCallById(id ?? "");
   const [isSetupComplete, setIsSetupComplete] = useState(false);
 
-  if (!isLoaded || !isCallLoading) return <LoaderUI />;
+  // ✅ Show loader while data is loading
+  if (!isLoaded || isCallLoading) return <LoaderUI />;
 
+  // 🛑 Handle missing call
   if (!call) {
     return (
       <div className="h-screen flex items-center justify-center bg-gradient-to-br from-background to-background/80">
@@ -28,6 +29,7 @@ export default function MeetingPage() {
     );
   }
 
+  // 🛑 Handle missing user
   if (!user) {
     return (
       <div className="h-screen flex items-center justify-center bg-gradient-to-br from-background to-background/80">
@@ -38,6 +40,7 @@ export default function MeetingPage() {
     );
   }
 
+  // ✅ Render the meeting room
   return (
     <StreamCall call={call}>
       <StreamTheme>

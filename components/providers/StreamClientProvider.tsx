@@ -1,7 +1,5 @@
 "use client";
 
-// isse phele koi join kare video call or start kare ye code ensure karega ki dono parties ke bich mai proper connection hue hai ki nhi
-
 import { useState, useEffect, ReactNode } from "react";
 import { StreamVideoClient, StreamVideo } from "@stream-io/video-react-sdk";
 import { streamProvider } from "@/actions/stream.actions";
@@ -18,11 +16,17 @@ export default function StreamClientProvider({
   const { user, isLoaded } = useUser();
 
   useEffect(() => {
-    if (!isLoaded || !user) {
-      throw new Error("User is not logged in stream client provider");
+    // Wait until auth state is loaded
+    if (!isLoaded) return;
+
+    // If no user is logged in, just return without initializing
+    // Don't throw an error here
+    if (!user) {
+      console.log("No user logged in, skipping Stream client initialization");
       return;
     }
 
+    // Initialize client only if user is logged in
     const initStreamVideoClient = new StreamVideoClient({
       apiKey: process.env.NEXT_PUBLIC_STREAM_API_KEY!,
       user: {
@@ -33,9 +37,24 @@ export default function StreamClientProvider({
       },
       tokenProvider: streamProvider,
     });
+
     setStreamVideoClient(initStreamVideoClient);
+
+    // Cleanup on unmount
+    return () => {
+      initStreamVideoClient.disconnectUser();
+    };
   }, [user, isLoaded]);
+
+  // If auth is still loading, show loader
+  if (!isLoaded) return <LoaderUI />;
+
+  // If no user is logged in, just render children without Stream wrapper
+  if (!user) return <>{children}</>;
+
+  // If user is logged in but client is still initializing, show loader
   if (!streamVideoClient) return <LoaderUI />;
 
+  // User is logged in and client is initialized
   return <StreamVideo client={streamVideoClient}>{children}</StreamVideo>;
 }
