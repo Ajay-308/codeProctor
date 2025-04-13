@@ -90,7 +90,7 @@ export const calculateRecodingDuration = (
 export const groupInterviews = (interview: Interview[]) => {
   if (!interview || interview.length === 0) return [];
 
-  return interview.reduce((acc: any, interview) => {
+  return interview.reduce((acc: { [key: string]: Interview[] }, interview) => {
     const date = new Date(interview.startTime).toLocaleDateString();
     const now = new Date();
 

@@ -41,7 +41,7 @@ function MeetingSetup({ onSetupComplete }: { onSetupComplete: () => void }) {
         setCameraEnabled(true);
       }
     }
-  }, [isCameraDisabled, call?.camera]);
+  }, [isCameraDisabled, call]);
 
   useEffect(() => {
     if (call) {
@@ -53,7 +53,7 @@ function MeetingSetup({ onSetupComplete }: { onSetupComplete: () => void }) {
         setMicrophoneEnabled(true);
       }
     }
-  }, [isMicDisabled, call?.microphone]);
+  }, [isMicDisabled, call]);
 
   if (!call) return null;
 
