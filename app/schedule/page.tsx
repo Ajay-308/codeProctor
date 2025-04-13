@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 
 import LoaderUI from "@/components/LoaderUI";
 import useUserRole from "@/hooks/useUserRole";
@@ -10,8 +11,13 @@ function SchedulePage() {
 
   const { isInterviewer, isLoading } = useUserRole();
 
+  useEffect(() => {
+    if (!isLoading && !isInterviewer) {
+      router.push("/");
+    }
+  }, [isLoading, isInterviewer, router]);
+
   if (isLoading) return <LoaderUI />;
-  if (!isInterviewer) return router.push("/");
 
   return <InterviewScheduleUI />;
 }

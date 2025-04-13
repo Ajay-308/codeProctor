@@ -104,7 +104,7 @@ function CommentBox({ interviewId, children }: CommentBoxProps) {
                   {existingComments.map((comment, index) => {
                     const interviewer = getInterviewerInfo(
                       users,
-                      comment.interviwerId
+                      comment.interviewerId // Corrected typo here
                     );
                     return (
                       <div

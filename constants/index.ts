@@ -20,6 +20,8 @@ export const interviewCategories = [
   { id: "failed", title: "Failed", variant: "destructive" },
 ] as const;
 
+export type InterviewCategoryId = (typeof interviewCategories)[number]["id"];
+
 export const timeSlots = [
   "09:00",
   "09:30",

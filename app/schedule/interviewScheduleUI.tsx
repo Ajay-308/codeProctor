@@ -716,7 +716,11 @@ function InterviewScheduleUI() {
               .length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {completedInterviews
-                  .filter((i: Interview) => filteredInterviews.includes(i))
+                  .filter((i: Interview) =>
+                    filteredInterviews.some(
+                      (interview) => interview._id === i._id
+                    )
+                  )
                   .map((interview: Interview) => (
                     <MeetingCard
                       key={interview._id}
@@ -733,14 +737,15 @@ function InterviewScheduleUI() {
               </div>
             )}
           </TabsContent>
-
           <TabsContent value="past" className="space-y-4">
             {pastInterviews.filter((i: Interview) =>
-              filteredInterviews.includes(i)
+              filteredInterviews.some((f) => f._id === i._id)
             ).length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {pastInterviews
-                  .filter((i: Interview) => filteredInterviews.includes(i))
+                  .filter((i: Interview) =>
+                    filteredInterviews.some((f) => f._id === i._id)
+                  )
                   .map((interview: Interview) => (
                     <MeetingCard
                       key={interview._id}

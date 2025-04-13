@@ -10,6 +10,7 @@ import LoaderUI from "@/components/LoaderUI";
 import Navbar from "@/components/Navbar";
 import { quickActions } from "@/constants";
 import { Calendar, Clock, Code, Users } from "lucide-react";
+import MeetingModel from "@/components/MeetingModel";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -31,8 +32,8 @@ export default function HomePage() {
       router.push("/");
     }
   }, [isLoaded, userId, router]);
-  const [, setShowModal] = useState(false);
-  const [, setModalType] = useState<"start" | "join">("start");
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<"start" | "join">("start");
 
   const handleQuickActionClick = (title: string) => {
     if (title === "New Call") {
@@ -129,6 +130,17 @@ export default function HomePage() {
                 </Card>
               ))}
             </div>
+            <MeetingModel
+              isOpen={showModal}
+              onClose={() => setShowModal(false)}
+              title={modalType === "join" ? "Join Meeting" : "Start Meeting"}
+              isJoinMeeting={modalType === "join"}
+              onSubmit={() => {
+                // Add your submit logic here
+                console.log("Meeting submitted");
+              }}
+              isLoading={false} // Set to true if loading state is required
+            />
           </div>
         ) : (
           <div className="space-y-6">

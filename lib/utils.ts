@@ -87,22 +87,54 @@ export const calculateRecodingDuration = (
   return `${duration.seconds} seconds`;
 };
 
-export const groupInterviews = (interview: Interview[]) => {
-  if (!interview || interview.length === 0) return [];
+export const groupInterviews = (
+  interviews: Interview[]
+): Record<"upcoming" | "completed" | "succeeded" | "failed", Interview[]> => {
+  const grouped: Record<
+    "upcoming" | "completed" | "succeeded" | "failed",
+    Interview[]
+  > = {
+    upcoming: [],
+    completed: [],
+    succeeded: [],
+    failed: [],
+  };
 
-  return interview.reduce((acc: { [key: string]: Interview[] }, interview) => {
-    const date = new Date(interview.startTime).toLocaleDateString();
-    const now = new Date();
+  const now = new Date();
+
+  for (const interview of interviews) {
+    const startTime = new Date(interview.startTime);
 
     if (interview.status === "succeeded") {
-      acc.Succeeded = [...(acc.succeeded || []), interview];
+      grouped.succeeded.push(interview);
     } else if (interview.status === "failed") {
-      acc.failed = [...(acc.failed || []), interview];
-    } else if (isBefore(date, now)) {
-      acc.completed = [...(acc.completed || []), interview];
-    } else if (isAfter(date, now)) {
-      acc.upcoming = [...(acc.upcoming || []), interview];
+      grouped.failed.push(interview);
+    } else if (isAfter(startTime, now)) {
+      grouped.upcoming.push(interview);
+    } else {
+      grouped.completed.push(interview);
     }
-    return acc;
-  }, {});
+  }
+
+  return grouped;
 };
+
+// export const groupInterviews = (interview: Interview[]) => {
+//   if (!interview || interview.length === 0) return [];
+
+//   return interview.reduce((acc:any, interview) => {
+//     const date = new Date(interview.startTime).toLocaleDateString();
+//     const now = new Date();
+
+//     if (interview.status === "succeeded") {
+//       acc.Succeeded = [...(acc.succeeded || []), interview];
+//     } else if (interview.status === "failed") {
+//       acc.failed = [...(acc.failed || []), interview];
+//     } else if (isBefore(date, now)) {
+//       acc.completed = [...(acc.completed || []), interview];
+//     } else if (isAfter(date, now)) {
+//       acc.upcoming = [...(acc.upcoming || []), interview];
+//     }
+//     return acc;
+//   }, {});
+// };
