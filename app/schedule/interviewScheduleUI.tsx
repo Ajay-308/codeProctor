@@ -218,7 +218,7 @@ function InterviewScheduleUI() {
           description,
           startTime: meetingDate.getTime(),
           status: "upcoming",
-          streamCallId: id,
+          streamCallId: `default:${id}`,
           candidateId,
           interviewerIds,
         });

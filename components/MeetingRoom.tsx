@@ -117,13 +117,13 @@ function MeetingRoom() {
                   >
                     <DropdownMenuItem
                       onClick={() => setLayout("grid")}
-                      className="hover:bg-slate-800 rounded mt-8"
+                      className="hover:bg-slate-800 rounded mt-8 text-white"
                     >
                       Grid View
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => setLayout("speaker")}
-                      className="hover:bg-slate-800 rounded"
+                      className="hover:bg-slate-800 rounded text-white"
                     >
                       Speaker View
                     </DropdownMenuItem>

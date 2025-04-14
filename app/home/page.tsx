@@ -1,17 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import useUserRole from "@/hooks/useUserRole";
 import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import LoaderUI from "@/components/LoaderUI";
-import Navbar from "@/components/Navbar";
-import { quickActions } from "@/constants";
-import { Calendar, Clock, Code, Users } from "lucide-react";
-import MeetingModel from "@/components/MeetingModel";
-import { Badge } from "@/components/ui/badge";
+import useUserRole from "@/hooks/useUserRole";
 import {
   Card,
   CardContent,
@@ -19,21 +12,34 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import LoaderUI from "@/components/LoaderUI";
+import Navbar from "@/components/Navbar";
+import MeetingModel from "@/components/MeetingModel";
+import MeetingCard from "@/components/MeetingCard";
+
+import { quickActions } from "@/constants";
+import {
+  Calendar,
+  Clock,
+  Code,
+  Users,
+  Loader2 as Loader2Icon,
+} from "lucide-react";
 
 export default function HomePage() {
   const router = useRouter();
   const { isInterviewer, isLoading } = useUserRole();
   const interviews = useQuery(api.interviews.getInterview);
-  // Remove invalid runtime check for 'User' as it is a type
-  // if user is not authenticated go back to landing page
   const { userId, isLoaded } = useAuth();
+
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<"start" | "join">("start");
+
   useEffect(() => {
     if (isLoaded && !userId) {
       router.push("/");
     }
   }, [isLoaded, userId, router]);
-  const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState<"start" | "join">("start");
 
   const handleQuickActionClick = (title: string) => {
     if (title === "New Call") {
@@ -45,32 +51,6 @@ export default function HomePage() {
     } else {
       router.push(`/${title.toLowerCase()}`);
     }
-  };
-
-  if (isLoading) return <LoaderUI />;
-
-  // Function to format date in a readable way
-  const formatDate = (dateString?: string | null): string => {
-    if (!dateString) {
-      console.warn("Date string is missing or null.");
-      return "Date not available";
-    }
-
-    const date = new Date(dateString);
-
-    if (isNaN(date.getTime())) {
-      console.warn("Invalid date:", dateString);
-      return "Invalid date";
-    }
-
-    return new Intl.DateTimeFormat("en-US", {
-      weekday: "long", // You can use "short" if you prefer
-      month: "long", // Or "short" for abbreviated month names
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    }).format(date);
   };
 
   const getActionIcon = (title: string) => {
@@ -87,6 +67,8 @@ export default function HomePage() {
         return null;
     }
   };
+
+  if (isLoading) return <LoaderUI />;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -136,106 +118,38 @@ export default function HomePage() {
               title={modalType === "join" ? "Join Meeting" : "Start Meeting"}
               isJoinMeeting={modalType === "join"}
               onSubmit={() => {
-                // Add your submit logic here
                 console.log("Meeting submitted");
               }}
-              isLoading={false} // Set to true if loading state is required
+              isLoading={false}
             />
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-800">
-                Your Upcoming Interviews
-              </h2>
-              <Button
-                variant="outline"
-                onClick={() => router.push("/schedule")}
-                className="text-gray-600"
-              >
-                View All
-              </Button>
+          <>
+            <div>
+              <h1 className="text-3xl font-bold">Your Interviews</h1>
+              <p className="text-muted-foreground mt-1">
+                View and join your scheduled interviews
+              </p>
             </div>
 
-            {interviews === undefined ? (
-              <div className="flex justify-center items-center py-12">
-                <LoaderUI />
-              </div>
-            ) : interviews.length === 0 ? (
-              <Card className="bg-gray-50 border border-dashed border-gray-300">
-                <CardContent className="flex flex-col items-center justify-center p-12 text-center">
-                  <Calendar className="h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-700 mb-2">
-                    No Upcoming Interviews
-                  </h3>
-                  <p className="text-gray-500 max-w-md">
-                    You don&apos;t have any interviews scheduled at the moment.
-                    Check back later or contact your recruiter.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {interviews.map((interview) => (
-                  <Card
-                    key={interview._id}
-                    className="overflow-hidden border-none shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <CardHeader className="pb-2 bg-white">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle className="text-lg font-bold">
-                            {interview.title}
-                          </CardTitle>
-                          <CardDescription className="text-sm text-gray-600 mt-1">
-                            {interview.description}
-                          </CardDescription>
-                        </div>
-                        <Badge
-                          variant="outline"
-                          className="bg-blue-50 text-blue-700 border-blue-200"
-                        >
-                          Upcoming
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-4">
-                      <div className="flex items-center text-sm text-gray-600 mb-2">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        <span>
-                          {formatDate(interview.startTime.toString())}
-                        </span>
-                      </div>
-                      {interview.endTime && (
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Clock className="h-4 w-4 mr-2" />
-                          <span>
-                            Duration:{" "}
-                            {Math.round(
-                              (new Date(interview.endTime).getTime() -
-                                new Date(interview.startTime).getTime()) /
-                                (1000 * 60)
-                            )}{" "}
-                            minutes
-                          </span>
-                        </div>
-                      )}
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <Button
-                          className="w-full"
-                          onClick={() =>
-                            router.push(`/interview/${interview._id}`)
-                          }
-                        >
-                          Join Interview
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
+            <div className="mt-8">
+              {interviews === undefined ? (
+                <div className="flex justify-center py-12">
+                  <Loader2Icon className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : interviews.length > 0 ? (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {interviews.map((interview) => (
+                    <MeetingCard key={interview._id} interview={interview} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  You have no scheduled interviews at the moment
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>

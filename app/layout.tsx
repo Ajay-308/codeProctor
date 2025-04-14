@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ConvexClerkProvider from "@/components/providers/ConvexClerkProvider";
 import StreamClientProvider from "@/components/providers/StreamClientProvider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,10 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <StreamClientProvider>{children}</StreamClientProvider>
+          <StreamClientProvider>
+            {children}
+            <Toaster position="top-center" reverseOrder={false} />
+          </StreamClientProvider>
         </body>
       </html>
     </ConvexClerkProvider>
