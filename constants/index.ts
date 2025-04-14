@@ -1,4 +1,11 @@
 import { Clock, Code2, Calendar, Users } from "lucide-react";
+import cpp from "@/app/assest/cpp.png";
+import cshapr from "@/app/assest/cshapr.png";
+import go from "@/app/assest/go.png";
+import java from "@/app/assest/java.png";
+import rust from "@/app/assest/rust.png";
+import javascript from "@/app/assest/Javascript.png";
+import python from "@/app/assest/python.png";
 
 export interface CodeQuestion {
   id: string;
@@ -77,13 +84,13 @@ export const quickActions = [
 export type QuickActionType = (typeof quickActions)[number];
 
 export const languages = [
-  { id: "javascript", name: "JavaScript", icon: "/javascript.png" },
-  { id: "python", name: "Python", icon: "/python.png" },
-  { id: "java", name: "Java", icon: "/java.png" },
-  { id: "cpp", name: "C++", icon: "/cpp.png" },
-  { id: "csharp", name: "C#", icon: "/csharp.png" },
-  { id: "go", name: "Go", icon: "/go.png" },
-  { id: "rust", name: "Rust", icon: "/rust.png" },
+  { id: "javascript", name: "JavaScript", icon: javascript },
+  { id: "python", name: "Python", icon: python },
+  { id: "java", name: "Java", icon: java },
+  { id: "cpp", name: "C++", icon: cpp },
+  { id: "csharp", name: "C#", icon: cshapr },
+  { id: "go", name: "Go", icon: go },
+  { id: "rust", name: "Rust", icon: rust },
 ] as const;
 
 export const codingQuestions: CodeQuestion[] = [

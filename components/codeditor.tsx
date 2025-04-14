@@ -1,14 +1,11 @@
-"use client";
-
+import { codingQuestions, languages } from "@/constants";
 import { useState } from "react";
-import Editor from "@monaco-editor/react";
-import { languages, codingQuestions } from "@/constants";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "./ui/resizable";
-import { ScrollArea } from "./ui/scroll-area";
+import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -18,103 +15,102 @@ import {
 } from "./ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { AlertCircleIcon, BookIcon, LightbulbIcon } from "lucide-react";
+import Editor from "@monaco-editor/react";
 import Image from "next/image";
+import cpp from "@/app/assest/cpp.png";
+import csharp from "@/app/assest/cshapr.png";
+import go from "@/app/assest/go.png";
+import java from "@/app/assest/java.png";
+import rust from "@/app/assest/rust.png";
+import javascript from "@/app/assest/Javascript.png";
+import python from "@/app/assest/python.png";
 
-export default function CodeEditor() {
+const languageImages = {
+  cpp,
+  python,
+  javascript,
+  java,
+  csharp,
+  go,
+  rust,
+};
+
+function CodeEditor() {
   const [selectedQuestion, setSelectedQuestion] = useState(codingQuestions[0]);
-  const [selectedLanguage, setSelectedLanguage] = useState<
-    "javascript" | "python" | "java" | "cpp" | "csharp" | "go" | "rust"
-  >(languages[0].id);
-  const [code, setCode] = useState(
-    selectedQuestion.starterCode[selectedLanguage]
+  const [language, setLanguage] = useState<"javascript" | "python" | "java">(
+    languages[0].id
   );
-  const handleQuestion = (questionId: string) => {
+  const [code, setCode] = useState(selectedQuestion.starterCode[language]);
+
+  const handleQuestionChange = (questionId: string) => {
     const question = codingQuestions.find((q) => q.id === questionId)!;
-    if (question) {
-      setSelectedQuestion(question);
-      setCode(question.starterCode[selectedLanguage]);
-    }
+    setSelectedQuestion(question);
+    setCode(question.starterCode[language]);
   };
+
   const handleLanguageChange = (
-    newLanguage:
-      | "javascript"
-      | "python"
-      | "java"
-      | "cpp"
-      | "csharp"
-      | "go"
-      | "rust"
+    newLanguage: "javascript" | "python" | "java"
   ) => {
-    setSelectedLanguage(newLanguage);
+    setLanguage(newLanguage);
     setCode(selectedQuestion.starterCode[newLanguage]);
   };
+
   return (
     <ResizablePanelGroup
       direction="vertical"
       className="min-h-[calc-100vh-4rem-1px]"
     >
+      {/* QUESTION SECTION */}
       <ResizablePanel>
         <ScrollArea className="h-full">
           <div className="p-6">
-            <div className="mx-w-4xl mx-auto space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="space-y-2">
+            <div className="max-w-4xl mx-auto space-y-6">
+              {/* HEADER */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h1 className="text-2xl font-bold">
+                    <h2 className="text-2xl font-semibold tracking-tight">
                       {selectedQuestion.title}
-                    </h1>
+                    </h2>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    choose a question and language to start coding
+                    Choose your language and solve the problem
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Select
                     value={selectedQuestion.id}
-                    onValueChange={handleQuestion}
+                    onValueChange={handleQuestionChange}
                   >
-                    <SelectTrigger className="w-[180px">
-                      <SelectValue placeholder="select question" />
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select question" />
                     </SelectTrigger>
                     <SelectContent>
-                      {codingQuestions.map((question) => (
-                        <SelectItem key={question.id} value={question.id}>
-                          <Card className="w-full">
-                            <CardHeader>
-                              <CardTitle className="flex items-center gap-2">
-                                <BookIcon className="w-4 h-4" />
-                                {question.title}
-                              </CardTitle>
-                            </CardHeader>
-                          </Card>
+                      {codingQuestions.map((q) => (
+                        <SelectItem key={q.id} value={q.id}>
+                          {q.title}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
 
-                  <Select
-                    value={selectedLanguage}
-                    onValueChange={handleLanguageChange}
-                  >
-                    <SelectTrigger className="w-[180px">
-                      <SelectValue placeholder="select language">
+                  <Select value={language} onValueChange={handleLanguageChange}>
+                    <SelectTrigger className="w-[150px]">
+                      {/* SELECT VALUE */}
+                      <SelectValue>
                         <div className="flex items-center gap-2">
                           <Image
-                            height={20}
+                            src={languageImages[language]}
+                            alt={language}
                             width={20}
-                            src={`/${selectedLanguage}.png`}
-                            alt={selectedLanguage}
-                            className="w-5 h-5 object-contain"
+                            height={20}
+                            className="object-contain"
                           />
-                          {
-                            languages.find(
-                              (lang) => lang.id === selectedLanguage
-                            )?.name
-                          }
+                          {languages.find((l) => l.id === language)?.name}
                         </div>
                       </SelectValue>
                     </SelectTrigger>
-
+                    {/* SELECT CONTENT */}
                     <SelectContent>
                       {languages.map((lang) => (
                         <SelectItem key={lang.id} value={lang.id}>
@@ -123,7 +119,7 @@ export default function CodeEditor() {
                               width={20}
                               height={20}
                               src={`/${lang.id}.png`}
-                              alt={lang.id}
+                              alt={lang.name}
                               className="w-5 h-5 object-contain"
                             />
                             {lang.name}
@@ -134,12 +130,12 @@ export default function CodeEditor() {
                   </Select>
                 </div>
               </div>
-              <Card className="w-full">
+
+              {/* PROBLEM DESC. */}
+              <Card>
                 <CardHeader className="flex flex-row items-center gap-2">
-                  <BookIcon className="w-4 h-4" />
-                  <CardTitle className="h-5 w-5 text-primary/80">
-                    problem Description
-                  </CardTitle>
+                  <BookIcon className="h-5 w-5 text-primary/80" />
+                  <CardTitle>Problem Description</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm leading-relaxed">
                   <div className="prose prose-sm dark:prose-invert max-w-none">
@@ -150,54 +146,51 @@ export default function CodeEditor() {
                 </CardContent>
               </Card>
 
-              {/*coding problem */}
+              {/* PROBLEM EXAMPLES */}
               <Card>
                 <CardHeader className="flex flex-row items-center gap-2">
-                  <LightbulbIcon className="w-4 h-4 text-yellow-50/80" />
+                  <LightbulbIcon className="h-5 w-5 text-yellow-500" />
                   <CardTitle>Examples</CardTitle>
                 </CardHeader>
-                <CardContent className="h-full w-full rounded-md border">
+                <CardContent>
                   <ScrollArea className="h-full w-full rounded-md border">
-                    <div className="flex flex-col gap-2 p-4">
+                    <div className="p-4 space-y-4">
                       {selectedQuestion.examples.map((example, index) => (
-                        <div key={index} className="flex flex-col gap-2">
+                        <div key={index} className="space-y-2">
                           <p className="font-medium text-sm">
-                            Example{index + 1}:
+                            Example {index + 1}:
                           </p>
                           <ScrollArea className="h-full w-full rounded-md">
-                            <pre className="bg-gray-100 p-2 rounded-md">
-                              <div>Input:{example.input}</div>
-                              <div>output:{example.output}</div>
+                            <pre className="bg-muted/50 p-3 rounded-lg text-sm font-mono">
+                              <div>Input: {example.input}</div>
+                              <div>Output: {example.output}</div>
                               {example.explanation && (
                                 <div className="pt-2 text-muted-foreground">
-                                  <span className="font-medium">
-                                    Explaination:{example.explanation}
-                                  </span>
+                                  Explanation: {example.explanation}
                                 </div>
                               )}
                             </pre>
+                            <ScrollBar orientation="horizontal" />
                           </ScrollArea>
                         </div>
                       ))}
                     </div>
+                    <ScrollBar />
                   </ScrollArea>
                 </CardContent>
               </Card>
 
-              {/*constraints*/}
+              {/* CONSTRAINTS */}
               {selectedQuestion.constraints && (
                 <Card>
                   <CardHeader className="flex flex-row items-center gap-2">
-                    <AlertCircleIcon className="w-4 h-4 text-red-50/80" />
+                    <AlertCircleIcon className="h-5 w-5 text-blue-500" />
                     <CardTitle>Constraints</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ul className="list-disc list-inside">
+                    <ul className="list-disc list-inside space-y-1.5 text-sm marker:text-muted-foreground">
                       {selectedQuestion.constraints.map((constraint, index) => (
-                        <li
-                          key={index}
-                          className="text-sm text-muted-foreground"
-                        >
+                        <li key={index} className="text-muted-foreground">
                           {constraint}
                         </li>
                       ))}
@@ -207,19 +200,22 @@ export default function CodeEditor() {
               )}
             </div>
           </div>
+          <ScrollBar />
         </ScrollArea>
       </ResizablePanel>
+
       <ResizableHandle withHandle />
-      {/*editor*/}
-      <ResizablePanel className="border-l">
-        <div className="h-full w-full">
+
+      {/* CODE EDITOR */}
+      <ResizablePanel defaultSize={60} maxSize={100}>
+        <div className="h-full relative">
           <Editor
             height={"100%"}
-            defaultLanguage={languages as unknown as string} // Assuming languages is a string array
-            language={languages as unknown as string} // Assuming languages is a string array
+            defaultLanguage={language}
+            language={language}
             theme="vs-dark"
             value={code}
-            onChange={(value: string | undefined) => setCode(value || "")}
+            onChange={(value) => setCode(value || "")}
             options={{
               minimap: { enabled: false },
               fontSize: 18,
@@ -236,3 +232,4 @@ export default function CodeEditor() {
     </ResizablePanelGroup>
   );
 }
+export default CodeEditor;
