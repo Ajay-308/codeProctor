@@ -16,7 +16,7 @@ import LoaderUI from "@/components/LoaderUI";
 import Navbar from "@/components/Navbar";
 import MeetingModel from "@/components/MeetingModel";
 import MeetingCard from "@/components/MeetingCard";
-
+import { useMeetingActions } from "@/hooks/useMeetingActions";
 import { quickActions } from "@/constants";
 import {
   Calendar,
@@ -34,6 +34,7 @@ export default function HomePage() {
 
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<"start" | "join">("start");
+  const { createInstantMeeting } = useMeetingActions();
 
   useEffect(() => {
     if (isLoaded && !userId) {
@@ -43,8 +44,7 @@ export default function HomePage() {
 
   const handleQuickActionClick = (title: string) => {
     if (title === "New Call") {
-      setModalType("start");
-      setShowModal(true);
+      createInstantMeeting();
     } else if (title === "Join Interview") {
       setModalType("join");
       setShowModal(true);
