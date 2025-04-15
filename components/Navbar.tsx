@@ -23,16 +23,16 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <Link
+              href="/home"
+              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+            >
+              Home
+            </Link>
+            <Link
               href="/dashboard"
               className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
             >
               Dashboard
-            </Link>
-            <Link
-              href="/interviews"
-              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
-            >
-              Interviews
             </Link>
             <Link
               href="/candidates"

@@ -433,7 +433,7 @@ function InterviewScheduleUI() {
                           >
                             <UserInfo user={interviewer} />
                             {interviewer.clerkId !== user?.id && (
-                              <button
+                              <Button
                                 onClick={() =>
                                   removeInterviewer(interviewer.clerkId)
                                 }
@@ -441,7 +441,7 @@ function InterviewScheduleUI() {
                                 aria-label="Remove interviewer"
                               >
                                 <XIcon className="h-4 w-4" />
-                              </button>
+                              </Button>
                             )}
                           </div>
                         ))}

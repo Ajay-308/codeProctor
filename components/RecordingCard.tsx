@@ -98,7 +98,7 @@ function RecordingCard({ recording }: { recording: CallRecording }) {
           className="w-full group/btn relative overflow-hidden"
           onClick={() => window.open(recording.url, "_blank")}
         >
-          <span className="relative z-10 flex items-center justify-center gap-2">
+          <span className="relative z-10 flex items-center cursor-pointer justify-center gap-2">
             <PlayIcon className="size-4" />
             Play Recording
           </span>

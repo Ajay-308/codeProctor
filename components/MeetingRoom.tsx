@@ -44,6 +44,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./tooltip";
+import toast from "react-hot-toast";
 
 function MeetingRoom() {
   const router = useRouter();
@@ -57,6 +58,7 @@ function MeetingRoom() {
   const [isCameraOff, setIsCameraOff] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
   const call = useCall();
 
@@ -71,6 +73,66 @@ function MeetingRoom() {
     }
     setIsMicMuted(!isMicMuted);
   };
+  const toggleRecording = async () => {
+    if (!call) {
+      toast.error("Call not initialized");
+      return;
+    }
+
+    try {
+      if (isRecording) {
+        await call.stopRecording();
+        toast.success("Recording stopped");
+        setIsRecording(false);
+      } else {
+        await call.startRecording();
+        toast.success("Recording started");
+        setIsRecording(true);
+      }
+    } catch (err: unknown) {
+      console.error("Recording error:", err);
+      if (
+        err instanceof Error &&
+        (err.message?.includes("already being recorded") ||
+          (err as { error?: { message?: string } })?.error?.message?.includes(
+            "already being recorded"
+          ))
+      ) {
+        toast.custom("Call is already being recorded");
+        setIsRecording(true);
+      } else {
+        if (err instanceof Error) {
+          toast.error(err.message || "Failed to toggle recording");
+        } else {
+          toast.error("Failed to toggle recording");
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const syncRecordingState = async () => {
+      if (call) {
+        try {
+          const recordings = await call.queryRecordings();
+          console.log("Recordings data structure:", recordings); // Log to inspect structure
+
+          // Check if there are any active recordings based on the actual structure
+          // This will need to be updated based on what you see in the console log
+          const isActiveRecording =
+            recordings &&
+            recordings.recordings &&
+            recordings.recordings.length > 0;
+
+          setIsRecording(isActiveRecording);
+        } catch (error) {
+          console.error("Error fetching recording state:", error);
+        }
+      }
+    };
+
+    syncRecordingState();
+  }, [call]);
 
   // Handle camera toggle
   const toggleCamera = () => {
@@ -336,9 +398,12 @@ function MeetingRoom() {
                       variant="ghost"
                       size="icon"
                       className="rounded-full w-12 h-12 hover:bg-slate-800"
+                      onClick={toggleRecording}
                     >
                       <div className="relative">
-                        <div className="h-3 w-3 rounded-full absolute -top-1 -right-1 bg-red-500 animate-pulse" />
+                        {isRecording && (
+                          <div className="h-3 w-3 rounded-full absolute -top-1 -right-1 bg-red-500 animate-pulse" />
+                        )}
                         <Video className="h-5 w-5" />
                       </div>
                     </Button>
