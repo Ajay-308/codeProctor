@@ -28,4 +28,49 @@ export default defineSchema({
     interviewerId: v.string(),
     interviewId: v.id("interviews"),
   }).index("by_interview_id", ["interviewId"]),
+
+  assignments: defineTable({
+    title: v.string(),
+    description: v.optional(v.string()),
+    dueDate: v.number(),
+    createdBy: v.string(),
+    passingScore: v.number(),
+    type: v.optional(v.string()), // ✅ Make this optional
+    timeLimit: v.optional(v.float64()), // ✅ Already optional, just double-check
+    status: v.optional(v.string()),
+    questions: v.array(
+      v.object({
+        id: v.number(),
+        question: v.string(),
+        options: v.array(v.string()),
+        correctAnswer: v.string(),
+      })
+    ),
+  }),
+
+  questions: defineTable({
+    questionText: v.string(),
+    type: v.union(v.literal("multiple-choice"), v.literal("open-ended")),
+    options: v.optional(v.array(v.string())),
+    correctAnswer: v.string(),
+    assignmentId: v.id("assignments"),
+  }).index("by_assignment_id", ["assignmentId"]),
+
+  assignmentSubmissions: defineTable({
+    assignmentId: v.id("assignments"),
+    candidateId: v.id("users"),
+    candidateName: v.optional(v.string()),
+    submittedAt: v.number(), // timestamp
+    completionTime: v.optional(v.number()), // minutes taken
+    score: v.number(),
+    answers: v.array(
+      v.object({
+        questionId: v.number(),
+        selectedAnswer: v.string(),
+        isCorrect: v.boolean(),
+      })
+    ),
+  })
+    .index("by_assignment_id", ["assignmentId"])
+    .index("by_candidate_id", ["candidateId"]),
 });
