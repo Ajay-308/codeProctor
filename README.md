@@ -3,11 +3,17 @@ landing page
 ![image](https://github.com/user-attachments/assets/9ee2e82c-9103-4568-8604-e3aec2a4bd51)
 ![image](https://github.com/user-attachments/assets/8ad7283b-3966-480e-9683-06f91c7e067b)
 
-![image](https://github.com/user-attachments/assets/055c118d-b78e-4113-bfce-7a1ad8f6d04c)
-![image](https://github.com/user-attachments/assets/277722ee-a934-4faa-97b6-6eef28cfc905)
-![image](https://github.com/user-attachments/assets/02730a7d-d840-4cef-8155-54316b4122fb)
-![image](https://github.com/user-attachments/assets/b595e068-9763-4039-bc48-f35ed1b37b79)
-![image](https://github.com/user-attachments/assets/50d5aa56-eafb-43de-9658-3f283d262ea9)
+![image](https://github.com/user-attachments/assets/c08edd33-6e69-4c5c-9233-46ea5539a1c1)
+![image](https://github.com/user-attachments/assets/839b3856-29b0-4e29-bcac-b74743428a91)
+![image](https://github.com/user-attachments/assets/1053a0b2-5975-4f4f-b7f7-84f869ccd7fa)
+![image](https://github.com/user-attachments/assets/87c0f2e9-98f7-447a-8253-868bba03824c)
+![image](https://github.com/user-attachments/assets/6815c087-d24f-418f-9457-6bf62ac15af6)
+![image](https://github.com/user-attachments/assets/ef000054-15a9-417f-bfbe-fa65c6f7fba7)
+![image](https://github.com/user-attachments/assets/d38fa400-9057-42a2-84a2-3f766a86e223)
+![image](https://github.com/user-attachments/assets/6ea55455-797b-4377-b74d-e2a36e0db989)
+
+
+
 
 
 
