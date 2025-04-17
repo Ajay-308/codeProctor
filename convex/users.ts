@@ -11,16 +11,14 @@ export const syncUser = mutation({
   handler: async (ctx, args) => {
     const existingUser = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("clerkId"), args.clerkId))
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
       .first();
+
     if (existingUser) {
-      console.log("user already exist");
-      return;
+      return { exists: true, hasRole: !!existingUser.role };
     }
-    return await ctx.db.insert("users", {
-      ...args,
-      role: "candidate",
-    });
+
+    return { exists: false, hasRole: false };
   },
 });
 
@@ -41,5 +39,25 @@ export const getUserByClerkId = query({
       .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
       .first();
     return user;
+  },
+});
+
+export const createUserWithRole = mutation({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    image: v.string(),
+    clerkId: v.string(),
+    role: v.union(v.literal("candidate"), v.literal("interviewer")),
+  },
+  handler: async (ctx, args) => {
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+
+    if (existingUser) throw new Error("User already exists");
+
+    return await ctx.db.insert("users", args);
   },
 });

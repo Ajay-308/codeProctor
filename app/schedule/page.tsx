@@ -5,6 +5,7 @@ import LoaderUI from "@/components/LoaderUI";
 import useUserRole from "@/hooks/useUserRole";
 import { useRouter } from "next/navigation";
 import InterviewScheduleUI from "./interviewScheduleUI";
+import Navbar from "@/components/Navbar";
 
 function SchedulePage() {
   const router = useRouter();
@@ -19,6 +20,11 @@ function SchedulePage() {
 
   if (isLoading) return <LoaderUI />;
 
-  return <InterviewScheduleUI />;
+  return (
+    <>
+      <Navbar />
+      <InterviewScheduleUI />;
+    </>
+  );
 }
 export default SchedulePage;

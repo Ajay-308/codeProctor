@@ -7,17 +7,43 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Code, Monitor, Play, Users, Video } from "lucide-react";
 import { SignInButton } from "@clerk/nextjs";
-import landingPage1 from "@/app/assest/LandingPage1.png";
+import { api } from "@/convex/_generated/api";
+import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
+import homePhoto from "@/app/assest/home.png";
 
 export default function LandingPage() {
   const router = useRouter();
   const { userId, isLoaded } = useAuth();
+  const { user } = useUser();
+  const syncUser = useMutation(api.users.syncUser);
+
   useEffect(() => {
-    if (userId) {
-      router.push("/home");
+    if (!isLoaded || !userId || !user) return;
+    if (isLoaded && userId) {
+      // Check if the user exists and has a role or not
+      const checkUser = async () => {
+        const res = await syncUser({
+          name: user.fullName!,
+          email: user.emailAddresses[0].emailAddress,
+          image: user.imageUrl,
+          clerkId: user.id,
+        });
+
+        if (!res.exists) {
+          router.push("/selectRole"); // Redirect to role selection if user doesn't exist
+        } else if (!res.hasRole) {
+          router.push("/selectRole"); // Redirect to role selection if user doesn't have a role
+        } else {
+          router.push("/home"); // Redirect to home if user exists and has a role
+        }
+      };
+
+      checkUser();
     }
-  }, [isLoaded, userId, router]);
+  }, [isLoaded, userId, user, syncUser, router]);
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -79,11 +105,11 @@ export default function LandingPage() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Link href="/signup">
-                    <Button size="lg" className="px-8">
+                  <SignInButton mode="modal">
+                    <Button size="lg" className="px-8 cursor-pointer">
                       Get Started Free
                     </Button>
-                  </Link>
+                  </SignInButton>
                   <Link href="#demo">
                     <Button size="lg" variant="outline" className="px-8">
                       <Play className="mr-2 h-4 w-4" />
@@ -112,7 +138,7 @@ export default function LandingPage() {
                     <div className="h-3 w-3 rounded-full bg-green-500"></div>
                   </div>
                   <Image
-                    src={landingPage1}
+                    src={homePhoto}
                     width={800}
                     height={600}
                     alt="CodeProctor platform screenshot showing split-screen with video and code editor"
@@ -300,11 +326,11 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <div>
-                  <Link href="/signup">
-                    <Button size="lg" className="mt-4">
+                  <SignInButton mode="modal">
+                    <Button size="lg" className="mt-4 cursor-pointer">
                       Try It Free
                     </Button>
-                  </Link>
+                  </SignInButton>
                 </div>
               </div>
               <div className="relative flex items-center justify-center rounded-lg border bg-background p-2 shadow-xl">
@@ -531,7 +557,7 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Link href="/signup">
+                <Link href="/signin">
                   <Button
                     size="lg"
                     className="bg-white text-primary hover:bg-white/90"

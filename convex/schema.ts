@@ -6,7 +6,7 @@ export default defineSchema({
     name: v.string(),
     email: v.string(),
     image: v.optional(v.string()),
-    role: v.union(v.literal("candidate"), v.literal("interviewer")),
+    role: v.optional(v.union(v.literal("candidate"), v.literal("interviewer"))),
     clerkId: v.string(),
   }).index("by_clerk_id", ["clerkId"]),
 
@@ -60,8 +60,8 @@ export default defineSchema({
     assignmentId: v.id("assignments"),
     candidateId: v.id("users"),
     candidateName: v.optional(v.string()),
-    submittedAt: v.number(), // timestamp
-    completionTime: v.optional(v.number()), // minutes taken
+    submittedAt: v.number(),
+    completionTime: v.optional(v.number()),
     score: v.number(),
     answers: v.array(
       v.object({
