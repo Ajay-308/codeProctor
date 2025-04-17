@@ -5,7 +5,7 @@ landing page
 
 ![image](https://github.com/user-attachments/assets/c08edd33-6e69-4c5c-9233-46ea5539a1c1)
 ![image](https://github.com/user-attachments/assets/839b3856-29b0-4e29-bcac-b74743428a91)
-![image](https://github.com/user-attachments/assets/1053a0b2-5975-4f4f-b7f7-84f869ccd7fa)
+![image](https://github.com/user-attachments/assets/2aeb2890-3483-46a2-977f-b8515b86dfbc)
 ![image](https://github.com/user-attachments/assets/87c0f2e9-98f7-447a-8253-868bba03824c)
 ![image](https://github.com/user-attachments/assets/6815c087-d24f-418f-9457-6bf62ac15af6)
 ![image](https://github.com/user-attachments/assets/ef000054-15a9-417f-bfbe-fa65c6f7fba7)
