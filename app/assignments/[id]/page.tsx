@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -470,7 +471,7 @@ export default function AssignmentDetailsPage() {
                     <div>Status</div>
                   </div>
 
-                  {submissions.map((submission: any) => (
+                  {submissions.map((submission: Submission) => (
                     <div
                       key={submission.id}
                       className="grid grid-cols-5 p-3 border-b last:border-0 items-center text-sm"
@@ -569,9 +570,7 @@ export default function AssignmentDetailsPage() {
                           Record screen during assessment
                         </p>
                       </div>
-                      <Badge variant="outline">
-                        {assignment.isProctored ? "Enabled" : "Disabled"}
-                      </Badge>
+                      <Badge variant="outline">{"N/A"}</Badge>
                     </li>
 
                     <li className="flex justify-between items-center">

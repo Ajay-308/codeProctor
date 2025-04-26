@@ -106,7 +106,7 @@ export default function CreateAssignmentPage() {
   const updateQuestion = (
     questionId: number,
     field: keyof Question,
-    value: any
+    value: string | number | null
   ) => {
     setFormData({
       ...formData,

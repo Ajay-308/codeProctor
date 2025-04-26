@@ -35,7 +35,7 @@ import { api } from "@/convex/_generated/api";
 import Navbar from "@/components/Navbar";
 
 // Helper Functions
-const getTypeIcon = (type: string) => {
+const getTypeIcon = () => {
   return <BookOpen className="h-4 w-4" />;
 };
 
@@ -216,7 +216,7 @@ export default function AssignmentsPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {getTypeIcon(assignment.title)}
+                          {getTypeIcon()}
                           {getTypeBadge(assignment.type)}
                         </div>
                       </TableCell>

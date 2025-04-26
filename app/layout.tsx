@@ -1,7 +1,7 @@
 import { type Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ConvexClerkProvider from "@/components/providers/ConvexClerkProvider";
+import ConvexClerkProvider from "@/components/providers/convexClProvider";
 import StreamClientProvider from "@/components/providers/StreamClientProvider";
 import { Toaster } from "react-hot-toast";
 
