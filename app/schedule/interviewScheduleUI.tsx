@@ -38,7 +38,7 @@ import {
   XIcon,
   BookOpen,
 } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
+import Calendar from "@/components/ui/calendar";
 import { timeSlots } from "@/constants";
 import MeetingCard from "@/components/MeetingCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
