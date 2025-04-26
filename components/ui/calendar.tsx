@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
+import * as React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DayPicker } from "react-day-picker";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 function Calendar({
   className,
@@ -13,6 +13,36 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: React.ComponentProps<typeof DayPicker>) {
+  // Custom navigation components
+  const iconLeft = React.forwardRef<HTMLButtonElement>((props, ref) => (
+    <button
+      ref={ref}
+      className={cn(
+        buttonVariants({ variant: "outline" }),
+        "size-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1"
+      )}
+      {...props}
+    >
+      <ChevronLeft className="size-4" />
+    </button>
+  ));
+
+  const iconRight = React.forwardRef<HTMLButtonElement>((props, ref) => (
+    <button
+      ref={ref}
+      className={cn(
+        buttonVariants({ variant: "outline" }),
+        "size-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1"
+      )}
+      {...props}
+    >
+      <ChevronRight className="size-4" />
+    </button>
+  ));
+
+  iconLeft.displayName = "IconLeft";
+  iconRight.displayName = "IconRight";
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -59,17 +89,14 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
-      components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn("size-4", className)} {...props} />
-        ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn("size-4", className)} {...props} />
-        ),
-      }}
+      components={
+        {
+          // Remove the custom components property entirely if it causes issues
+        }
+      }
       {...props}
     />
-  )
+  );
 }
 
-export { Calendar }
+export { Calendar };
