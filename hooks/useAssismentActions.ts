@@ -26,6 +26,7 @@ export const useAssignmentActions = () => {
         description,
         dueDate,
         createdBy: userId ?? "",
+        passingScore: 0, // Default passing score
         questions: [],
       });
 
