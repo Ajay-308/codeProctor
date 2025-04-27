@@ -141,38 +141,3 @@ export const submitAssignment = mutation({
     return submissionId;
   },
 });
-export const assignToUsers = mutation({
-  args: {
-    assignmentId: v.id("assignments"),
-    userIds: v.array(v.string()),
-    dueDate: v.optional(v.number()),
-    isInterview: v.optional(v.boolean()),
-    interviewId: v.optional(v.union(v.id("interviews"), v.null())),
-  },
-  handler: async (ctx, args) => {
-    // Check if assignment exists
-    const assignment = await ctx.db.get(args.assignmentId);
-    if (!assignment) {
-      throw new Error("Assignment not found");
-    }
-
-    // Create assignment-user associations
-    const assignmentUserIds = [];
-
-    for (const userId of args.userIds) {
-      const assignmentUserId = await ctx.db.insert("assignmentUsers", {
-        assignmentId: args.assignmentId,
-        userId,
-        assignedAt: Date.now(),
-        dueDate: args.dueDate || assignment.dueDate,
-        status: "pending", // pending, completed, expired
-        isInterview: args.isInterview || false,
-        interviewId: args.interviewId,
-      });
-
-      assignmentUserIds.push(assignmentUserId);
-    }
-
-    return assignmentUserIds;
-  },
-});
