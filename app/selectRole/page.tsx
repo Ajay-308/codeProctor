@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/card";
 import { Briefcase, Loader2, UserCircle } from "lucide-react";
 import Image from "next/image";
+import interviwerImage from "@/app/assest/interviewer.png";
+import candidateImage from "@/app/assest/candidate.png";
 
 export default function SelectRole() {
   const { user } = useUser();
@@ -52,18 +54,25 @@ export default function SelectRole() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-      <div className="container max-w-6xl mx-auto px-4 py-16">
+      <div className="container max-w-6xl mx-auto px-4 py-6">
         <div className="flex flex-col items-center text-center mb-12">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-            <UserCircle className="h-8 w-8 text-primary" />
-          </div>
-          <h1 className="text-4xl font-bold tracking-tight mb-3">
+          <motion.h1
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-4xl font-bold tracking-tight mb-3"
+          >
             Welcome to InterviewPro
-          </h1>
-          <p className="text-muted-foreground max-w-md">
+          </motion.h1>
+          <motion.p
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-muted-foreground max-w-md"
+          >
             Please select your role to personalize your experience on our
             platform.
-          </p>
+          </motion.p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -72,6 +81,7 @@ export default function SelectRole() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
+            whileHover={{ y: -5 }}
           >
             <Card
               className={`overflow-hidden h-full transition-all hover:shadow-md ${
@@ -82,10 +92,10 @@ export default function SelectRole() {
             >
               <div className="relative h-48 bg-gradient-to-r from-blue-500/20 to-purple-500/20">
                 <Image
-                  src="/placeholder.svg?height=200&width=400"
+                  src={candidateImage}
                   alt="Candidate"
                   fill
-                  className="object-cover opacity-90"
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="bg-white dark:bg-slate-800 rounded-full p-4 shadow-lg">
@@ -142,6 +152,7 @@ export default function SelectRole() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
+            whileHover={{ y: -5 }}
           >
             <Card
               className={`overflow-hidden h-full transition-all hover:shadow-md ${
@@ -152,10 +163,10 @@ export default function SelectRole() {
             >
               <div className="relative h-48 bg-gradient-to-r from-emerald-500/20 to-teal-500/20">
                 <Image
-                  src="/placeholder.svg?height=200&width=400"
+                  src={interviwerImage}
                   alt="Interviewer"
                   fill
-                  className="object-cover opacity-90"
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="bg-white dark:bg-slate-800 rounded-full p-4 shadow-lg">
