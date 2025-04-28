@@ -47,7 +47,7 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
           <div className="flex items-center ml-4 gap-2">
             <Code className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold ">CodeProctor</span>
@@ -78,6 +78,27 @@ export default function LandingPage() {
               Testimonials
             </Link>
           </nav>
+          <div className="md:hidden">
+            <Button variant="ghost" size="icon" className="cursor-pointer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6"
+              >
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <line x1="4" y1="18" x2="20" y2="18" />
+              </svg>
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </div>
           <div className="flex items-center mt-2 gap-4 cursor-grab">
             <SignInButton mode="modal">
               <Button className="cursor-pointer" variant="outline">
@@ -91,8 +112,8 @@ export default function LandingPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="py-20 md:py-28">
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_600px] lg:gap-12 xl:grid-cols-[1fr_700px]">
+          <div className="container px-4 sm:px-6 md:px-8">
+            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-[1fr_600px] lg:gap-12 xl:grid-cols-[1fr_700px]">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
@@ -111,7 +132,11 @@ export default function LandingPage() {
                     </Button>
                   </SignInButton>
                   <Link href="#demo">
-                    <Button size="lg" variant="outline" className="px-8">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="px-8 cursor-pointer"
+                    >
                       <Play className="mr-2 h-4 w-4" />
                       Watch Demo
                     </Button>
@@ -138,7 +163,7 @@ export default function LandingPage() {
                     <div className="h-3 w-3 rounded-full bg-green-500"></div>
                   </div>
                   <Image
-                    src={homePhoto}
+                    src={homePhoto || "/placeholder.svg"}
                     width={800}
                     height={600}
                     alt="CodeProctor platform screenshot showing split-screen with video and code editor"
@@ -162,7 +187,7 @@ export default function LandingPage() {
 
         {/* Features Section */}
         <section id="features" className="py-20">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
@@ -177,7 +202,7 @@ export default function LandingPage() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
                   icon: <Monitor className="h-10 w-10 text-primary" />,
@@ -234,7 +259,7 @@ export default function LandingPage() {
 
         {/* How It Works Section */}
         <section id="how-it-works" className="border-t py-20 bg-muted/30">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
@@ -294,7 +319,7 @@ export default function LandingPage() {
 
         {/* Screenshot Section */}
         <section id="demo" className="py-20">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 sm:px-6 md:px-8">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
@@ -335,7 +360,7 @@ export default function LandingPage() {
               </div>
               <div className="relative flex items-center justify-center rounded-lg border bg-background p-2 shadow-xl">
                 <Image
-                  src="/placeholder.svg?height=600&width=800"
+                  src={homePhoto || "/placeholder.svg"}
                   width={800}
                   height={600}
                   alt="CodeProctor interface showing code editor and video"
@@ -353,7 +378,7 @@ export default function LandingPage() {
 
         {/* Testimonials Section */}
         <section id="testimonials" className="border-t py-20 bg-muted/30">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
@@ -430,7 +455,7 @@ export default function LandingPage() {
 
         {/* Pricing Section */}
         <section id="pricing" className="py-20">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
@@ -446,7 +471,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-3">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
                   name: "Starter",
@@ -499,11 +524,7 @@ export default function LandingPage() {
               ].map((plan, i) => (
                 <Card
                   key={i}
-                  className={`overflow-hidden ${
-                    plan.popular
-                      ? "border-primary shadow-lg ring-2 ring-primary"
-                      : ""
-                  }`}
+                  className={`overflow-hidden ${plan.popular ? "border-primary shadow-lg ring-2 ring-primary" : ""}`}
                 >
                   <CardContent className="p-6">
                     {plan.popular && (
@@ -530,9 +551,7 @@ export default function LandingPage() {
                       ))}
                     </ul>
                     <Button
-                      className={`mt-8 w-full ${
-                        plan.popular ? "" : "variant-outline"
-                      }`}
+                      className={`mt-8 w-full cursor-pointer ${plan.popular ? "" : "variant-outline"}`}
                     >
                       {plan.cta}
                     </Button>
@@ -545,7 +564,7 @@ export default function LandingPage() {
 
         {/* CTA Section */}
         <section className="border-t py-20 bg-primary text-primary-foreground">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
@@ -560,7 +579,7 @@ export default function LandingPage() {
                 <Link href="/signin">
                   <Button
                     size="lg"
-                    className="bg-white text-primary hover:bg-white/90"
+                    className="bg-white text-primary hover:bg-white/90 cursor-pointer"
                   >
                     Get Started Free
                   </Button>
@@ -569,7 +588,7 @@ export default function LandingPage() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white text-white hover:bg-white/10"
+                    className="border-white text-white hover:bg-white/10 cursor-pointer"
                   >
                     Contact Sales
                   </Button>
@@ -581,7 +600,7 @@ export default function LandingPage() {
 
         {/* FAQ Section */}
         <section className="py-20">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
@@ -637,7 +656,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t py-12 md:py-16">
-        <div className="container px-4 md:px-6">
+        <div className="container px-4 sm:px-6 md:px-8">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-4">
               <div className="flex items-center gap-2">

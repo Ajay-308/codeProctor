@@ -84,6 +84,18 @@ export default function Navbar() {
                 <Menu className="h-6 w-6" />
               )}
             </Button>
+            <Link
+              href="/setting"
+              className="hidden md:flex items-center gap-2 text-gray-600 hover:text-black cursor-pointer"
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Settings className="h-5 w-5 text-gray-600 cursor-pointer" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
