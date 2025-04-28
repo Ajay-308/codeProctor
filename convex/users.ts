@@ -48,6 +48,7 @@ export const createUserWithRole = mutation({
     email: v.string(),
     image: v.string(),
     clerkId: v.string(),
+    userName: v.string(),
     role: v.union(v.literal("candidate"), v.literal("interviewer")),
   },
   handler: async (ctx, args) => {
@@ -56,8 +57,34 @@ export const createUserWithRole = mutation({
       .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
       .first();
 
-    if (existingUser) throw new Error("User already exists");
+    if (existingUser) {
+      return { success: false, error: "User already exists" };
+    }
 
-    return await ctx.db.insert("users", args);
+    const existingUsername = await ctx.db
+      .query("users")
+      .withIndex("by_user_name", (q) => q.eq("userName", args.userName))
+      .first();
+
+    if (existingUsername) {
+      return { success: false, error: "Username already taken" };
+    }
+
+    await ctx.db.insert("users", args);
+
+    return { success: true };
+  },
+});
+
+export const getUserByUserName = query({
+  args: { userName: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_user_name", (q) => q.eq("userName", args.userName))
+      .unique();
+
+    if (!user) throw new Error("user not found");
+    return user;
   },
 });

@@ -19,6 +19,8 @@ import { Briefcase, Loader2, UserCircle } from "lucide-react";
 import Image from "next/image";
 import interviwerImage from "@/app/assest/interviewer.png";
 import candidateImage from "@/app/assest/candidate.png";
+import { Input } from "@/components/ui/input";
+import toast from "react-hot-toast";
 
 export default function SelectRole() {
   const { user } = useUser();
@@ -27,6 +29,7 @@ export default function SelectRole() {
   const [selectedRole, setSelectedRole] = useState<
     "candidate" | "interviewer" | null
   >(null);
+  const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleRoleSelect = async (role: "candidate" | "interviewer") => {
@@ -36,17 +39,34 @@ export default function SelectRole() {
     setIsLoading(true);
 
     try {
-      await createUserWithRole({
+      const response = await createUserWithRole({
         name: user.fullName || "",
         email: user.emailAddresses[0].emailAddress,
         image: user.imageUrl,
         clerkId: user.id,
+        userName,
         role,
       });
 
+      if (!response.success) {
+        if (response.error === "Username already taken") {
+          setUserName("");
+          toast.error("Username already taken");
+        } else if (response.error === "User already exists") {
+          toast.error("User already exists");
+        } else {
+          toast.error("Something went wrong");
+        }
+
+        setIsLoading(false);
+        setSelectedRole(null);
+
+        return;
+      }
       router.push("/home");
     } catch (error) {
-      console.error("Error setting role:", error);
+      console.error("Unexpected error setting role:", error);
+      toast.error("Something went wrong");
       setIsLoading(false);
       setSelectedRole(null);
     }
@@ -92,7 +112,7 @@ export default function SelectRole() {
             >
               <div className="relative h-48 bg-gradient-to-r from-blue-500/20 to-purple-500/20">
                 <Image
-                  src={candidateImage}
+                  src={candidateImage || "/placeholder.svg"}
                   alt="Candidate"
                   fill
                   className="object-cover"
@@ -111,8 +131,8 @@ export default function SelectRole() {
                   Looking for opportunities and ready to showcase my skills
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-center text-muted-foreground">
-                <ul className="space-y-2 text-sm">
+              <CardContent>
+                <ul className="space-y-2 text-sm text-center text-muted-foreground mb-4">
                   <li className="flex items-center justify-center gap-2">
                     <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-500"></span>
                     Schedule and attend interviews
@@ -126,13 +146,30 @@ export default function SelectRole() {
                     Track your application progress
                   </li>
                 </ul>
+
+                <Input
+                  type="text"
+                  placeholder="Enter your username"
+                  className="px-4 rounded-md"
+                  autoFocus
+                  required
+                  minLength={4}
+                  maxLength={15}
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                />
+                {userName.trim().length < 4 && userName.trim().length > 0 && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Username must be at least 4 characters
+                  </p>
+                )}
               </CardContent>
-              <CardFooter className="flex justify-center pt-4">
+              <CardFooter className="flex flex-col gap-2">
                 <Button
                   size="lg"
                   className="w-full"
                   onClick={() => handleRoleSelect("candidate")}
-                  disabled={isLoading}
+                  disabled={isLoading || userName.trim().length < 4}
                 >
                   {isLoading && selectedRole === "candidate" ? (
                     <>
@@ -142,6 +179,15 @@ export default function SelectRole() {
                   ) : (
                     "Continue as Candidate"
                   )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full"
+                  onClick={() => setUserName("")}
+                  disabled={isLoading || userName.trim().length === 0}
+                >
+                  Clear
                 </Button>
               </CardFooter>
             </Card>
@@ -163,7 +209,7 @@ export default function SelectRole() {
             >
               <div className="relative h-48 bg-gradient-to-r from-emerald-500/20 to-teal-500/20">
                 <Image
-                  src={interviwerImage}
+                  src={interviwerImage || "/placeholder.svg"}
                   alt="Interviewer"
                   fill
                   className="object-cover"
@@ -182,8 +228,8 @@ export default function SelectRole() {
                   Evaluating candidates and providing valuable feedback
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-center text-muted-foreground">
-                <ul className="space-y-2 text-sm">
+              <CardContent>
+                <ul className="space-y-2 text-sm text-center text-muted-foreground mb-4">
                   <li className="flex items-center justify-center gap-2">
                     <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                     Conduct and manage interviews
@@ -197,14 +243,31 @@ export default function SelectRole() {
                     Collaborate with hiring teams
                   </li>
                 </ul>
+
+                <Input
+                  type="text"
+                  placeholder="Enter your username"
+                  className="px-4 rounded-md"
+                  autoFocus
+                  required
+                  minLength={4}
+                  maxLength={15}
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                />
+                {userName.trim().length < 4 && userName.trim().length > 0 && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Username must be at least 4 characters
+                  </p>
+                )}
               </CardContent>
-              <CardFooter className="flex justify-center pt-4">
+              <CardFooter className="flex flex-col gap-2">
                 <Button
                   size="lg"
                   className="w-full"
-                  onClick={() => handleRoleSelect("interviewer")}
-                  disabled={isLoading}
                   variant="outline"
+                  onClick={() => handleRoleSelect("interviewer")}
+                  disabled={isLoading || userName.trim().length < 4}
                 >
                   {isLoading && selectedRole === "interviewer" ? (
                     <>
@@ -214,6 +277,15 @@ export default function SelectRole() {
                   ) : (
                     "Continue as Interviewer"
                   )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="lg"
+                  className="w-full"
+                  onClick={() => setUserName("")}
+                  disabled={isLoading || userName.trim().length === 0}
+                >
+                  Clear
                 </Button>
               </CardFooter>
             </Card>
