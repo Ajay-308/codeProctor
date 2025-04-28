@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import toast from "react-hot-toast";
+import { useAuth } from "@clerk/nextjs";
 import {
   Card,
   CardContent,
@@ -30,10 +31,12 @@ export default function SettingsPage() {
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const [clerkId, setClerkId] = useState("");
-  const [userId, setUserId] = useState("");
   const [userNameError, setUserNameError] = useState("");
+  const { userId } = useAuth();
 
-  const getUserDetails = useQuery(api.users.getUser);
+  const getUserDetails = useQuery(api.users.getUserByClerkId, {
+    clerkId: userId || "",
+  });
   const updateUserDetails = useMutation(api.users.updateUser);
   const getUserByUserName = useQuery(api.users.getUserByUserName, {
     userName: userName,
@@ -44,7 +47,7 @@ export default function SettingsPage() {
       if (!getUserDetails) return;
       setLoading(true);
       try {
-        const user = getUserDetails[0];
+        const user = getUserDetails;
         if (user) {
           setUserName(user.userName || "");
           setEmail(user.email || "");
@@ -52,7 +55,6 @@ export default function SettingsPage() {
           setRole(user.role || "candidate");
           setName(user.name || "");
           setClerkId(user.clerkId || "");
-          setUserId(user._id);
         }
       } catch (error) {
         console.error("Error fetching user details", error);
@@ -78,9 +80,7 @@ export default function SettingsPage() {
         setLoading(false);
         return;
       }
-
-      // Check if username exists and belongs to a different user
-      if (getUserByUserName && getUserByUserName._id !== userId) {
+      if (getUserByUserName && getUserByUserName.clerkId !== userId) {
         setUserNameError("Username already taken");
         setLoading(false);
         return;
