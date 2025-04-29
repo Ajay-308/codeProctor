@@ -33,6 +33,8 @@ export default defineSchema({
     interviewId: v.id("interviews"),
   }).index("by_interview_id", ["interviewId"]),
 
+  // yaha tak sab theek hai check point hai
+
   assignments: defineTable({
     title: v.string(),
     description: v.optional(v.string()),
