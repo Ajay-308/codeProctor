@@ -8,8 +8,9 @@ landing page
 
 ![image](https://github.com/user-attachments/assets/9ee2e82c-9103-4568-8604-e3aec2a4bd51)
 ![image](https://github.com/user-attachments/assets/8ad7283b-3966-480e-9683-06f91c7e067b)
+![image](https://github.com/user-attachments/assets/962da456-f5ab-4041-bea8-35a41cdf1495)
 
-![image](https://github.com/user-attachments/assets/c08edd33-6e69-4c5c-9233-46ea5539a1c1)
+
 ![image](https://github.com/user-attachments/assets/839b3856-29b0-4e29-bcac-b74743428a91)
 ![image](https://github.com/user-attachments/assets/2aeb2890-3483-46a2-977f-b8515b86dfbc)
 ![image](https://github.com/user-attachments/assets/87c0f2e9-98f7-447a-8253-868bba03824c)
