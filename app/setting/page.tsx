@@ -147,7 +147,7 @@ export default function SettingsPage() {
                       id="image"
                       value={image}
                       onChange={(e) => setImage(e.target.value)}
-                      placeholder="https://example.com/your-image.jpg"
+                      disabled
                     />
                   </div>
                 </div>

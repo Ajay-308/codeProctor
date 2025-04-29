@@ -32,11 +32,11 @@ export default function LandingPage() {
         });
 
         if (!res.exists) {
-          router.push("/selectRole"); // Redirect to role selection if user doesn't exist
+          router.push("/selectRole");
         } else if (!res.hasRole) {
-          router.push("/selectRole"); // Redirect to role selection if user doesn't have a role
+          router.push("/selectRole");
         } else {
-          router.push("/home"); // Redirect to home if user exists and has a role
+          router.push("/home");
         }
       };
 
