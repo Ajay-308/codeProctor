@@ -4,7 +4,7 @@
 
 
 landing page
-![Uploading image.png…]()
+![image](https://github.com/user-attachments/assets/d73e2559-31f5-4d22-a247-517c044cb6cf)
 
 ![image](https://github.com/user-attachments/assets/9ee2e82c-9103-4568-8604-e3aec2a4bd51)
 ![image](https://github.com/user-attachments/assets/8ad7283b-3966-480e-9683-06f91c7e067b)
