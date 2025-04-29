@@ -46,6 +46,12 @@ export const getInterviewByStreamId = query({
   },
 });
 
+export const debugAllInterviews = query({
+  handler: async (ctx) => {
+    return await ctx.db.query("interviews").collect();
+  },
+});
+
 // interview create kardo
 export const createInterview = mutation({
   args: {
