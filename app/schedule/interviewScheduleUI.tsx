@@ -76,9 +76,13 @@ function InterviewScheduleUI() {
   const [isCreating, setIsCreating] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const interviews = useQuery(api.interviews.getAllInterviews) ?? [];
+  const interviews = useQuery(api.interviews.getInterviewByInterviewerId, {
+    interviewerId: user?.id ?? "",
+  });
+  console.log("Interviews:", interviews);
   const users = useQuery(api.users.getUser) ?? [];
   const createInterview = useMutation(api.interviews.createInterview);
+  const updateInterview = useMutation(api.interviews.updateInterview);
 
   const candidates = users?.filter((u) => u.role === "candidate");
   const interviewers = users?.filter((u) => u.role === "interviewer");
@@ -93,23 +97,25 @@ function InterviewScheduleUI() {
   });
 
   // stream api key
-  const streamApiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY;
-  const streamSecretKey = process.env.NEXT_PUBLIC_STREAM_SECRET_KEY;
+  // const streamApiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY;
+  // const streamSecretKey = process.env.NEXT_PUBLIC_STREAM_SECRET_KEY;
 
   // Group interviews by status
-  const upcomingInterviews = interviews.filter(
+  const upcomingInterviews = (interviews ?? []).filter(
     (interview) => interview.status === "upcoming"
   );
-  const completedInterviews = interviews.filter(
+  const completedInterviews = (interviews ?? []).filter(
     (interview) => interview.status === "completed"
   );
-  const pastInterviews = interviews.filter(
+  const pastInterviews = (interviews ?? []).filter(
     (interview) =>
-      interview.status === "succeeded" || interview.status === "failed"
+      interview.status === "completed" ||
+      interview.status === "failed" ||
+      interview.status === "Completed"
   );
 
   // Filter interviews based on search query
-  const filteredInterviews = interviews.filter((interview) => {
+  const filteredInterviews = (interviews ?? []).filter((interview) => {
     if (!searchQuery) return true;
 
     const matchesTitle = interview.title
@@ -127,10 +133,26 @@ function InterviewScheduleUI() {
     return matchesTitle || matchesDescription || matchesCandidate;
   });
 
+  useEffect(() => {
+    const now = Date.now();
+
+    (interviews ?? []).forEach(async (interview) => {
+      const start = interview.startTime;
+      const end = interview.endTime ?? start + 30 * 60 * 1000;
+
+      if (now > end && interview.status !== "completed") {
+        await updateInterview({
+          id: interview._id,
+          status: "completed",
+        });
+      }
+    });
+  }, [interviews, updateInterview]);
+
   const scheduleMeeting = async () => {
-    console.log("this is stream api key:", streamApiKey);
-    console.log("this is stream secret key:", streamSecretKey);
-    console.log("scheduleMeeting function called");
+    // console.log("this is stream api key:", streamApiKey);
+    // console.log("this is stream secret key:", streamSecretKey);
+    // console.log("scheduleMeeting function called");
 
     if (!client) {
       console.error("Stream video client is not initialized");
@@ -183,7 +205,16 @@ function InterviewScheduleUI() {
       // Create date object for meeting
       const [hours, minutes] = time.split(":");
       const meetingDate = new Date(date);
-      meetingDate.setHours(parseInt(hours), parseInt(minutes), 0);
+      meetingDate.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0);
+
+      if (meetingDate < new Date()) {
+        //console.error("Meeting date is in the past:", meetingDate);
+        toast.error(
+          "Meeting date cannot be in the past. Please select a future date."
+        );
+        setIsCreating(false);
+        return;
+      }
       console.log("Meeting date:", meetingDate.toISOString());
 
       // Generate UUID
@@ -253,6 +284,18 @@ function InterviewScheduleUI() {
     }
   };
   const handleScheduleMeeting = async () => {
+    const [hours, minutes] = formData.time.split(":");
+    const meetingDate = new Date(formData.date);
+    meetingDate.setHours(Number.parseInt(hours), Number.parseInt(minutes), 0);
+
+    if (meetingDate < new Date()) {
+      //console.error("Meeting date is in the past:", meetingDate);
+      toast.error(
+        "Meeting date cannot be in the past. Please select a future date."
+      );
+      setIsCreating(false);
+      return;
+    }
     try {
       await scheduleMeeting();
       console.log("Meeting scheduled successfully");
@@ -690,6 +733,11 @@ function InterviewScheduleUI() {
                     interview={{
                       ...interview,
                       _id: interview._id as Id<"interviews">,
+                      status: interview.status as
+                        | "upcoming"
+                        | "ongoing"
+                        | "completed"
+                        | "cancelled",
                     }}
                   />
                 ))}
@@ -713,6 +761,11 @@ function InterviewScheduleUI() {
                       interview={{
                         ...interview,
                         _id: interview._id as Id<"interviews">,
+                        status: interview.status as
+                          | "upcoming"
+                          | "ongoing"
+                          | "completed"
+                          | "cancelled",
                       }}
                     />
                   ))}
@@ -740,6 +793,11 @@ function InterviewScheduleUI() {
                       interview={{
                         ...interview,
                         _id: interview._id as Id<"interviews">,
+                        status: interview.status as
+                          | "upcoming"
+                          | "ongoing"
+                          | "completed"
+                          | "cancelled",
                       }}
                     />
                   ))}
@@ -765,6 +823,11 @@ function InterviewScheduleUI() {
                       interview={{
                         ...interview,
                         _id: interview._id as Id<"interviews">,
+                        status: interview.status as
+                          | "upcoming"
+                          | "ongoing"
+                          | "completed"
+                          | "cancelled",
                       }}
                     />
                   ))}
