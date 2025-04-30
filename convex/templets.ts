@@ -73,3 +73,28 @@ export const deleteTempletes = mutation({
     return;
   },
 });
+
+export const duplicateTemmpletes = mutation({
+  args: {
+    id: v.id("templetes"),
+  },
+  handler: async (ctx, { id }) => {
+    const templete = await ctx.db.get(id);
+    if (!templete) throw new Error("templete not found");
+
+    const now = new Date().toISOString();
+
+    // Exclude internal Convex fields
+    const { _id, _creationTime: _, ...cleanTemplete } = templete;
+    console.log(_id, _);
+    const newTemplete = {
+      ...cleanTemplete,
+      createdAt: now, // ✅ Correct field name
+      updatedAt: now,
+      usageCount: 0,
+    };
+
+    const newId = await ctx.db.insert("templetes", newTemplete);
+    return newId;
+  },
+});

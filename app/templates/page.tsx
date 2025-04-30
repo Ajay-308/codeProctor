@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
+import toast from "react-hot-toast";
 
 // Map the variants to actual UI variants that our Badge component supports
 const getBadgeVariant = (difficulty: "easy" | "medium" | "hard" | "expert") => {
@@ -84,6 +85,7 @@ type Template = {
 const TemplatesList: React.FC = () => {
   const templates = useQuery(api.templets.getTempletes);
   const deleteTemplate = useMutation(api.templets.deleteTempletes);
+  const DuplicateTemplate = useMutation(api.templets.duplicateTemmpletes);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<"all" | "language" | "difficulty">(
     "all"
@@ -116,6 +118,20 @@ const TemplatesList: React.FC = () => {
   const openModal = (template: Template | null) => {
     setEditTemplate(template);
     setIsModalOpen(true);
+  };
+
+  const handleDuplicate = (template: {
+    _id: Id<"templetes">;
+    title: string;
+  }) => {
+    DuplicateTemplate({ id: template._id })
+      .then(() => {
+        toast.success(`Template "${template.title}" duplicated successfully!`);
+      })
+      .catch((error) => {
+        toast.error(`failed to duplicate template "${template.title}"`);
+        console.error("failed to duplicate template", error);
+      });
   };
 
   const handleDelete = (template: { _id: Id<"templetes">; title: string }) => {
@@ -268,7 +284,7 @@ const TemplatesList: React.FC = () => {
                       <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem
                           onClick={() => {
-                            /* Add duplicate functionality */
+                            handleDuplicate(template);
                           }}
                         >
                           <Copy className="mr-2 h-4 w-4" />
