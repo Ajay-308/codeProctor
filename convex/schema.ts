@@ -79,4 +79,22 @@ export default defineSchema({
   })
     .index("by_assignment_id", ["assignmentId"])
     .index("by_candidate_id", ["candidateId"]),
+
+  //assignment templetes
+  templetes: defineTable({
+    title: v.string(),
+    description: v.optional(v.string()),
+    difficulty: v.union(
+      v.literal("easy"),
+      v.literal("medium"),
+      v.literal("hard"),
+      v.literal("expert")
+    ),
+    language: v.string(),
+    tags: v.array(v.string()),
+    createdAt: v.string(),
+    updatedAt: v.string(),
+    timeLimit: v.number(),
+    usageCount: v.number(),
+  }),
 });

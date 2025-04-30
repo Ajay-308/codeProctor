@@ -17,6 +17,7 @@ import type * as assignments from "../assignments.js";
 import type * as comments from "../comments.js";
 import type * as http from "../http.js";
 import type * as interviews from "../interviews.js";
+import type * as templets from "../templets.js";
 import type * as users from "../users.js";
 
 /**
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   comments: typeof comments;
   http: typeof http;
   interviews: typeof interviews;
+  templets: typeof templets;
   users: typeof users;
 }>;
 export declare const api: FilterApi<
