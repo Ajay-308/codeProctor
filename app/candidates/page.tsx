@@ -208,7 +208,7 @@ export default function Page() {
                           <span className="ml-2">{candidate.score}%</span>
                         </div>
                       ) : (
-                        <span>Not scored</span>
+                        <span>Not Given Interviews</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
