@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Filter, Mail, Calendar, Code, MoreVertical, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +10,7 @@ import CandidateCard from "./candidateCard";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Navbar from "@/components/Navbar";
+
 interface Candidate {
   id: string;
   name: string;
@@ -25,7 +25,7 @@ interface Candidate {
     | "rejected";
   lastActivity: string;
   avatarUrl?: string;
-  score?: number;
+  score: number;
   tags: string[];
 }
 
@@ -49,20 +49,26 @@ export default function Page() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const users = useQuery(api.users.getUser) || [];
+  const scores = useQuery(api.users.successfulInterviews) || [];
 
   const candidateUsers = users.filter((user) => user.role === "candidate");
 
-  const candidates: Candidate[] = candidateUsers.map((user) => ({
-    id: user.clerkId,
-    name: user.name,
-    email: user.email,
-    position: "Candidate",
-    status: "applied",
-    lastActivity: new Date(user._creationTime).toISOString().split("T")[0],
-    avatarUrl: user.image,
-    score: Math.floor(Math.random() * 30) + 70,
-    tags: ["React", "TypeScript", "JavaScript"],
-  }));
+  const candidates: Candidate[] = candidateUsers.map((user) => {
+    const scoreData = scores.find((s) => s.candidateId === user.clerkId);
+
+    const roundScore = Math.round((scoreData?.score ?? 0) * 100);
+    return {
+      id: user.clerkId,
+      name: user.name,
+      email: user.email,
+      position: "Candidate",
+      status: "applied",
+      lastActivity: new Date(user._creationTime).toISOString().split("T")[0],
+      avatarUrl: user.image,
+      score: roundScore || 0,
+      tags: ["React", "TypeScript", "JavaScript"],
+    };
+  });
 
   const filteredCandidates = candidates.filter(
     (candidate) =>
@@ -94,7 +100,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4  sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <Input
             className="w-full sm:w-80 mt-4"
             placeholder="Search candidates..."

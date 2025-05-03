@@ -31,6 +31,50 @@ export const getUser = query({
   },
 });
 
+// get all users uske sath unke successful interviews bhi dedo
+export const successfulInterviews = query({
+  handler: async (ctx) => {
+    const userIdentity = await ctx.auth.getUserIdentity();
+    if (!userIdentity) throw new Error("user not authenticated");
+
+    const interviews = await ctx.db.query("interviews").collect();
+
+    // Group interviews by candidateId
+    const interviewStats: Record<string, { total: number; succeeded: number }> =
+      {};
+
+    for (const interview of interviews) {
+      const candidateId = interview.candidateId;
+
+      if (!interviewStats[candidateId]) {
+        interviewStats[candidateId] = { total: 0, succeeded: 0 };
+      }
+
+      interviewStats[candidateId].total += 1;
+
+      if (interview.status === "succeeded") {
+        interviewStats[candidateId].succeeded += 1;
+      }
+    }
+
+    // Convert to an array of results with scores
+    const result = Object.entries(interviewStats).map(
+      ([candidateId, stats]) => {
+        const score = stats.succeeded / stats.total;
+        return {
+          candidateId,
+          totalInterviews: stats.total,
+          successfulInterviews: stats.succeeded,
+          score,
+        };
+      }
+    );
+    console.log(result);
+
+    return result;
+  },
+});
+
 export const getUserByClerkId = query({
   args: { clerkId: v.string() },
   handler: async (ctx, args) => {

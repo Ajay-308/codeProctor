@@ -1,6 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
+// get all templetes
 export const getTempletes = query({
   handler: async (ctx) => {
     const templetes = await ctx.db.query("templetes").collect();
@@ -89,7 +90,7 @@ export const duplicateTemmpletes = mutation({
     console.log(_id, _);
     const newTemplete = {
       ...cleanTemplete,
-      createdAt: now, // ✅ Correct field name
+      createdAt: now,
       updatedAt: now,
       usageCount: 0,
     };
