@@ -41,8 +41,8 @@ export default defineSchema({
     dueDate: v.number(),
     createdBy: v.string(),
     passingScore: v.number(),
-    type: v.optional(v.string()), // ✅ Make this optional
-    timeLimit: v.optional(v.float64()), // ✅ Already optional, just double-check
+    type: v.optional(v.string()),
+    timeLimit: v.optional(v.float64()),
     status: v.optional(v.string()),
     questions: v.array(
       v.object({

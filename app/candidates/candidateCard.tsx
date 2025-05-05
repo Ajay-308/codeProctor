@@ -1,9 +1,17 @@
-import React from "react";
-import { Mail, Calendar, Code } from "lucide-react";
+"use client";
+
+import type React from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Mail, CalendarIcon, Code, X } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Calendar from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import toast from "react-hot-toast";
 
 interface Candidate {
   id: string;
@@ -21,11 +29,13 @@ interface Candidate {
   avatarUrl?: string;
   score?: number;
   tags: string[];
+  scheduledInterviews?: Date[];
+  rejectedDates?: Date[];
 }
 
 const statusLabels: Record<
   Candidate["status"],
-  { label: string; variant: React.ComponentProps<typeof Badge>["variant"] }
+  { label: string; variant: string }
 > = {
   applied: { label: "Applied", variant: "default" },
   screening: { label: "Screening", variant: "secondary" },
@@ -40,26 +50,396 @@ interface CandidateCardProps {
   onClick?: () => void;
 }
 
+type ActiveView = null | "email" | "calendar" | "test";
+
+const interviewStatusColors = {
+  upcoming: {
+    bg: "bg-emerald-50",
+    border: "border-emerald-200",
+    text: "text-emerald-800",
+    icon: "text-emerald-600",
+    badge: "bg-emerald-100 text-emerald-800 border-emerald-300",
+  },
+  today: {
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+    text: "text-blue-800",
+    icon: "text-blue-600",
+    badge: "bg-blue-100 text-blue-800 border-blue-300",
+  },
+  tomorrow: {
+    bg: "bg-indigo-50",
+    border: "border-indigo-200",
+    text: "text-indigo-800",
+    icon: "text-indigo-600",
+    badge: "bg-indigo-100 text-indigo-800 border-indigo-300",
+  },
+  thisWeek: {
+    bg: "bg-violet-50",
+    border: "border-violet-200",
+    text: "text-violet-800",
+    icon: "text-violet-600",
+    badge: "bg-violet-100 text-violet-800 border-violet-300",
+  },
+  past: {
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    text: "text-amber-800",
+    icon: "text-amber-600",
+    badge: "bg-amber-100 text-amber-800 border-amber-300",
+  },
+};
+
 const CandidateCard: React.FC<CandidateCardProps> = ({
   candidate,
   onClick,
 }) => {
+  const [activeView, setActiveView] = useState<ActiveView>(null);
+  const interviews = useQuery(api.interviews.getAllInterviews);
+  const [formData, setFormData] = useState({
+    date: new Date(),
+    time: "09:00",
+    notes: "",
+  });
+  const [scheduledDates, setScheduledDates] = useState<Date[]>([]);
+  const isMounted = useRef(true);
+
+  const createInterview = useMutation(api.interviews.createInterview);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!interviews || !Array.isArray(interviews)) return;
+
+    const getDateOnly = (date: Date) => {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    };
+
+    const candidateInterviews = interviews.filter(
+      (interview) => interview.candidateId === candidate.id
+    );
+
+    const dates = candidateInterviews.map((interview) => {
+      return getDateOnly(new Date(interview.startTime));
+    });
+
+    if (isMounted.current) {
+      setScheduledDates(dates);
+    }
+  }, [interviews, candidate.id]);
+
+  const handleCardClick = () => {
+    if (activeView === null && onClick) {
+      onClick();
+    }
+  };
+
+  const handleEmailClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveView(activeView === "email" ? null : "email");
+  };
+
+  const handleScheduleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveView(activeView === "calendar" ? null : "calendar");
+  };
+
+  const handleTestClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveView(activeView === "test" ? null : "test");
+  };
+
+  const closeView = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveView(null);
+  };
+
+  const handleSubmitSchedule = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!formData.date) return;
+
+      const interviewDate = new Date(formData.date);
+      const [hours, minutes] = formData.time.split(":").map(Number);
+
+      interviewDate.setHours(hours, minutes);
+      const startTime = interviewDate.getTime();
+
+      try {
+        await createInterview({
+          candidateId: candidate.id,
+          startTime,
+          description: formData.notes,
+          status: "scheduled",
+          title: `${candidate.name} Interview`,
+          streamCallId: "default-stream-id",
+          interviewerIds: ["interviewer1", "interviewer2"],
+        });
+        toast.success("Interview Scheduled Successfully");
+        setActiveView(null);
+
+        setFormData({
+          date: new Date(),
+          time: "09:00",
+          notes: "",
+        });
+      } catch (error) {
+        console.error("Failed to schedule interview:", error);
+      }
+    },
+    [candidate.id, candidate.name, formData, createInterview]
+  );
+
+  const isSameDay = useCallback((date1: Date, date2: Date) => {
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
+  }, []);
+
+  const isDateScheduled = useCallback(
+    (date: Date) => {
+      return scheduledDates.some((scheduledDate) =>
+        isSameDay(scheduledDate, date)
+      );
+    },
+    [scheduledDates]
+  );
+
+  const formatInterviewDate = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" });
+    const month = date.toLocaleDateString("en-US", { month: "long" });
+    const day = date.getDate();
+    const time = date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+
+    return `${dayOfWeek}, ${month} ${day} · ${time}`;
+  };
+
+  // const getInterviewTimesForDate = useCallback(
+  //   (date: Date) => {
+  //     if (!interviews || !Array.isArray(interviews)) return [];
+
+  //     return interviews
+  //       .filter((interview) => {
+  //         const interviewDate = new Date(interview.startTime);
+  //         return (
+  //           interview.candidateId === candidate.id &&
+  //           isSameDay(interviewDate, date)
+  //         );
+  //       })
+  //       .map((interview) => {
+  //         const interviewDate = new Date(interview.startTime);
+  //         return interviewDate.toLocaleTimeString("en-US", {
+  //           hour: "numeric",
+  //           minute: "2-digit",
+  //         });
+  //       });
+  //   },
+  //   [interviews, candidate.id]
+  // );
+
+  // Fixed isPastDate function
+  // const isPastDate = useCallback((date: Date) => {
+  //   const today = new Date();
+  //   today.setHours(0, 0, 0, 0);
+
+  //   // Ensure we're working with a proper Date object
+  //   const compareDate = date instanceof Date ? new Date(date) : new Date();
+  //   compareDate.setHours(0, 0, 0, 0);
+
+  //   return compareDate < today;
+  // }, []);
+
+  const isTodayDate = useCallback((date: Date) => {
+    const today = new Date();
+    return isSameDay(today, date);
+  }, []);
+
+  const isTomorrowDate = useCallback((date: Date) => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return isSameDay(tomorrow, date);
+  }, []);
+
+  const isThisWeekDate = useCallback((date: Date) => {
+    const today = new Date();
+    const nextWeek = new Date();
+    nextWeek.setDate(today.getDate() + 7);
+
+    return date > today && date <= nextWeek;
+  }, []);
+
+  const getInterviewStatusLabel = useCallback((status: string) => {
+    switch (status) {
+      case "past":
+        return "Past";
+      case "today":
+        return "Today";
+      case "tomorrow":
+        return "Tomorrow";
+      case "thisWeek":
+        return "This Week";
+      default:
+        return "Upcoming";
+    }
+  }, []);
+
+  const isPastOrToday = useCallback((date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const compareDate = new Date(date);
+    compareDate.setHours(0, 0, 0, 0);
+    return compareDate < today;
+  }, []);
+
+  // const getDateStatus = useCallback(
+  //   (date: Date) => {
+  //     if (isDateScheduled(date)) {
+  //       if (isTodayDate(date)) return "today";
+  //       if (isTomorrowDate(date)) return "tomorrow";
+  //       if (isThisWeekDate(date)) return "thisWeek";
+  //       if (isPastDate(date)) return "past";
+  //       return "scheduled";
+  //     }
+  //     if (isPastDate(date)) {
+  //       return "not-available";
+  //     }
+  //     return "available";
+  //   },
+  //   [isDateScheduled, isPastDate, isTodayDate, isTomorrowDate, isThisWeekDate]
+  // );
+
+  // Filter and sort interviews for this candidate
+  const candidateInterviews = Array.isArray(interviews)
+    ? interviews.filter((interview) => interview.candidateId === candidate.id)
+    : [];
+
+  const sortedInterviews = candidateInterviews.sort(
+    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+  );
+
+  const pastInterviews = sortedInterviews.filter((i) => {
+    const interviewDate = new Date(i.startTime);
+    return interviewDate < new Date();
+  });
+
+  const upcomingInterviews = sortedInterviews.filter((i) => {
+    return !pastInterviews.includes(i);
+  });
+
+  // Fix: Create a proper day cell renderer compatible with the Calendar component
+  // const renderDayCell = useCallback(
+  //   (day: Date, modifiers: Record<string, boolean>) => {
+  //     const status = getDateStatus(day);
+  //     const interviewTimes = getInterviewTimesForDate(day);
+  //     const hasInterviews = interviewTimes.length > 0;
+  //     const isToday = isSameDay(day, new Date());
+  //     const isPast = isPastOrToday(day);
+  //     const isSelected = modifiers.selected === true;
+
+  //     const dayKey = `${day.getFullYear()}-${day.getMonth()}-${day.getDate()}`;
+
+  //     let tooltipContent = "";
+  //     switch (status) {
+  //       case "scheduled":
+  //         tooltipContent = `Scheduled: ${interviewTimes.join(", ")}`;
+  //         break;
+  //       case "not-available":
+  //         tooltipContent = "Not Available";
+  //         break;
+  //       default:
+  //         tooltipContent = "Available";
+  //     }
+
+  //     return (
+  //       <div
+  //         key={dayKey}
+  //         className={cn(
+  //           "relative w-full h-full p-0",
+  //           status === "scheduled" && isPast
+  //             ? "!bg-amber-100 hover:bg-amber-200"
+  //             : status === "scheduled"
+  //               ? "!bg-green-100 hover:bg-green-200"
+  //               : "",
+  //           status === "not-available" && "!bg-gray-100",
+  //           isToday && "!border-2 !border-blue-500",
+  //           isSelected && "!bg-primary !text-primary-foreground"
+  //         )}
+  //         title={tooltipContent}
+  //       >
+  //         <div
+  //           className={cn(
+  //             "w-8 h-8 flex items-center justify-center text-sm rounded-full mx-auto relative",
+  //             isSelected && "!bg-primary !text-primary-foreground",
+  //             status === "scheduled" && !isSelected && isPast
+  //               ? "text-amber-800 font-medium"
+  //               : status === "scheduled" && !isSelected
+  //                 ? "text-green-800 font-medium"
+  //                 : status === "not-available" && !isSelected
+  //                   ? "text-gray-500"
+  //                   : ""
+  //           )}
+  //         >
+  //           {day.getDate()}
+  //           {hasInterviews && (
+  //             <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full bg-blue-500"></span>
+  //           )}
+  //         </div>
+  //       </div>
+  //     );
+  //   },
+  //   [getDateStatus, getInterviewTimesForDate, isSameDay, isPastOrToday]
+  // );
+
   return (
-    <Card className="hover:shadow-lg cursor-pointer" onClick={onClick}>
-      <CardContent>
+    <Card
+      className={cn(
+        "relative overflow-hidden transition-shadow duration-300",
+        activeView === null && "hover:shadow-lg cursor-pointer"
+      )}
+      onClick={handleCardClick}
+    >
+      <CardContent className="p-4">
         <div className="flex items-center">
-          <Avatar>
-            <AvatarImage src={candidate.avatarUrl} alt={candidate.name} />
-            <AvatarFallback>{candidate.name.charAt(0)}</AvatarFallback>
+          <Avatar className="h-12 w-12">
+            {candidate.avatarUrl ? (
+              <AvatarImage
+                src={candidate.avatarUrl || "/placeholder.svg"}
+                alt={candidate.name}
+              />
+            ) : (
+              <AvatarFallback className="bg-blue-500 text-white">
+                {candidate.name.charAt(0)}
+              </AvatarFallback>
+            )}
           </Avatar>
-          <div>
+          <div className="ml-3">
             <h3 className="font-medium text-gray-900">{candidate.name}</h3>
             <p className="text-sm text-gray-500">{candidate.position}</p>
           </div>
         </div>
 
         <div className="mt-4">
-          <Badge variant={statusLabels[candidate.status].variant}>
+          <Badge
+            variant={
+              statusLabels[candidate.status].variant as
+                | "default"
+                | "secondary"
+                | "outline"
+                | "destructive"
+            }
+          >
             {statusLabels[candidate.status].label}
           </Badge>
           <div className="mt-2 text-sm text-gray-500">
@@ -70,13 +450,91 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
           </div>
         </div>
 
+        {/* Show upcoming interviews section */}
+        {upcomingInterviews.length > 0 && activeView === null && (
+          <div className="mt-4 p-3 border rounded-md bg-gradient-to-r from-blue-50 to-emerald-50">
+            <h4 className="font-medium text-blue-800 flex items-center">
+              <CalendarIcon className="h-4 w-4 mr-1" />
+              Upcoming{" "}
+              {upcomingInterviews.length > 1 ? "Interviews" : "Interview"}
+            </h4>
+            <div className="mt-2 space-y-2">
+              {upcomingInterviews.slice(0, 2).map((interview, index) => {
+                const interviewDate = new Date(interview.startTime);
+                let status = "upcoming";
+
+                // Determine the correct status
+                if (isTodayDate(interviewDate)) {
+                  status = "today";
+                } else if (isTomorrowDate(interviewDate)) {
+                  status = "tomorrow";
+                } else if (isThisWeekDate(interviewDate)) {
+                  status = "thisWeek";
+                }
+
+                const colors =
+                  interviewStatusColors[
+                    status as keyof typeof interviewStatusColors
+                  ];
+
+                return (
+                  <div
+                    key={`upcoming-${interview._id || index}`}
+                    className={cn(
+                      "p-2 rounded shadow-sm",
+                      colors.bg,
+                      colors.border
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <CalendarIcon
+                          className={cn("h-3 w-3 mr-1", colors.icon)}
+                        />
+                        <span
+                          className={cn("text-sm font-medium", colors.text)}
+                        >
+                          {formatInterviewDate(interview.startTime)}
+                        </span>
+                      </div>
+                      <Badge variant="outline" className={colors.badge}>
+                        {getInterviewStatusLabel(status)}
+                      </Badge>
+                    </div>
+                    {interview.description && (
+                      <p className="text-xs text-gray-600 mt-1">
+                        {interview.description}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+              {upcomingInterviews.length > 2 && (
+                <p className="text-xs text-blue-600 mt-1">
+                  +{upcomingInterviews.length - 2} more scheduled
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {pastInterviews.length > 0 &&
+          activeView === null &&
+          upcomingInterviews.length > 0 && (
+            <div className="mt-2 text-xs text-gray-500">
+              {pastInterviews.length} past{" "}
+              {pastInterviews.length === 1 ? "interview" : "interviews"}
+            </div>
+          )}
+
         {candidate.score !== undefined && (
           <div className="mt-4">
             <div className="text-sm font-medium text-gray-700">Score</div>
             <div className="mt-1 flex items-center">
               <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
                 <div
-                  className={`h-full ${
+                  className={cn(
+                    "h-full",
                     candidate.score >= 90
                       ? "bg-green-500"
                       : candidate.score >= 70
@@ -84,7 +542,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
                         : candidate.score >= 50
                           ? "bg-yellow-500"
                           : "bg-red-500"
-                  }`}
+                  )}
                   style={{ width: `${candidate.score}%` }}
                 />
               </div>
@@ -98,25 +556,262 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
         <div className="mt-4">
           <div className="text-sm font-medium text-gray-700">Skills</div>
           <div className="mt-1 flex flex-wrap gap-1">
-            {candidate.tags.map((tag, index) => (
-              <Badge key={index} variant="default" className="mt-1">
+            {candidate.tags?.map((tag, index) => (
+              <Badge key={index} variant="secondary">
                 {tag}
               </Badge>
             ))}
           </div>
         </div>
+
+        {activeView === "email" && (
+          <div className="mt-4 p-3 border rounded-md bg-gray-50 relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-1 right-1"
+              onClick={closeView}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <div className="text-sm font-medium mb-2">Contact via Email</div>
+            <div className="flex items-center">
+              <Mail className="h-4 w-4 mr-2 text-gray-500" />
+              <a
+                href={`mailto:${candidate.email}`}
+                className="text-sm text-blue-600 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {candidate.email}
+              </a>
+            </div>
+          </div>
+        )}
+
+        {activeView === "calendar" && (
+          <div className="mt-4 border rounded-md bg-gray-50 p-3 relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-1 right-1"
+              onClick={closeView}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <div className="text-sm cursor-pointer font-medium mb-2">
+              Interview Schedule
+            </div>
+
+            {sortedInterviews.length > 0 && (
+              <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-md">
+                <h4 className="text-sm font-medium text-blue-800 mb-2">
+                  All Interviews ({sortedInterviews.length})
+                </h4>
+                <div className="space-y-2 max-h-40 overflow-auto">
+                  {sortedInterviews.map((interview, index) => {
+                    const interviewDate = new Date(interview.startTime);
+                    let status = "upcoming";
+
+                    if (interviewDate < new Date()) {
+                      status = "past";
+                    } else if (isTodayDate(interviewDate)) {
+                      status = "today";
+                    } else if (isTomorrowDate(interviewDate)) {
+                      status = "tomorrow";
+                    } else if (isThisWeekDate(interviewDate)) {
+                      status = "thisWeek";
+                    }
+
+                    const colors =
+                      interviewStatusColors[
+                        status as keyof typeof interviewStatusColors
+                      ];
+
+                    return (
+                      <div
+                        key={`calendar-${interview._id || index}`}
+                        className={cn(
+                          "p-2 rounded shadow-sm",
+                          colors.bg,
+                          colors.border
+                        )}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <CalendarIcon
+                              className={cn("h-3 w-3 mr-1", colors.icon)}
+                            />
+                            <span
+                              className={cn("text-sm font-medium", colors.text)}
+                            >
+                              {formatInterviewDate(interview.startTime)}
+                            </span>
+                          </div>
+                          <Badge variant="outline" className={colors.badge}>
+                            {getInterviewStatusLabel(status)}
+                          </Badge>
+                        </div>
+                        {interview.description && (
+                          <p className="text-xs text-gray-600 mt-1">
+                            {interview.description}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmitSchedule}>
+              <Calendar
+                mode="single"
+                selected={formData.date}
+                onSelect={(date) => {
+                  setFormData({ ...formData, date: date ? date : new Date() });
+                }}
+                className="rounded-md border"
+                disabled={(date) => isPastOrToday(date)}
+                modifiers={{
+                  scheduled: (date) => isDateScheduled(date),
+                  notAvailable: (date) => isPastOrToday(date),
+                }}
+                modifiersClassNames={{
+                  scheduled: "bg-green-100 text-green-800 font-medium",
+                  notAvailable: "bg-amber-100 text-amber-800",
+                  selected: "bg-primary text-primary-foreground",
+                  today: "border-2 border-blue-500",
+                }}
+                modifiersStyles={{
+                  scheduled: { backgroundColor: "#d1fae5" },
+                  notAvailable: { backgroundColor: "#f3f4f6" },
+                  past: { backgroundColor: "#fef3c7" },
+                }}
+              />
+              <div className="mt-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Time
+                </label>
+                <select
+                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md"
+                  value={formData.time}
+                  onChange={(e) =>
+                    setFormData({ ...formData, time: e.target.value })
+                  }
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 9).map((hour) => {
+                    const formattedHour = hour > 12 ? hour - 12 : hour;
+                    const period = hour >= 12 ? "PM" : "AM";
+                    return (
+                      <option key={hour} value={`${hour}:00`}>
+                        {formattedHour}:00 {period}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <div className="mt-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  Notes
+                </label>
+                <textarea
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                  rows={2}
+                  value={formData.notes}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
+                  placeholder="Add details about this interview"
+                ></textarea>
+              </div>
+              <Button type="submit" className="mt-3 w-full cursor-pointer">
+                Schedule Interview
+              </Button>
+            </form>
+
+            <div className="mt-2 flex flex-wrap gap-2 text-xs">
+              {Object.entries(interviewStatusColors).map(([key, colors]) => (
+                <div key={key} className="flex items-center">
+                  <div
+                    className={cn(
+                      "w-3 h-3 rounded-full mr-1",
+                      colors.bg,
+                      colors.border
+                    )}
+                  />
+                  <span>{getInterviewStatusLabel(key)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeView === "test" && (
+          <div className="mt-4 p-3 border rounded-md bg-gray-50 relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-1 right-1"
+              onClick={closeView}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <div className="text-sm font-medium mb-2">Technical Assessment</div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Select Assessment
+                </label>
+                <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                  <option>Frontend Developer Test</option>
+                  <option>Backend Developer Test</option>
+                  <option>Full Stack Developer Test</option>
+                  <option>DevOps Engineer Test</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Time Limit (minutes)
+                </label>
+                <input
+                  type="number"
+                  min="30"
+                  max="180"
+                  step="15"
+                  defaultValue="60"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <Button className="w-full" variant="default">
+                Send Test Invitation
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between">
-        <Button variant="outline" size="sm">
+      <CardFooter className="px-4 py-3 bg-gray-50 border-t flex items-center justify-between">
+        <Button
+          variant={activeView === "email" ? "secondary" : "outline"}
+          onClick={handleEmailClick}
+          className="flex items-center cursor-pointer"
+        >
           <Mail className="h-4 w-4 mr-1" />
           Email
         </Button>
-        <Button variant="outline" size="sm">
-          <Calendar className="h-4 w-4 mr-1" />
+        <Button
+          variant={activeView === "calendar" ? "secondary" : "outline"}
+          onClick={handleScheduleClick}
+          className="flex items-center cursor-pointer"
+        >
+          <CalendarIcon className="h-4 w-4 mr-1" />
           Schedule
         </Button>
-        <Button variant="default" size="sm">
+        <Button
+          variant={activeView === "test" ? "secondary" : "outline"}
+          onClick={handleTestClick}
+          className="flex items-center cursor-pointer"
+        >
           <Code className="h-4 w-4 mr-1" />
           Test
         </Button>
