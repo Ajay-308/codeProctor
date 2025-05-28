@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
@@ -18,11 +18,18 @@ import {
   Hash,
   Calendar,
   BarChart2,
+  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import TemplateModal from "@/components/TempleteModel";
 import ConfirmDelete from "@/components/ConfirmDelete";
 import type { Id } from "@/convex/_generated/dataModel";
@@ -52,7 +59,6 @@ const getBadgeVariant = (difficulty: "easy" | "medium" | "hard" | "expert") => {
   }
 };
 
-// Map difficulty to colors for the visual indicator
 const getDifficultyColor = (
   difficulty: "easy" | "medium" | "hard" | "expert"
 ) => {
@@ -97,23 +103,7 @@ const TemplatesList: React.FC = () => {
   const [templateToDelete, setTemplateToDelete] = useState<string | undefined>(
     undefined
   );
-
-  // Ref for the dropdown menu to handle clicks outside
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  // Close the dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
 
   const openModal = (template: Template | null) => {
     setEditTemplate(template);
@@ -151,9 +141,7 @@ const TemplatesList: React.FC = () => {
       )
   );
 
-  // Function to get a random gradient for language badges
   const getLanguageGradient = (language: string) => {
-    // Create a deterministic but seemingly random gradient based on the language name
     const hash = language
       .split("")
       .reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -371,6 +359,7 @@ const TemplatesList: React.FC = () => {
                     variant="outline"
                     size="sm"
                     className="text-xs h-7 px-2"
+                    onClick={() => setPreviewTemplate(template)}
                   >
                     Preview
                   </Button>
@@ -387,6 +376,97 @@ const TemplatesList: React.FC = () => {
             ))}
           </div>
         )}
+
+        {/* Preview Modal */}
+        <Dialog
+          open={!!previewTemplate}
+          onOpenChange={() => setPreviewTemplate(null)}
+        >
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader className="relative">
+              <DialogTitle className="text-2xl font-bold">
+                Template Preview
+              </DialogTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0"
+                onClick={() => setPreviewTemplate(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogHeader>
+
+            {previewTemplate && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Badge
+                    variant={getBadgeVariant(previewTemplate.difficulty)}
+                    className="font-medium text-xs px-2.5 py-0.5 rounded-full"
+                  >
+                    {previewTemplate.difficulty.charAt(0).toUpperCase() +
+                      previewTemplate.difficulty.slice(1)}
+                  </Badge>
+                  <div
+                    className="px-3 py-1 text-xs font-medium text-white rounded-full"
+                    style={{
+                      background: getLanguageGradient(previewTemplate.language),
+                    }}
+                  >
+                    {previewTemplate.language}
+                  </div>
+                </div>
+
+                <div>
+                  <h2 className="text-xl font-semibold mb-2">
+                    {previewTemplate.title}
+                  </h2>
+                  <p className="text-slate-600 dark:text-slate-300">
+                    {previewTemplate.description || "No description provided"}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
+                      <Clock className="h-4 w-4 mr-2" />
+                      Time Limit: {previewTemplate.timeLimit} min
+                    </div>
+                    <div className="flex items-center text-sm text-slate-600 dark:text-slate-300">
+                      <BarChart2 className="h-4 w-4 mr-2" />
+                      Used {previewTemplate.usageCount} times
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Tags:</h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {previewTemplate.tags.map((tag, idx) => (
+                        <Badge
+                          key={idx}
+                          variant="outline"
+                          className="text-xs font-normal px-2 py-0.5 bg-slate-50 dark:bg-slate-900"
+                        >
+                          <Hash className="h-3 w-3 mr-1 text-slate-400" />
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center">
+                    <Calendar className="h-3.5 w-3.5 mr-1.5" />
+                    <span>
+                      Last Updated:{" "}
+                      {new Date(previewTemplate.updatedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         <TemplateModal
           open={isModalOpen}
