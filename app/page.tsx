@@ -1,11 +1,20 @@
 "use client";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Code, Monitor, Play, Users, Video } from "lucide-react";
+import {
+  CheckCircle,
+  Code,
+  Monitor,
+  Play,
+  Users,
+  Video,
+  X,
+  Menu,
+} from "lucide-react";
 import { SignInButton } from "@clerk/nextjs";
 import { api } from "@/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
@@ -19,6 +28,7 @@ export default function LandingPage() {
   const { userId, isLoaded } = useAuth();
   const { user } = useUser();
   const syncUser = useMutation(api.users.syncUser);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoaded || !userId || !user) return;
@@ -45,56 +55,60 @@ export default function LandingPage() {
     }
   }, [isLoaded, userId, user, syncUser, router]);
 
+  // Close mobile menu when clicking on a link
+  const handleNavLinkClick = () => {
+    setMobileMenuOpen(false);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
-          <div className="flex items-center ml-4 gap-2">
+          <div className="flex items-center gap-2">
             <Code className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold ">CodeProctor</span>
+            <span className="text-xl font-bold">CodeProctor</span>
           </div>
-          <nav className="hidden md:flex items-center gap-20">
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-8 lg:gap-20">
             <Link
               href="#features"
-              className="text-sm font-medium hover:text-primary"
+              className="text-sm font-medium hover:text-primary transition-colors"
             >
               Features
             </Link>
             <Link
               href="#how-it-works"
-              className="text-sm font-medium hover:text-primary"
+              className="text-sm font-medium hover:text-primary transition-colors"
             >
               How It Works
             </Link>
             <Link
               href="#testimonials"
-              className="text-sm font-medium hover:text-primary"
+              className="text-sm font-medium hover:text-primary transition-colors"
             >
               Testimonials
             </Link>
           </nav>
+
+          {/* Mobile Menu Button */}
           <div className="md:hidden">
-            <Button variant="ghost" size="icon" className="cursor-pointer">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-6 w-6"
-              >
-                <line x1="4" y1="6" x2="20" y2="6" />
-                <line x1="4" y1="12" x2="20" y2="12" />
-                <line x1="4" y1="18" x2="20" y2="18" />
-              </svg>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="cursor-pointer"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
               <span className="sr-only">Toggle menu</span>
             </Button>
           </div>
-          <div className="flex items-center mt-2 gap-4 cursor-grab">
+
+          <div className="hidden md:flex items-center gap-4">
             <SignInButton mode="modal">
               <Button className="cursor-pointer" variant="outline">
                 Log In
@@ -102,35 +116,74 @@ export default function LandingPage() {
             </SignInButton>
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t py-4 px-4 bg-background animate-in slide-in-from-top">
+            <nav className="flex flex-col space-y-4">
+              <Link
+                href="#features"
+                className="text-sm font-medium hover:text-primary py-2"
+                onClick={handleNavLinkClick}
+              >
+                Features
+              </Link>
+              <Link
+                href="#how-it-works"
+                className="text-sm font-medium hover:text-primary py-2"
+                onClick={handleNavLinkClick}
+              >
+                How It Works
+              </Link>
+              <Link
+                href="#testimonials"
+                className="text-sm font-medium hover:text-primary py-2"
+                onClick={handleNavLinkClick}
+              >
+                Testimonials
+              </Link>
+              <div className="pt-2 border-t">
+                <SignInButton mode="modal">
+                  <Button className="cursor-pointer w-full" variant="outline">
+                    Log In
+                  </Button>
+                </SignInButton>
+              </div>
+            </nav>
+          </div>
+        )}
       </header>
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 md:py-28">
+        <section className="py-12 md:py-20 lg:py-28">
           <div className="container px-4 sm:px-6 md:px-8">
-            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-[1fr_600px] lg:gap-12 xl:grid-cols-[1fr_700px]">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+            <div className="grid gap-8 md:gap-12 lg:grid-cols-[1fr_600px] xl:grid-cols-[1fr_700px]">
+              <div className="flex flex-col justify-center space-y-6">
+                <div className="space-y-4">
+                  <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl xl:text-6xl/none">
                     Revolutionize Your Technical Interviews
                   </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                  <p className="max-w-[600px] text-muted-foreground text-lg md:text-xl">
                     The all-in-one platform that combines live video proctoring
                     with a powerful coding environment for seamless technical
                     assessments.
                   </p>
                 </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <SignInButton mode="modal">
-                    <Button size="lg" className="px-8 cursor-pointer">
+                    <Button
+                      size="lg"
+                      className="px-8 cursor-pointer w-full sm:w-auto"
+                    >
                       Get Started Free
                     </Button>
                   </SignInButton>
-                  <Link href="#demo">
+                  <Link href="#demo" className="w-full sm:w-auto">
                     <Button
                       size="lg"
                       variant="outline"
-                      className="px-8 cursor-pointer"
+                      className="px-8 cursor-pointer w-full"
                     >
                       <Play className="mr-2 h-4 w-4" />
                       Watch Demo
@@ -141,7 +194,7 @@ export default function LandingPage() {
                   No credit card required. Start interviewing in minutes.
                 </p>
               </div>
-              <div className="relative flex items-center justify-center">
+              <div className="relative flex items-center justify-center mt-8 lg:mt-0">
                 <div className="relative w-full overflow-hidden rounded-lg border bg-background shadow-xl">
                   <div className="absolute right-2 top-2 z-10 flex gap-1">
                     <div className="h-3 w-3 rounded-full bg-red-500"></div>
@@ -154,16 +207,17 @@ export default function LandingPage() {
                     height={600}
                     alt="CodeProctor platform screenshot showing split-screen with video and code editor"
                     className="aspect-[4/3] object-cover"
+                    priority
                   />
                 </div>
-                <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-lg border bg-background p-2 shadow-lg">
+                <div className="absolute -bottom-6 -left-6 h-16 w-16 sm:h-24 sm:w-24 rounded-lg border bg-background p-2 shadow-lg hidden sm:block">
                   <div className="h-full w-full rounded bg-muted flex items-center justify-center">
-                    <Video className="h-10 w-10 text-primary" />
+                    <Video className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
                   </div>
                 </div>
-                <div className="absolute -top-6 -right-6 h-24 w-24 rounded-lg border bg-background p-2 shadow-lg">
+                <div className="absolute -top-6 -right-6 h-16 w-16 sm:h-24 sm:w-24 rounded-lg border bg-background p-2 shadow-lg hidden sm:block">
                   <div className="h-full w-full rounded bg-muted flex items-center justify-center">
-                    <Code className="h-10 w-10 text-primary" />
+                    <Code className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
                   </div>
                 </div>
               </div>
@@ -172,7 +226,7 @@ export default function LandingPage() {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="py-20">
+        <section id="features" className="py-16 md:py-20">
           <div className="container px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -244,7 +298,10 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="border-t py-20 bg-muted/30">
+        <section
+          id="how-it-works"
+          className="border-t py-16 md:py-20 bg-muted/30"
+        >
           <div className="container px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -261,7 +318,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="mt-16 grid gap-12 md:grid-cols-3">
+            <div className="mt-12 md:mt-16 grid gap-8 md:gap-12 md:grid-cols-3">
               {[
                 {
                   step: "01",
@@ -286,7 +343,7 @@ export default function LandingPage() {
                   key={i}
                   className="relative flex flex-col items-center text-center"
                 >
-                  <div className="absolute -top-10 text-6xl font-bold text-primary/10">
+                  <div className="absolute -top-10 text-5xl sm:text-6xl font-bold text-primary/10">
                     {item.step}
                   </div>
                   <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -304,9 +361,9 @@ export default function LandingPage() {
         </section>
 
         {/* Screenshot Section */}
-        <section id="demo" className="py-20">
+        <section id="demo" className="py-16 md:py-20">
           <div className="container px-4 sm:px-6 md:px-8">
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
+            <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
@@ -338,13 +395,16 @@ export default function LandingPage() {
                 </ul>
                 <div>
                   <SignInButton mode="modal">
-                    <Button size="lg" className="mt-4 cursor-pointer">
+                    <Button
+                      size="lg"
+                      className="mt-4 cursor-pointer w-full sm:w-auto"
+                    >
                       Try It Free
                     </Button>
                   </SignInButton>
                 </div>
               </div>
-              <div className="relative flex items-center justify-center rounded-lg border bg-background p-2 shadow-xl">
+              <div className="relative flex items-center justify-center rounded-lg border bg-background p-2 shadow-xl mt-8 lg:mt-0">
                 <Image
                   src={homePhoto || "/placeholder.svg"}
                   width={800}
@@ -353,8 +413,11 @@ export default function LandingPage() {
                   className="rounded aspect-video object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="rounded-full bg-primary/90 p-4 shadow-lg">
-                    <Play className="h-8 w-8 text-white" fill="white" />
+                  <div className="rounded-full bg-primary/90 p-3 sm:p-4 shadow-lg">
+                    <Play
+                      className="h-6 w-6 sm:h-8 sm:w-8 text-white"
+                      fill="white"
+                    />
                   </div>
                 </div>
               </div>
@@ -363,7 +426,10 @@ export default function LandingPage() {
         </section>
 
         {/* Testimonials Section */}
-        <section id="testimonials" className="border-t py-20 bg-muted/30">
+        <section
+          id="testimonials"
+          className="border-t py-16 md:py-20 bg-muted/30"
+        >
           <div className="container px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -440,10 +506,10 @@ export default function LandingPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="border-t py-20 bg-primary text-primary-foreground">
+        <section className="border-t py-16 md:py-20 bg-primary text-primary-foreground">
           <div className="container px-4 sm:px-6 md:px-8">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
+            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+              <div className="space-y-3">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
                   Ready to transform your technical interviews?
                 </h2>
@@ -452,20 +518,20 @@ export default function LandingPage() {
                   technical hiring needs.
                 </p>
               </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Link href="/signin">
+              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                <Link href="/signin" className="w-full sm:w-auto">
                   <Button
                     size="lg"
-                    className="bg-white text-primary hover:bg-white/90 cursor-pointer"
+                    className="bg-white text-primary hover:bg-white/90 cursor-pointer w-full"
                   >
                     Get Started Free
                   </Button>
                 </Link>
-                <Link href="/contact">
+                <Link href="/contact" className="w-full sm:w-auto">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white text-primary hover:bg-white/10 cursor-pointer"
+                    className="border-white text-white hover:bg-white/10 cursor-pointer w-full"
                   >
                     Contact Sales
                   </Button>
@@ -476,7 +542,7 @@ export default function LandingPage() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-20">
+        <section className="py-16 md:py-20">
           <FAQSection />
         </section>
       </main>
