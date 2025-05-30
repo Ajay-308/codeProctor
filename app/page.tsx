@@ -154,9 +154,9 @@ export default function LandingPage() {
         )}
       </header>
 
-      <main className="flex-1 xl:ml-14 sm:ml-0 md:ml-0 lg:ml-0 ">
+      <main className="flex-1 ">
         {/* Hero Section */}
-        <section className="py-12 md:py-20 lg:py-28 ">
+        <section className="py-12 md:py-20 lg:py-28 xl:ml-14 sm:ml-0 md:ml-0 lg:ml-0 ">
           <div className="container px-4 sm:px-6 md:px-8">
             <div className="grid gap-8 md:gap-12 lg:grid-cols-[1fr_600px] xl:grid-cols-[1fr_700px]">
               <div className="flex flex-col justify-center space-y-6">
@@ -361,7 +361,10 @@ export default function LandingPage() {
         </section>
 
         {/* Screenshot Section */}
-        <section id="demo" className="py-16 md:py-20">
+        <section
+          id="demo"
+          className="py-16 md:py-20 xl:ml-14 sm:ml-0 md:ml-0 lg:ml-0 "
+        >
           <div className="container px-4 sm:px-6 md:px-8">
             <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
               <div className="flex flex-col justify-center space-y-4">
@@ -428,7 +431,7 @@ export default function LandingPage() {
         {/* Testimonials Section */}
         <section
           id="testimonials"
-          className="border-t py-16 md:py-20 bg-muted/30"
+          className="border-t py-16  md:py-20 bg-muted/30"
         >
           <div className="container px-4 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -446,7 +449,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-12 py-12 md:grid-cols-2 lg:grid-cols-3">
               {[
                 {
                   quote:
@@ -506,9 +509,9 @@ export default function LandingPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="border-t py-16 md:py-20 bg-primary text-primary-foreground">
+        <section className="border-t  py-16 md:py-20 bg-primary text-primary-foreground">
           <div className="container px-4 sm:px-6 md:px-8">
-            <div className="flex flex-col items-center justify-center space-y-6 text-center">
+            <div className="flex flex-col items-center xl:ml-18 justify-center space-y-6 text-center">
               <div className="space-y-3">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
                   Ready to transform your technical interviews?
