@@ -12,6 +12,7 @@ import { useUser } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import homePhoto from "@/app/assest/home.png";
+import FAQSection from "@/components/FaqSection";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -52,7 +53,7 @@ export default function LandingPage() {
             <Code className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold ">CodeProctor</span>
           </div>
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-20">
             <Link
               href="#features"
               className="text-sm font-medium hover:text-primary"
@@ -64,12 +65,6 @@ export default function LandingPage() {
               className="text-sm font-medium hover:text-primary"
             >
               How It Works
-            </Link>
-            <Link
-              href="#pricing"
-              className="text-sm font-medium hover:text-primary"
-            >
-              Pricing
             </Link>
             <Link
               href="#testimonials"
@@ -142,18 +137,9 @@ export default function LandingPage() {
                     </Button>
                   </Link>
                 </div>
-                <div className="flex items-center gap-4 text-sm">
-                  <div className="flex -space-x-2">
-                    <div className="inline-block h-8 w-8 rounded-full bg-gray-100 ring-2 ring-background"></div>
-                    <div className="inline-block h-8 w-8 rounded-full bg-gray-200 ring-2 ring-background"></div>
-                    <div className="inline-block h-8 w-8 rounded-full bg-gray-300 ring-2 ring-background"></div>
-                  </div>
-                  <div className="text-muted-foreground">
-                    Trusted by{" "}
-                    <span className="font-medium text-foreground">2,000+</span>{" "}
-                    companies
-                  </div>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  No credit card required. Start interviewing in minutes.
+                </p>
               </div>
               <div className="relative flex items-center justify-center">
                 <div className="relative w-full overflow-hidden rounded-lg border bg-background shadow-xl">
@@ -453,115 +439,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section id="pricing" className="py-20">
-          <div className="container px-4 sm:px-6 md:px-8">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
-                  Pricing
-                </div>
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                  Simple, transparent pricing
-                </h2>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed">
-                  Choose the plan that&#39;s right for your team. All plans
-                  include a 14-day free trial.
-                </p>
-              </div>
-            </div>
-
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  name: "Starter",
-                  price: "$49",
-                  description: "Perfect for small teams and startups",
-                  features: [
-                    "Up to 5 team members",
-                    "20 interviews per month",
-                    "Basic video proctoring",
-                    "10 pre-built coding challenges",
-                    "7-day interview history",
-                  ],
-                  cta: "Start Free Trial",
-                  popular: false,
-                },
-                {
-                  name: "Professional",
-                  price: "$99",
-                  description: "Ideal for growing engineering teams",
-                  features: [
-                    "Up to 15 team members",
-                    "100 interviews per month",
-                    "Advanced video proctoring",
-                    "50 pre-built coding challenges",
-                    "30-day interview history",
-                    "Custom branding",
-                    "API access",
-                  ],
-                  cta: "Start Free Trial",
-                  popular: true,
-                },
-                {
-                  name: "Enterprise",
-                  price: "Custom",
-                  description: "For large organizations with custom needs",
-                  features: [
-                    "Unlimited team members",
-                    "Unlimited interviews",
-                    "Premium video proctoring",
-                    "Unlimited coding challenges",
-                    "90-day interview history",
-                    "Custom branding",
-                    "API access",
-                    "Dedicated support",
-                    "SSO integration",
-                  ],
-                  cta: "Contact Sales",
-                  popular: false,
-                },
-              ].map((plan, i) => (
-                <Card
-                  key={i}
-                  className={`overflow-hidden ${plan.popular ? "border-primary shadow-lg ring-2 ring-primary" : ""}`}
-                >
-                  <CardContent className="p-6">
-                    {plan.popular && (
-                      <div className="mb-4 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                        Most Popular
-                      </div>
-                    )}
-                    <h3 className="text-2xl font-bold">{plan.name}</h3>
-                    <div className="mt-4 flex items-baseline">
-                      <span className="text-4xl font-bold">{plan.price}</span>
-                      {plan.price !== "Custom" && (
-                        <span className="text-muted-foreground">/month</span>
-                      )}
-                    </div>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {plan.description}
-                    </p>
-                    <ul className="mt-6 space-y-3">
-                      {plan.features.map((feature, j) => (
-                        <li key={j} className="flex items-center gap-2 text-sm">
-                          <CheckCircle className="h-4 w-4 text-primary" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      className={`mt-8 w-full cursor-pointer ${plan.popular ? "" : "variant-outline"}`}
-                    >
-                      {plan.cta}
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* CTA Section */}
         <section className="border-t py-20 bg-primary text-primary-foreground">
           <div className="container px-4 sm:px-6 md:px-8">
@@ -588,7 +465,7 @@ export default function LandingPage() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white text-white hover:bg-white/10 cursor-pointer"
+                    className="border-white text-primary hover:bg-white/10 cursor-pointer"
                   >
                     Contact Sales
                   </Button>
@@ -600,57 +477,7 @@ export default function LandingPage() {
 
         {/* FAQ Section */}
         <section className="py-20">
-          <div className="container px-4 sm:px-6 md:px-8">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
-                  FAQ
-                </div>
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                  Frequently Asked Questions
-                </h2>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed">
-                  Find answers to common questions about CodeProctor.
-                </p>
-              </div>
-            </div>
-
-            <div className="mx-auto mt-12 max-w-3xl space-y-4">
-              {[
-                {
-                  question: "How does the video proctoring work?",
-                  answer:
-                    "Our platform uses secure WebRTC technology to enable real-time video streaming during interviews. Candidates will be prompted to enable their camera when they join the interview session. The video feed is encrypted and can be recorded for later review if needed.",
-                },
-                {
-                  question: "What programming languages are supported?",
-                  answer:
-                    "CodeProctor supports all major programming languages including JavaScript, Python, Java, C++, Ruby, Go, and many more. Our code execution environment is fully configurable to match your specific requirements.",
-                },
-                {
-                  question: "Can I customize the coding challenges?",
-                  answer:
-                    "Yes! You can create your own custom coding challenges or choose from our library of pre-built questions. Each challenge can be customized with specific requirements, test cases, and time limits.",
-                },
-                {
-                  question:
-                    "Is there a limit to the number of interviews I can conduct?",
-                  answer:
-                    "The number of interviews depends on your subscription plan. Our Starter plan includes 20 interviews per month, Professional includes 100, and Enterprise offers unlimited interviews. You can always upgrade your plan as your needs grow.",
-                },
-                {
-                  question: "How secure is the platform?",
-                  answer:
-                    "Security is our top priority. All data is encrypted in transit and at rest. We use industry-standard security practices and regularly undergo security audits. We are SOC 2 compliant and GDPR ready.",
-                },
-              ].map((faq, i) => (
-                <div key={i} className="rounded-lg border p-6">
-                  <h3 className="text-lg font-medium">{faq.question}</h3>
-                  <p className="mt-2 text-muted-foreground">{faq.answer}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <FAQSection />
         </section>
       </main>
 
