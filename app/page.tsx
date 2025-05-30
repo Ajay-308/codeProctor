@@ -108,7 +108,7 @@ export default function LandingPage() {
             </Button>
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center -mr-20">
             <SignInButton mode="modal">
               <Button className="cursor-pointer" variant="outline">
                 Log In
@@ -154,9 +154,9 @@ export default function LandingPage() {
         )}
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 xl:ml-14 sm:ml-0 md:ml-0 lg:ml-0 ">
         {/* Hero Section */}
-        <section className="py-12 md:py-20 lg:py-28">
+        <section className="py-12 md:py-20 lg:py-28 ">
           <div className="container px-4 sm:px-6 md:px-8">
             <div className="grid gap-8 md:gap-12 lg:grid-cols-[1fr_600px] xl:grid-cols-[1fr_700px]">
               <div className="flex flex-col justify-center space-y-6">
@@ -194,7 +194,7 @@ export default function LandingPage() {
                   No credit card required. Start interviewing in minutes.
                 </p>
               </div>
-              <div className="relative flex items-center justify-center mt-8 lg:mt-0">
+              <div className="relative flex items-center justify-center mt-8 lg:mt-0 ml-6">
                 <div className="relative w-full overflow-hidden rounded-lg border bg-background shadow-xl">
                   <div className="absolute right-2 top-2 z-10 flex gap-1">
                     <div className="h-3 w-3 rounded-full bg-red-500"></div>
@@ -226,8 +226,8 @@ export default function LandingPage() {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="py-16 md:py-20">
-          <div className="container px-4 sm:px-6 md:px-8">
+        <section id="features" className="py-16 md:py-20 ">
+          <div className="container px-12 sm:px-6 md:px-8">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
@@ -242,7 +242,7 @@ export default function LandingPage() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-20  py-12 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
                   icon: <Monitor className="h-10 w-10 text-primary" />,
@@ -531,7 +531,7 @@ export default function LandingPage() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white text-white hover:bg-white/10 cursor-pointer w-full"
+                    className="border-white text-primary hover:bg-white/10 cursor-pointer w-full"
                   >
                     Contact Sales
                   </Button>
@@ -548,7 +548,7 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t py-12 md:py-16">
+      <footer className="border-t py-12 md:py-16 gap-4">
         <div className="container px-4 sm:px-6 md:px-8">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-4">
@@ -622,7 +622,7 @@ export default function LandingPage() {
                 </Link>
               </div>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-4 ml-4">
               <h3 className="text-lg font-medium">Product</h3>
               <ul className="space-y-2 text-sm">
                 <li>

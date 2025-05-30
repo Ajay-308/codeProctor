@@ -35,7 +35,7 @@ export default function FAQSection() {
   ];
 
   return (
-    <section className="py-20">
+    <section className="py-20 xl:ml-14">
       <div className="container px-4 sm:px-6 md:px-8">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
