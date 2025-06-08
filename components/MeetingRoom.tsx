@@ -5,9 +5,9 @@ import {
   CallParticipantsList,
   useCall,
   useCallStateHooks,
-  ParticipantView,
-  StreamVideoParticipant,
 } from "@stream-io/video-react-sdk";
+import { CustomSpeakerLayout } from "./CustomSpeakerLayout";
+import { CustomGridLayout } from "./customeGridLayout";
 import {
   LayoutListIcon,
   LoaderIcon,
@@ -45,222 +45,82 @@ import {
   TooltipTrigger,
 } from "./tooltip";
 import toast from "react-hot-toast";
+import { FloatingReactions } from "./FlootingReaction";
 
-// Custom Participant Tile Component
-const ParticipantTile = ({
-  participant,
-  isLocal = false,
-}: {
-  participant: StreamVideoParticipant;
-  isLocal?: boolean;
-}) => {
-  const [isSpeaking] = useState(false);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      className={cn(
-        "relative bg-white rounded-xl overflow-hidden border-2 transition-all duration-200 min-h-0",
-        isSpeaking
-          ? "border-green-400 shadow-lg shadow-green-400/20"
-          : "border-slate-700/50",
-        "hover:border-slate-500/70 shadow-lg"
-      )}
-    >
-      <div className="w-full h-full object-contain">
-        <ParticipantView participant={participant} className="w-full h-full" />
-        <style jsx>{`
-          :global(.str-video__participant-view video) {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
-            object-position: center center !important;
-          }
-        `}</style>
-
-        {/* Participant Info Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 min-w-0 flex-1">
-              <span className="text-white text-sm font-medium truncate">
-                {participant.name || participant.userId}
-                {isLocal && " (You)"}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              {participant.audioStream && (
-                <div
-                  className={cn(
-                    "w-2 h-2 rounded-full",
-                    isSpeaking ? "bg-red-600 animate-pulse" : "bg-gray-500"
-                  )}
-                />
-              )}
-              {participant.videoStream && (
-                <div
-                  className={cn(
-                    "w-2 h-2 rounded-full",
-                    participant.videoDimension?.width &&
-                      participant.videoDimension?.height
-                      ? "bg-blue-400 animate-pulse"
-                      : "bg-gray-500"
-                  )}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Speaking Indicator */}
-        {isSpeaking && (
-          <div className="absolute top-3 right-3">
-            <div className="bg-green-500 rounded-full p-1.5 animate-pulse">
-              <div className="w-2 h-2 bg-white rounded-full" />
-            </div>
-          </div>
-        )}
-
-        {/* Connection Status */}
-        <div className="absolute top-3 left-3">
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// Custom Grid Layout Component
-const CustomGridLayout = () => {
-  const { useParticipants, useLocalParticipant } = useCallStateHooks();
-  const participants = useParticipants();
-  const localParticipant = useLocalParticipant();
-
-  const totalParticipants = participants.length;
-
-  // Calculate optimal grid layout
-  const getGridLayout = (count: number) => {
-    if (count === 1) return { cols: 1, rows: 1, maxWidth: "60%" };
-    if (count === 2) return { cols: 1, rows: 2, maxWidth: "80%" };
-    if (count <= 4) return { cols: 2, rows: 2, maxWidth: "100%" };
-    if (count <= 6) return { cols: 3, rows: 2, maxWidth: "100%" };
-    if (count <= 9) return { cols: 3, rows: 3, maxWidth: "100%" };
-    if (count <= 12) return { cols: 4, rows: 3, maxWidth: "100%" };
-    return { cols: 4, rows: 4, maxWidth: "100%" };
+// Reaction interface
+interface CustomEventPayload {
+  type: "custom";
+  custom?: {
+    type?: string;
+    emoji?: string;
+    userId?: string;
+    userName?: string;
+    timestamp?: number;
   };
-
-  const layout = getGridLayout(totalParticipants);
-
-  return (
-    <div className="h-full flex items-center justify-center p-6 bg-slate-950">
-      <div
-        className="w-full h-full max-w-7xl"
-        style={{ maxWidth: layout.maxWidth }}
-      >
-        <div
-          className="grid gap-4 h-full w-full"
-          style={{
-            gridTemplateColumns: `repeat(${layout.cols}, 1fr)`,
-            gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
-            aspectRatio: totalParticipants === 1 ? "16/9" : "auto",
-          }}
-        >
-          <AnimatePresence>
-            {/* Local Participant First */}
-            {localParticipant && (
-              <ParticipantTile
-                key={localParticipant.sessionId}
-                participant={localParticipant}
-                isLocal={true}
-              />
-            )}
-
-            {/* Remote Participants */}
-            {participants
-              .filter((p) => p.sessionId !== localParticipant?.sessionId)
-              .map((participant) => (
-                <ParticipantTile
-                  key={participant.sessionId}
-                  participant={participant}
-                />
-              ))}
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Speaker Layout with Thumbnails
-const CustomSpeakerLayout = () => {
-  const { useParticipants, useLocalParticipant, useDominantSpeaker } =
-    useCallStateHooks();
-  const participants = useParticipants();
-  const localParticipant = useLocalParticipant();
-  const dominantSpeaker = useDominantSpeaker();
-
-  // Main speaker is either dominant speaker or local participant
-  const mainSpeaker = dominantSpeaker || localParticipant;
-  const otherParticipants = participants.filter(
-    (p) => p.sessionId !== mainSpeaker?.sessionId
-  );
-
-  return (
-    <div className="h-full bg-white relative flex flex-col">
-      {/* Main Speaker */}
-      {mainSpeaker && (
-        <div className="flex-1 p-6">
-          <div className="h-full max-w-5xl mx-auto">
-            <ParticipantTile
-              participant={mainSpeaker}
-              isLocal={mainSpeaker.sessionId === localParticipant?.sessionId}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Thumbnail Strip */}
-      {otherParticipants.length > 0 && (
-        <div className="p-4 border-t border-slate-800/50">
-          <div className="flex gap-3 justify-center flex-wrap max-w-6xl mx-auto">
-            {otherParticipants.slice(0, 8).map((participant) => (
-              <div
-                key={participant.sessionId}
-                className="w-32 h-48 flex-shrink-0"
-              >
-                <ParticipantTile
-                  participant={participant}
-                  isLocal={
-                    participant.sessionId === localParticipant?.sessionId
-                  }
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+}
+interface EmojiReaction {
+  id: string;
+  emoji: string;
+  userId: string;
+  userName: string;
+  timestamp: number;
+}
 
 function MeetingRoom() {
   const router = useRouter();
   const [layout, setLayout] = useState<"grid" | "speaker">("grid");
   const [showParticipants, setShowParticipants] = useState(false);
-  const { useCallCallingState } = useCallStateHooks();
+  const { useCallCallingState, useLocalParticipant } = useCallStateHooks();
   const callingState = useCallCallingState();
-
-  // Add state for media controls
+  const localParticipant = useLocalParticipant();
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [reactions, setReactions] = useState<EmojiReaction[]>([]);
 
   const call = useCall();
+
+  useEffect(() => {
+    if (!call) return;
+
+    const handleCustomEvent = (event: CustomEventPayload) => {
+      console.log("Received custom event:", event);
+
+      if (
+        event.custom &&
+        typeof event.custom === "object" &&
+        event.custom.type === "emoji_reaction"
+      ) {
+        const reactionData = event.custom as {
+          emoji?: string;
+          userId?: string;
+          userName?: string;
+        };
+        const newReaction: EmojiReaction = {
+          id: `${reactionData.userId}-${Date.now()}-${Math.random()}`,
+          emoji: reactionData.emoji ?? "",
+          userId: reactionData.userId ?? "",
+          userName: reactionData.userName ?? "",
+          timestamp: Date.now(),
+        };
+
+        console.log("Adding new reaction:", newReaction);
+        setReactions((prev) => [...prev, newReaction]);
+
+        setTimeout(() => {
+          setReactions((prev) => prev.filter((r) => r.id !== newReaction.id));
+        }, 6000);
+      }
+    };
+
+    call.on("custom", handleCustomEvent);
+
+    return () => {
+      call.off("custom", handleCustomEvent);
+    };
+  }, [call]);
 
   // Handle mic toggle
   const toggleMic = () => {
@@ -333,7 +193,6 @@ function MeetingRoom() {
     syncRecordingState();
   }, [call]);
 
-  // Handle camera toggle
   const toggleCamera = () => {
     if (!call) return;
 
@@ -345,7 +204,6 @@ function MeetingRoom() {
     setIsCameraOff(!isCameraOff);
   };
 
-  // Handle screen sharing
   const toggleScreenShare = async () => {
     if (!call) return;
 
@@ -361,7 +219,6 @@ function MeetingRoom() {
     }
   };
 
-  // Handle end call
   const endCall = async () => {
     if (!call) return;
 
@@ -374,7 +231,6 @@ function MeetingRoom() {
     }
   };
 
-  // Sync state with call object on mount
   useEffect(() => {
     if (call) {
       setIsMicMuted(!call.microphone.enabled);
@@ -383,12 +239,29 @@ function MeetingRoom() {
     }
   }, [call]);
 
-  // Emoji reactions
   const emojis = ["👍", "👏", "❤️", "🎉", "🔥", "😂", "😮", "🤔"];
 
-  const sendReaction = (emoji: string) => {
-    console.log(`Sending reaction: ${emoji}`);
-    setShowEmoji(false);
+  const sendReaction = async (emoji: string) => {
+    if (!call || !localParticipant) return;
+
+    try {
+      console.log("Sending reaction:", emoji);
+
+      await call.sendCustomEvent({
+        type: "emoji_reaction",
+        emoji: emoji,
+        userId: localParticipant.userId,
+        userName: localParticipant.name || localParticipant.userId,
+        timestamp: Date.now(),
+      });
+
+      console.log("Reaction sent successfully");
+      setShowEmoji(false);
+      toast.success(`Sent ${emoji} reaction!`);
+    } catch (error) {
+      console.error("Error sending reaction:", error);
+      toast.error("Failed to send reaction");
+    }
   };
 
   if (callingState !== CallingState.JOINED) {
@@ -426,13 +299,16 @@ function MeetingRoom() {
           >
             <div className="relative h-full rounded-lg overflow-hidden border border-border/50 shadow-lg">
               {layout === "grid" ? (
-                <CustomGridLayout />
+                <CustomGridLayout reactions={reactions} />
               ) : (
-                <CustomSpeakerLayout />
+                <CustomSpeakerLayout reactions={reactions} />
               )}
+
+              <div className="absolute inset-0 pointer-events-none z-30">
+                <FloatingReactions reactions={reactions} />
+              </div>
             </div>
 
-            {/* PARTICIPANTS LIST OVERLAY */}
             <AnimatePresence>
               {showParticipants && (
                 <motion.div
@@ -440,7 +316,7 @@ function MeetingRoom() {
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: 300, opacity: 0 }}
                   transition={{ type: "spring", damping: 20 }}
-                  className="absolute right-0 top-0 h-full w-[300px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-l border-border/50 shadow-lg"
+                  className="absolute right-0 top-0 h-full w-[300px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-l border-border/50 shadow-lg z-20"
                 >
                   <CallParticipantsList
                     onClose={() => setShowParticipants(false)}
@@ -450,21 +326,21 @@ function MeetingRoom() {
             </AnimatePresence>
           </motion.div>
 
-          {/* EMOJI REACTIONS PANEL */}
           <AnimatePresence>
             {showEmoji && (
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: -80, opacity: 1 }}
                 exit={{ y: 20, opacity: 0 }}
-                className="absolute bottom-24 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md rounded-full p-2 shadow-xl"
+                className="absolute bottom-24 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md rounded-full p-3 shadow-xl z-30"
               >
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   {emojis.map((emoji) => (
                     <button
                       key={emoji}
                       onClick={() => sendReaction(emoji)}
-                      className="text-xl hover:scale-125 transition-transform p-1"
+                      className="text-2xl hover:scale-125 transition-transform p-2 rounded-full hover:bg-slate-800/50"
+                      title={`Send ${emoji} reaction`}
                     >
                       {emoji}
                     </button>
@@ -473,16 +349,13 @@ function MeetingRoom() {
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* CUSTOM VIDEO CONTROLS */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20"
           >
             <div className="flex items-center gap-2 p-2 rounded-full bg-slate-900/90 backdrop-blur-md shadow-xl">
-              {/* Mic Button */}
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -510,7 +383,6 @@ function MeetingRoom() {
                 </Tooltip>
               </TooltipProvider>
 
-              {/* Camera Button */}
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -560,7 +432,6 @@ function MeetingRoom() {
                 </Tooltip>
               </TooltipProvider>
 
-              {/* Screen Share Button */}
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -588,7 +459,6 @@ function MeetingRoom() {
                 </Tooltip>
               </TooltipProvider>
 
-              {/* Record Button */}
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -612,7 +482,6 @@ function MeetingRoom() {
                 </Tooltip>
               </TooltipProvider>
 
-              {/* End Call Button */}
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
