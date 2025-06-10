@@ -45,7 +45,7 @@ type Submission = {
 export default function AssignmentDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const assignmentId = params.id as string;
+  const assignmentId = params?.id as string;
   const [activeTab, setActiveTab] = useState("overview");
 
   // Fetch the specific assignment

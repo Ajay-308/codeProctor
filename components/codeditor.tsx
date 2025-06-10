@@ -162,7 +162,14 @@ function CodeEditor({
     return () => {
       socket.disconnect();
     };
-  }, [roomId, userId, userName]);
+  }, [
+    roomId,
+    userId,
+    userName,
+    language,
+    selectedQuestion.id,
+    selectedQuestion.starterCode,
+  ]);
 
   // Handle code changes
   const handleCodeChange = (value: string | undefined) => {
