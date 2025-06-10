@@ -10,15 +10,14 @@ import MeetingSetup from "@/components/MeetingSetup";
 import MeetingRoom from "@/components/MeetingRoom";
 
 export default function MeetingPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id as string | undefined;
   const { isLoaded, user } = useUser();
   const { call, isCallLoading } = useGetCallById(id ?? "");
   const [isSetupComplete, setIsSetupComplete] = useState(false);
 
-  // ✅ Show loader while data is loading
   if (!isLoaded || isCallLoading) return <LoaderUI />;
 
-  // 🛑 Handle missing call
   if (!call) {
     return (
       <div className="h-screen flex items-center justify-center bg-gradient-to-br from-background to-background/80">
