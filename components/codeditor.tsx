@@ -1,5 +1,5 @@
 import { codingQuestions, languages } from "@/constants";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import type * as monaco from "monaco-editor";
 import {
   ResizableHandle,
@@ -78,86 +78,48 @@ function CodeEditor({
   const isRemoteChange = useRef(false);
 
   useEffect(() => {
-    socketRef.current = io(
-      process.env.NEXT_PUBLIC_SOCKET_URL || "ws://localhost:3001",
-      {
-        transports: ["websocket"],
-      }
-    );
+    socketRef.current = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
+      transports: ["websocket"],
+    });
 
     const socket = socketRef.current;
+    if (!socket) return;
 
-    // Join the room
-    socket.emit("join-room", {
-      roomId,
-      userId,
-      userName,
-    });
+    socket.emit("join-room", { roomId, userId, userName });
 
-    // Socket event listeners
-    socket.on("connect", () => {
-      setIsConnected(true);
-      console.log("Connected to collaboration server");
-    });
-
-    socket.on("disconnect", () => {
-      setIsConnected(false);
-      console.log("Disconnected from collaboration server");
-    });
-
-    socket.on("user-joined", (users: CollaborativeUser[]) => {
-      setConnectedUsers(users);
-    });
-
-    socket.on("user-left", (users: CollaborativeUser[]) => {
-      setConnectedUsers(users);
-    });
+    socket.on("connect", () => setIsConnected(true));
+    socket.on("disconnect", () => setIsConnected(false));
+    socket.on("user-joined", (users) => setConnectedUsers(users));
+    socket.on("user-left", (users) => setConnectedUsers(users));
 
     socket.on("code-change", (data: CodeSyncData) => {
       if (data.userId !== userId) {
         isRemoteChange.current = true;
         setCode(data.code);
-
-        // Update question and language if they changed
-        if (data.questionId !== selectedQuestion.id) {
-          const question = codingQuestions.find(
-            (q) => q.id === data.questionId
-          )!;
-          setSelectedQuestion(question);
-        }
-
-        if (data.language !== language) {
+        const question = codingQuestions.find((q) => q.id === data.questionId);
+        if (question) setSelectedQuestion(question);
+        if (data.language !== language)
           setLanguage(data.language as "javascript" | "python" | "java");
-        }
       }
     });
 
-    socket.on(
-      "question-change",
-      (data: { questionId: string; userId: string }) => {
-        if (data.userId !== userId) {
-          const question = codingQuestions.find(
-            (q) => q.id === data.questionId
-          )!;
+    socket.on("question-change", (data) => {
+      if (data.userId !== userId) {
+        const question = codingQuestions.find((q) => q.id === data.questionId);
+        if (question) {
           setSelectedQuestion(question);
           setCode(question.starterCode[language]);
         }
       }
-    );
+    });
 
-    socket.on(
-      "language-change",
-      (data: { language: string; userId: string }) => {
-        if (data.userId !== userId) {
-          setLanguage(data.language as "javascript" | "python" | "java");
-          setCode(
-            selectedQuestion.starterCode[
-              data.language as "javascript" | "python" | "java"
-            ]
-          );
-        }
+    socket.on("language-change", (data) => {
+      if (data.userId !== userId) {
+        const newLang = data.language as "javascript" | "python" | "java";
+        setLanguage(newLang);
+        setCode(selectedQuestion.starterCode[newLang]);
       }
-    );
+    });
 
     return () => {
       socket.disconnect();
@@ -171,18 +133,15 @@ function CodeEditor({
     selectedQuestion.starterCode,
   ]);
 
-  // Handle code changes
   const handleCodeChange = (value: string | undefined) => {
     const newCode = value || "";
     setCode(newCode);
 
-    // Don't emit if this is a remote change
     if (isRemoteChange.current) {
       isRemoteChange.current = false;
       return;
     }
 
-    // Emit code change to other users
     if (socketRef.current && isConnected) {
       socketRef.current.emit("code-change", {
         roomId,
@@ -196,43 +155,72 @@ function CodeEditor({
   };
 
   const handleQuestionChange = (questionId: string) => {
-    const question = codingQuestions.find((q) => q.id === questionId)!;
-    setSelectedQuestion(question);
-    setCode(question.starterCode[language]);
+    const question = codingQuestions.find((q) => q.id === questionId);
+    if (question) {
+      setSelectedQuestion(question);
+      setCode(question.starterCode[language]);
 
-    // Emit question change to other users
-    if (socketRef.current && isConnected) {
-      socketRef.current.emit("question-change", {
-        roomId,
-        questionId,
-        userId,
-      });
+      if (socketRef.current && isConnected) {
+        socketRef.current.emit("question-change", {
+          roomId,
+          questionId,
+          userId,
+        });
+      }
     }
   };
 
-  const handleLanguageChange = (
-    newLanguage: "javascript" | "python" | "java"
-  ) => {
-    setLanguage(newLanguage);
-    const newCode = selectedQuestion.starterCode[newLanguage];
+  const handleLanguageChange = (newLang: "javascript" | "python" | "java") => {
+    setLanguage(newLang);
+    const newCode = selectedQuestion.starterCode[newLang];
     setCode(newCode);
 
-    // Emit language change to other users
     if (socketRef.current && isConnected) {
       socketRef.current.emit("language-change", {
         roomId,
-        language: newLanguage,
+        language: newLang,
         userId,
       });
     }
   };
 
-  // Handle editor mounting
-
+  // handle editor copy paste
   const handleEditorDidMount = (
-    editor: monaco.editor.IStandaloneCodeEditor
+    editor: monaco.editor.IStandaloneCodeEditor,
+    monacoInstance: typeof monaco
   ) => {
     editorRef.current = editor;
+
+    // Block copy/paste/cut/selectAll keyboard shortcuts
+    const keysToBlock = [
+      [monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyC],
+      [monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyV],
+      [monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyX],
+      [monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyA],
+    ];
+    keysToBlock.forEach(([key]) => {
+      editor.addCommand(key, () => {});
+    });
+
+    // Disable right-click context menu
+    editor.onContextMenu((e) => {
+      e.event.preventDefault();
+      e.event.stopPropagation();
+    });
+
+    // Disable native clipboard events
+    const editorDOM = editor.getDomNode();
+    if (editorDOM) {
+      const prevent = (e: Event) => {
+        e.preventDefault();
+        alert("Copy, paste, and cut are disabled.");
+      };
+
+      editorDOM.addEventListener("copy", prevent);
+      editorDOM.addEventListener("paste", prevent);
+      editorDOM.addEventListener("cut", prevent);
+      editorDOM.addEventListener("contextmenu", prevent);
+    }
   };
 
   return (
@@ -446,6 +434,7 @@ function CodeEditor({
               padding: { top: 16, bottom: 16 },
               wordWrap: "on",
               wrappingIndent: "indent",
+              contextmenu: false,
             }}
           />
         </div>

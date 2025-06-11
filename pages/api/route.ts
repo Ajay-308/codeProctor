@@ -8,7 +8,10 @@ const server = http.createServer(app);
 
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin:
+      process.env.CLIENT_URL ||
+      "http://localhost:3000" ||
+      "https://code-proctor.vercel.app/",
     methods: ["GET", "POST"],
     credentials: true,
   },
