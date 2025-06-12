@@ -92,9 +92,17 @@ export default defineSchema({
     ),
     language: v.string(),
     tags: v.array(v.string()),
+    timeLimit: v.number(),
+
+    inputFormat: v.optional(v.string()),
+    outputFormat: v.optional(v.string()),
+    constraints: v.optional(v.string()),
+    sampleInput: v.optional(v.string()),
+    sampleOutput: v.optional(v.string()),
+    explanation: v.optional(v.string()),
+
     createdAt: v.string(),
     updatedAt: v.string(),
-    timeLimit: v.number(),
     usageCount: v.number(),
   }),
 });

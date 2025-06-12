@@ -23,14 +23,24 @@ import {
 import { Badge } from "@/components/ui/badge";
 import LeetCodeProblemSelector from "./leetcodeProblemSelector";
 
+// Updated Template interface to match your main component
 interface Template {
   _id?: string;
   title: string;
-  description: string;
+  description?: string;
   tags: string[];
   difficulty: "easy" | "medium" | "hard" | "expert";
   language: string;
   timeLimit: number;
+  usageCount: number;
+  updatedAt: string;
+  // Enhanced fields
+  inputFormat?: string;
+  outputFormat?: string;
+  constraints?: string;
+  sampleInput?: string;
+  sampleOutput?: string;
+  explanation?: string;
 }
 
 interface LeetCodeProblem {
@@ -49,11 +59,20 @@ interface LeetCodeProblem {
   }>;
 }
 
+// Updated props interface to accept async onSave
 interface EnhancedTemplateModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  template?: Template;
-  onSave?: (template: Template) => void;
+  template?: {
+    _id: string;
+    title: string;
+    description: string;
+    language: string;
+    difficulty: "easy" | "medium" | "hard" | "expert";
+    tags: string[];
+    timeLimit: number;
+  };
+  onSave?: (template: Template) => Promise<void>; // Changed to async
 }
 
 export default function EnhancedTemplateModal({
@@ -62,7 +81,7 @@ export default function EnhancedTemplateModal({
   template,
   onSave,
 }: EnhancedTemplateModalProps) {
-  const [formData, setFormData] = useState<Template>({
+  const [formData, setFormData] = useState<Partial<Template>>({
     title: "",
     description: "",
     tags: [],
@@ -72,10 +91,19 @@ export default function EnhancedTemplateModal({
   });
   const [tagInput, setTagInput] = useState("");
   const [showLeetCodeSelector, setShowLeetCodeSelector] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (template) {
-      setFormData(template);
+      setFormData({
+        _id: template._id,
+        title: template.title,
+        description: template.description,
+        tags: template.tags,
+        difficulty: template.difficulty,
+        language: template.language,
+        timeLimit: template.timeLimit,
+      });
       setTagInput(template.tags.join(", "));
     } else {
       setFormData({
@@ -109,20 +137,47 @@ export default function EnhancedTemplateModal({
     setTagInput(problem.topics.join(", "));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const tagsArray = tagInput
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0);
+    setIsSubmitting(true);
 
-    const templateData = {
-      ...formData,
-      tags: tagsArray,
-    };
+    try {
+      const tagsArray = tagInput
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0);
 
-    onSave?.(templateData);
-    setOpen(false);
+      // Create complete template data with all required fields
+      const templateData: Template = {
+        _id: formData._id,
+        title: formData.title || "",
+        description: formData.description || "",
+        tags: tagsArray,
+        difficulty: formData.difficulty || "easy",
+        language: formData.language || "",
+        timeLimit: formData.timeLimit || 30,
+        // Provide defaults for required fields that aren't in the form
+        usageCount: 0, // Will be handled by backend for existing templates
+        updatedAt: new Date().toISOString(),
+        // Enhanced fields (empty for now, but could be added to form later)
+        inputFormat: "",
+        outputFormat: "",
+        constraints: "",
+        sampleInput: "",
+        sampleOutput: "",
+        explanation: "",
+      };
+
+      if (onSave) {
+        await onSave(templateData);
+        setOpen(false);
+      }
+    } catch (error) {
+      console.error("Error saving template:", error);
+      // You could add error handling here (toast notification, etc.)
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleTagsChange = (value: string) => {
@@ -168,7 +223,7 @@ export default function EnhancedTemplateModal({
                 <Input
                   id="title"
                   placeholder="Enter template title"
-                  value={formData.title}
+                  value={formData.title || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, title: e.target.value })
                   }
@@ -183,7 +238,7 @@ export default function EnhancedTemplateModal({
                 <Textarea
                   id="description"
                   placeholder="Enter template description"
-                  value={formData.description}
+                  value={formData.description || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
@@ -197,7 +252,7 @@ export default function EnhancedTemplateModal({
                     Language <span className="text-red-500">*</span>
                   </Label>
                   <Select
-                    value={formData.language}
+                    value={formData.language || ""}
                     onValueChange={(value) =>
                       setFormData({ ...formData, language: value })
                     }
@@ -226,7 +281,7 @@ export default function EnhancedTemplateModal({
                     Difficulty <span className="text-red-500">*</span>
                   </Label>
                   <Select
-                    value={formData.difficulty}
+                    value={formData.difficulty || "easy"}
                     onValueChange={(value) =>
                       setFormData({
                         ...formData,
@@ -264,7 +319,7 @@ export default function EnhancedTemplateModal({
                 <p className="text-xs text-slate-500 dark:text-slate-400">
                   Example: arrays, sorting, recursion
                 </p>
-                {formData.tags.length > 0 && (
+                {tagInput && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {tagInput.split(",").map((tag, idx) => {
                       const trimmedTag = tag.trim();
@@ -287,7 +342,7 @@ export default function EnhancedTemplateModal({
                   type="number"
                   min="1"
                   max="180"
-                  value={formData.timeLimit}
+                  value={formData.timeLimit || 30}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -304,14 +359,16 @@ export default function EnhancedTemplateModal({
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-black hover:bg-gray-800 text-white"
+                disabled={isSubmitting}
               >
-                {template ? "Update" : "Create"}
+                {isSubmitting ? "Saving..." : template ? "Update" : "Create"}
               </Button>
             </div>
           </form>

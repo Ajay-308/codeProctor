@@ -14,7 +14,7 @@ export const getTempletes = query({
 export const addTempletes = mutation({
   args: {
     title: v.string(),
-    description: v.optional(v.string()),
+    description: v.string(), // if required, make it optional with `v.optional`
     difficulty: v.union(
       v.literal("easy"),
       v.literal("medium"),
@@ -24,6 +24,15 @@ export const addTempletes = mutation({
     language: v.string(),
     tags: v.array(v.string()),
     timeLimit: v.number(),
+    updatedAt: v.optional(v.string()), // ✅ Add this
+    createdAt: v.optional(v.string()), // ✅ Add this
+    usageCount: v.optional(v.number()), // ✅ Add this
+    explanation: v.optional(v.string()), // ✅ Add these new fields if used
+    inputFormat: v.optional(v.string()),
+    outputFormat: v.optional(v.string()),
+    sampleInput: v.optional(v.string()),
+    sampleOutput: v.optional(v.string()),
+    constraints: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const now = new Date().toISOString();
@@ -43,7 +52,7 @@ export const updateTempletes = mutation({
     id: v.id("templetes"),
     updates: v.object({
       title: v.optional(v.string()),
-      description: v.optional(v.string()),
+      description: v.optional(v.string()), // Problem Statement
       difficulty: v.optional(
         v.union(
           v.literal("easy"),
@@ -55,23 +64,19 @@ export const updateTempletes = mutation({
       language: v.optional(v.string()),
       tags: v.optional(v.array(v.string())),
       timeLimit: v.optional(v.number()),
+
+      // Optional LeetCode fields
+      inputFormat: v.optional(v.string()),
+      outputFormat: v.optional(v.string()),
+      constraints: v.optional(v.string()),
+      sampleInput: v.optional(v.string()),
+      sampleOutput: v.optional(v.string()),
+      explanation: v.optional(v.string()),
     }),
   },
   handler: async (ctx, { id, updates }) => {
     const now = new Date().toISOString();
     await ctx.db.patch(id, { ...updates, updatedAt: now });
-  },
-});
-
-// delete templete
-
-export const deleteTempletes = mutation({
-  args: {
-    id: v.id("templetes"),
-  },
-  handler: async (ctx, { id }) => {
-    await ctx.db.delete(id);
-    return;
   },
 });
 
@@ -97,5 +102,18 @@ export const duplicateTemmpletes = mutation({
 
     const newId = await ctx.db.insert("templetes", newTemplete);
     return newId;
+  },
+});
+
+export const deleteTempletes = mutation({
+  args: {
+    id: v.id("templetes"),
+  },
+  handler: async (ctx, { id }) => {
+    const templetes = await ctx.db.get(id);
+    if (!templetes) throw new Error("templete not dound");
+
+    await ctx.db.delete(id);
+    return { success: true, message: "templete deleted successfully" };
   },
 });
