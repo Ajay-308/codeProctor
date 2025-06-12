@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { X, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -191,13 +191,6 @@ export default function EnhancedTemplateModal({
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center justify-between">
               {template ? "Edit Template" : "New Template"}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </DialogTitle>
           </DialogHeader>
 

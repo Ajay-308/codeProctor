@@ -221,7 +221,7 @@ export default function HomePage() {
             variant="default"
             size="sm"
             onClick={() => openModal(null)}
-            className="bg-black hover:bg-gray-800 text-white shadow-md hover:shadow-lg transition-all duration-200"
+            className="bg-black hover:bg-gray-800 cursor-pointer text-white shadow-md hover:shadow-lg transition-all duration-200"
           >
             <Plus className="mr-1.5 h-4 w-4" />
             New Template
@@ -416,7 +416,7 @@ export default function HomePage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-xs h-7 px-2"
+                    className="text-xs h-7 px-2 cursor-pointer"
                     onClick={() => setPreviewTemplate(template)}
                   >
                     Preview
@@ -424,7 +424,7 @@ export default function HomePage() {
                   <Button
                     variant="default"
                     size="sm"
-                    className="text-xs h-7 px-2 bg-black hover:bg-gray-800 border-0"
+                    className="text-xs h-7 cursor-pointer px-2 bg-black hover:bg-gray-800 border-0"
                   >
                     <Code className="mr-1 h-3 w-3" />
                     Use Template
@@ -448,10 +448,10 @@ export default function HomePage() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-0 top-0"
+                className="absolute right-0 top-0 cursor-pointer"
                 onClick={() => setPreviewTemplate(null)}
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4 cursor-pointer" />
               </Button>
             </DialogHeader>
 
