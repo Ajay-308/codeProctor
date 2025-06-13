@@ -23,7 +23,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import LeetCodeProblemSelector from "./leetcodeProblemSelector";
 
-// Updated Template interface to match your main component
+// Updated Template interface to match your schema and LeetCode data
 interface Template {
   _id?: string;
   title: string;
@@ -34,13 +34,18 @@ interface Template {
   timeLimit: number;
   usageCount: number;
   updatedAt: string;
-  // Enhanced fields
+  createdAt: string;
+  // Enhanced fields from your schema
   inputFormat?: string;
   outputFormat?: string;
   constraints?: string;
   sampleInput?: string;
   sampleOutput?: string;
   explanation?: string;
+  // Additional LeetCode fields
+  url?: string;
+  topics?: string[];
+  leetcodeId?: string;
 }
 
 interface LeetCodeProblem {
@@ -53,13 +58,16 @@ interface LeetCodeProblem {
   description: string;
   exampleTestCases: string;
   sampleTestCase: string;
+  inputFormat?: string;
+  outputFormat?: string;
+  sampleInput?: string;
+  sampleOutput?: string;
   codeSnippets: Array<{
     lang: string;
     code: string;
   }>;
 }
 
-// Updated props interface to accept async onSave
 interface EnhancedTemplateModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -71,8 +79,14 @@ interface EnhancedTemplateModalProps {
     difficulty: "easy" | "medium" | "hard" | "expert";
     tags: string[];
     timeLimit: number;
+    inputFormat?: string;
+    outputFormat?: string;
+    constraints?: string;
+    sampleInput?: string;
+    sampleOutput?: string;
+    explanation?: string;
   };
-  onSave?: (template: Template) => Promise<void>; // Changed to async
+  onSave?: (template: Template) => Promise<void>;
 }
 
 export default function EnhancedTemplateModal({
@@ -88,6 +102,12 @@ export default function EnhancedTemplateModal({
     difficulty: "easy",
     language: "",
     timeLimit: 30,
+    inputFormat: "",
+    outputFormat: "",
+    constraints: "",
+    sampleInput: "",
+    sampleOutput: "",
+    explanation: "",
   });
   const [tagInput, setTagInput] = useState("");
   const [showLeetCodeSelector, setShowLeetCodeSelector] = useState(false);
@@ -103,6 +123,12 @@ export default function EnhancedTemplateModal({
         difficulty: template.difficulty,
         language: template.language,
         timeLimit: template.timeLimit,
+        inputFormat: template.inputFormat || "",
+        outputFormat: template.outputFormat || "",
+        constraints: template.constraints || "",
+        sampleInput: template.sampleInput || "",
+        sampleOutput: template.sampleOutput || "",
+        explanation: template.explanation || "",
       });
       setTagInput(template.tags.join(", "));
     } else {
@@ -113,6 +139,12 @@ export default function EnhancedTemplateModal({
         difficulty: "easy",
         language: "",
         timeLimit: 30,
+        inputFormat: "",
+        outputFormat: "",
+        constraints: "",
+        sampleInput: "",
+        sampleOutput: "",
+        explanation: "",
       });
       setTagInput("");
     }
@@ -126,6 +158,14 @@ export default function EnhancedTemplateModal({
       | "hard";
     const primaryLanguage = problem.codeSnippets[0]?.lang || "JavaScript";
 
+    // Extract constraints from description if available
+    const extractConstraints = (description: string) => {
+      const constraintsMatch = description.match(
+        /Constraints:?\s*([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i
+      );
+      return constraintsMatch ? constraintsMatch[1].trim() : "";
+    };
+
     setFormData({
       ...formData,
       title: problem.title,
@@ -133,8 +173,14 @@ export default function EnhancedTemplateModal({
       tags: problem.topics,
       difficulty: mappedDifficulty === "hard" ? "hard" : mappedDifficulty,
       language: primaryLanguage,
+      inputFormat: problem.inputFormat || "",
+      outputFormat: problem.outputFormat || "",
+      constraints: extractConstraints(problem.description),
+      sampleInput: problem.sampleInput || "",
+      sampleOutput: problem.sampleOutput || "",
     });
     setTagInput(problem.topics.join(", "));
+    setShowLeetCodeSelector(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -147,7 +193,6 @@ export default function EnhancedTemplateModal({
         .map((tag) => tag.trim())
         .filter((tag) => tag.length > 0);
 
-      // Create complete template data with all required fields
       const templateData: Template = {
         _id: formData._id,
         title: formData.title || "",
@@ -156,16 +201,15 @@ export default function EnhancedTemplateModal({
         difficulty: formData.difficulty || "easy",
         language: formData.language || "",
         timeLimit: formData.timeLimit || 30,
-        // Provide defaults for required fields that aren't in the form
-        usageCount: 0, // Will be handled by backend for existing templates
+        usageCount: 0,
         updatedAt: new Date().toISOString(),
-        // Enhanced fields (empty for now, but could be added to form later)
-        inputFormat: "",
-        outputFormat: "",
-        constraints: "",
-        sampleInput: "",
-        sampleOutput: "",
-        explanation: "",
+        createdAt: formData._id ? "" : new Date().toISOString(), // Will be set by backend for new templates
+        inputFormat: formData.inputFormat || "",
+        outputFormat: formData.outputFormat || "",
+        constraints: formData.constraints || "",
+        sampleInput: formData.sampleInput || "",
+        sampleOutput: formData.sampleOutput || "",
+        explanation: formData.explanation || "",
       };
 
       if (onSave) {
@@ -174,7 +218,6 @@ export default function EnhancedTemplateModal({
       }
     } catch (error) {
       console.error("Error saving template:", error);
-      // You could add error handling here (toast notification, etc.)
     } finally {
       setIsSubmitting(false);
     }
@@ -184,10 +227,17 @@ export default function EnhancedTemplateModal({
     setTagInput(value);
   };
 
+  const handleInputChange = (field: keyof Template, value: string | number) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[800px] max-h-[95vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center justify-between">
               {template ? "Edit Template" : "New Template"}
@@ -196,47 +246,58 @@ export default function EnhancedTemplateModal({
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* LeetCode Problem Selector Button */}
-            <div className="flex justify-center">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowLeetCodeSelector(true)}
-                className="w-full border-dashed border-2 border-violet-300 hover:border-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950"
-              >
-                <Search className="mr-2 h-4 w-4" />
-                Select from LeetCode Problems
-              </Button>
-            </div>
-
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title" className="text-sm font-medium">
-                  Title <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="title"
-                  placeholder="Enter template title"
-                  value={formData.title || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  required
-                />
+            {!template && (
+              <div className="border-2 border-dashed border-blue-300 rounded-lg p-4 bg-blue-50/50 dark:bg-blue-950/20">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowLeetCodeSelector(true)}
+                  className="w-full border-dashed border-2 border-blue-400 hover:border-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                >
+                  <Search className="mr-2 h-4 w-4" />
+                  Select from LeetCode Problems →
+                </Button>
+                <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
+                  Browse 2000+ LeetCode problems to auto-populate your template
+                </p>
               </div>
+            )}
 
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-sm font-medium">
-                  Description
-                </Label>
-                <Textarea
-                  id="description"
-                  placeholder="Enter template description"
-                  value={formData.description || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows={4}
-                />
+            {/* Basic Information */}
+            <div className="grid gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-sm font-medium">
+                    Title <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="title"
+                    placeholder="Enter template title"
+                    value={formData.title || ""}
+                    onChange={(e) => handleInputChange("title", e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="timeLimit" className="text-sm font-medium">
+                    Time Limit (minutes) <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="timeLimit"
+                    type="number"
+                    min="1"
+                    max="180"
+                    value={formData.timeLimit || 30}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "timeLimit",
+                        parseInt(e.target.value) || 30
+                      )
+                    }
+                    required
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -247,7 +308,7 @@ export default function EnhancedTemplateModal({
                   <Select
                     value={formData.language || ""}
                     onValueChange={(value) =>
-                      setFormData({ ...formData, language: value })
+                      handleInputChange("language", value)
                     }
                     required
                   >
@@ -255,16 +316,16 @@ export default function EnhancedTemplateModal({
                       <SelectValue placeholder="Select a language" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="JavaScript">JavaScript</SelectItem>
                       <SelectItem value="Python">Python</SelectItem>
+                      <SelectItem value="JavaScript">JavaScript</SelectItem>
+                      <SelectItem value="TypeScript">TypeScript</SelectItem>
                       <SelectItem value="Java">Java</SelectItem>
                       <SelectItem value="C++">C++</SelectItem>
                       <SelectItem value="C#">C#</SelectItem>
                       <SelectItem value="Go">Go</SelectItem>
                       <SelectItem value="Rust">Rust</SelectItem>
-                      <SelectItem value="TypeScript">TypeScript</SelectItem>
-                      <SelectItem value="MySQL">MySQL</SelectItem>
-                      <SelectItem value="PostgreSQL">PostgreSQL</SelectItem>
+                      <SelectItem value="Swift">Swift</SelectItem>
+                      <SelectItem value="Kotlin">Kotlin</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -276,14 +337,7 @@ export default function EnhancedTemplateModal({
                   <Select
                     value={formData.difficulty || "easy"}
                     onValueChange={(value) =>
-                      setFormData({
-                        ...formData,
-                        difficulty: value as
-                          | "easy"
-                          | "medium"
-                          | "hard"
-                          | "expert",
-                      })
+                      handleInputChange("difficulty", value)
                     }
                   >
                     <SelectTrigger>
@@ -305,7 +359,7 @@ export default function EnhancedTemplateModal({
                 </Label>
                 <Input
                   id="tags"
-                  placeholder="Enter tags separated by commas"
+                  placeholder="Two Pointers, String"
                   value={tagInput}
                   onChange={(e) => handleTagsChange(e.target.value)}
                 />
@@ -327,27 +381,125 @@ export default function EnhancedTemplateModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="timeLimit" className="text-sm font-medium">
-                  Time Limit (minutes) <span className="text-red-500">*</span>
+                <Label htmlFor="description" className="text-sm font-medium">
+                  Problem Statement
                 </Label>
-                <Input
-                  id="timeLimit"
-                  type="number"
-                  min="1"
-                  max="180"
-                  value={formData.timeLimit || 30}
+                <Textarea
+                  id="description"
+                  placeholder="Enter the problem statement"
+                  value={formData.description || ""}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      timeLimit: Number.parseInt(e.target.value) || 30,
-                    })
+                    handleInputChange("description", e.target.value)
                   }
-                  required
+                  rows={6}
+                  className="resize-none"
+                />
+              </div>
+
+              {/* Input/Output Format Row */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="inputFormat" className="text-sm font-medium">
+                    Input Format
+                  </Label>
+                  <Textarea
+                    id="inputFormat"
+                    placeholder='s = ["h","e","l","l","o"]'
+                    value={formData.inputFormat || ""}
+                    onChange={(e) =>
+                      handleInputChange("inputFormat", e.target.value)
+                    }
+                    rows={3}
+                    className="resize-none font-mono text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="outputFormat" className="text-sm font-medium">
+                    Output Format
+                  </Label>
+                  <Textarea
+                    id="outputFormat"
+                    placeholder='["o","l","l","e","h"]'
+                    value={formData.outputFormat || ""}
+                    onChange={(e) =>
+                      handleInputChange("outputFormat", e.target.value)
+                    }
+                    rows={3}
+                    className="resize-none font-mono text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="constraints" className="text-sm font-medium">
+                  Constraints
+                </Label>
+                <Textarea
+                  id="constraints"
+                  placeholder="1 <= s.length <= 10^5"
+                  value={formData.constraints || ""}
+                  onChange={(e) =>
+                    handleInputChange("constraints", e.target.value)
+                  }
+                  rows={3}
+                  className="resize-none font-mono text-sm"
+                />
+              </div>
+
+              {/* Sample Input/Output Row */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="sampleInput" className="text-sm font-medium">
+                    Sample Input
+                  </Label>
+                  <Textarea
+                    id="sampleInput"
+                    placeholder='s = ["h","e","l","l","o"]'
+                    value={formData.sampleInput || ""}
+                    onChange={(e) =>
+                      handleInputChange("sampleInput", e.target.value)
+                    }
+                    rows={3}
+                    className="resize-none font-mono text-sm"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="sampleOutput" className="text-sm font-medium">
+                    Sample Output
+                  </Label>
+                  <Textarea
+                    id="sampleOutput"
+                    placeholder='["o","l","l","e","h"]'
+                    value={formData.sampleOutput || ""}
+                    onChange={(e) =>
+                      handleInputChange("sampleOutput", e.target.value)
+                    }
+                    rows={3}
+                    className="resize-none font-mono text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="explanation" className="text-sm font-medium">
+                  Explanation
+                </Label>
+                <Textarea
+                  id="explanation"
+                  placeholder="Reverse the array in-place with O(1) extra memory."
+                  value={formData.explanation || ""}
+                  onChange={(e) =>
+                    handleInputChange("explanation", e.target.value)
+                  }
+                  rows={3}
+                  className="resize-none"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex justify-end gap-3 pt-4 border-t">
               <Button
                 type="button"
                 variant="outline"
@@ -358,7 +510,7 @@ export default function EnhancedTemplateModal({
               </Button>
               <Button
                 type="submit"
-                className="bg-black hover:bg-gray-800 text-white"
+                className="bg-black hover:bg-gray-800 text-white dark:bg-white dark:text-black dark:hover:bg-gray-200"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Saving..." : template ? "Update" : "Create"}

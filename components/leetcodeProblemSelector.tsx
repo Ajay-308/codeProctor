@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import leetcodeData from "@/leetcode_problems.json";
+import leetcodeData from "@/cleaned_problems.json";
 import {
   Dialog,
   DialogContent,

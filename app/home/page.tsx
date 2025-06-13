@@ -31,6 +31,8 @@ export default function HomePage() {
   const router = useRouter();
   const { isInterviewer, isLoading } = useUserRole();
   const interviews = useQuery(api.interviews.getInterview);
+  const templates = useQuery(api.templets.getTempletes);
+  const templetesCount = templates?.length ?? 0;
   const { userId, isLoaded } = useAuth();
 
   const [showModal, setShowModal] = useState(false);
@@ -155,7 +157,9 @@ export default function HomePage() {
                       <p className="text-sm font-medium text-gray-600">
                         Active Templates
                       </p>
-                      <h3 className="text-2xl font-bold text-gray-900">15</h3>
+                      <h3 className="text-2xl font-bold text-gray-900">
+                        {templetesCount}
+                      </h3>
                     </div>
                   </div>
                 </CardContent>
