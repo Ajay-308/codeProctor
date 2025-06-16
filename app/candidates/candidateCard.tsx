@@ -192,13 +192,14 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
 
       const selectedDate = normalizeDate(formData.date);
 
-      // Enhanced check for existing interviews
+      // Check if there's already an interview scheduled on this date
       if (isDateScheduled(selectedDate)) {
         toast.error(
           "Interview already scheduled on this day. Please select a different date."
         );
         return;
       }
+
       if (interviews && Array.isArray(interviews)) {
         const candidateInterviews = interviews.filter(
           (interview) => interview.candidateId === candidate.id
@@ -220,6 +221,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
       const interviewDate = new Date(formData.date);
       const [hours, minutes] = formData.time.split(":").map(Number);
       interviewDate.setHours(hours, minutes);
+
       const startTime = interviewDate.getTime();
 
       try {
@@ -234,6 +236,33 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
         });
 
         toast.success("Interview scheduled successfully!");
+
+        try {
+          const res = await fetch("/api/send_email", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: candidate.name,
+              email: candidate.email,
+              interviewDate,
+              link: "https://code-proctor.vercel.app/home",
+            }),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            toast.success("Interview email sent successfully!");
+          } else {
+            toast.error("Failed to send email: " + data.message);
+          }
+        } catch (err) {
+          console.error("Email error:", err);
+          toast.error("Something went wrong while sending the email.");
+        }
+
+        // Reset state
         setActiveView(null);
         setFormData({
           date: new Date(),
@@ -248,11 +277,14 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
     [
       candidate.id,
       candidate.name,
+      candidate.email,
       formData,
       createInterview,
       isDateScheduled,
       interviews,
       normalizeDate,
+      setActiveView,
+      setFormData,
     ]
   );
 
