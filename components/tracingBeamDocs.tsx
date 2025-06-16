@@ -66,6 +66,7 @@ export function TracingBeamDocs() {
               <div className="flex gap-3 mt-6">
                 {item.actions.map((action, actionIndex) => (
                   <Button
+                    className="cursor-pointer"
                     key={actionIndex}
                     variant={
                       (action.variant as
@@ -77,7 +78,9 @@ export function TracingBeamDocs() {
                         | "ghost") || "default"
                     }
                   >
-                    {action.icon && <action.icon className="h-4 w-4 mr-2" />}
+                    {action.icon && (
+                      <action.icon className="h-4 w-4 cursor-pointer mr-2" />
+                    )}
                     {action.label}
                   </Button>
                 ))}
@@ -137,11 +140,11 @@ const docsContent = [
         </p>
         <p>Key benefits of the split-screen interface:</p>
         <ul>
-          <li>Simultaneous code and video monitoring</li>
-          <li>Customizable layout options</li>
-          <li>Real-time synchronization</li>
-          <li>Responsive design for all screen sizes</li>
-          <li>Picture-in-picture mode support</li>
+          <li>1. Simultaneous code and video monitoring.</li>
+          <li>2. Customizable layout options.</li>
+          <li>3. Real-time synchronization.</li>
+          <li>4. Responsive design for all screen sizes.</li>
+          <li>5. Picture-in-picture mode support.</li>
         </ul>
         <p>
           The interface is designed to minimize cognitive load on interviewers
@@ -168,12 +171,12 @@ const docsContent = [
         </p>
         <p>Proctoring features include:</p>
         <ul>
-          <li>HD video recording with cloud storage</li>
-          <li>Real-time monitoring alerts</li>
-          <li>Automated suspicious activity detection</li>
-          <li>Screen sharing prevention</li>
-          <li>Browser lockdown capabilities</li>
-          <li>Multi-camera support</li>
+          <li>1. HD video recording with cloud storage.</li>
+          <li>2. Real-time monitoring alerts.</li>
+          <li>3. Automated suspicious activity detection.</li>
+          <li>4. Screen sharing prevention.</li>
+          <li>5. Browser lockdown capabilities.</li>
+          <li>6. Multi-camera support.</li>
         </ul>
         <p>
           All video data is encrypted and stored securely, with configurable
@@ -201,12 +204,12 @@ const docsContent = [
         </p>
         <p>Editor capabilities:</p>
         <ul>
-          <li>Support for 50+ programming languages</li>
-          <li>Intelligent syntax highlighting</li>
-          <li>Auto-completion and IntelliSense</li>
-          <li>Code formatting and linting</li>
-          <li>Customizable themes and layouts</li>
-          <li>Real-time collaboration features</li>
+          <li>1. Support for 50+ programming languages.</li>
+          <li>2. Intelligent syntax highlighting.</li>
+          <li>3. Auto-completion and IntelliSense.</li>
+          <li>4. Code formatting and linting.</li>
+          <li>5. Customizable themes and layouts.</li>
+          <li>6. Real-time collaboration features.</li>
         </ul>
         <p>
           The editor integrates seamlessly with our testing engine, allowing for
@@ -240,12 +243,12 @@ console.log(fibonacci(10)); // Output: 55
         </p>
         <p>Assessment features:</p>
         <ul>
-          <li>Custom test case creation</li>
-          <li>Performance benchmarking</li>
-          <li>Code quality analysis</li>
-          <li>Plagiarism detection</li>
-          <li>Automated scoring algorithms</li>
-          <li>Detailed feedback generation</li>
+          <li>1. Custom test case creation.</li>
+          <li>2. Performance benchmarking.</li>
+          <li>3. Code quality analysis.</li>
+          <li>4. Plagiarism detection.</li>
+          <li>5. Automated scoring algorithms.</li>
+          <li>6. Detailed feedback generation.</li>
         </ul>
         <p>
           Create comprehensive test suites that evaluate not just correctness,
@@ -293,12 +296,12 @@ console.log(fibonacci(10)); // Output: 55
         </p>
         <p>Collaboration features:</p>
         <ul>
-          <li>Multi-interviewer support (up to 10 participants)</li>
-          <li>Role-based permissions</li>
-          <li>Real-time note sharing</li>
-          <li>Private interviewer chat</li>
-          <li>Synchronized evaluation forms</li>
-          <li>Post-interview discussion tools</li>
+          <li>1. Multi-interviewer support (up to 10 participants).</li>
+          <li>2. Role-based permissions.</li>
+          <li>3. Real-time note sharing.</li>
+          <li>4. Private interviewer chat.</li>
+          <li>5. Synchronized evaluation forms.</li>
+          <li>6. Post-interview discussion tools.</li>
         </ul>
         <p>
           Streamline your interview process with tools designed for team-based
@@ -325,12 +328,12 @@ console.log(fibonacci(10)); // Output: 55
         </p>
         <p>Analysis capabilities:</p>
         <ul>
-          <li>Synchronized video and code playback</li>
-          <li>Keystroke analysis and timing</li>
-          <li>Problem-solving pattern recognition</li>
-          <li>Collaboration effectiveness metrics</li>
-          <li>Performance trend analysis</li>
-          <li>Exportable interview reports</li>
+          <li>1. Synchronized video and code playback.</li>
+          <li>2. Keystroke analysis and timing.</li>
+          <li>3. Problem-solving pattern recognition.</li>
+          <li>4. Collaboration effectiveness metrics.</li>
+          <li>5. Performance trend analysis.</li>
+          <li>6. Exportable interview reports.</li>
         </ul>
         <p>
           Generate comprehensive reports that provide actionable insights for
@@ -395,12 +398,12 @@ console.log(fibonacci(10)); // Output: 55
         </p>
         <p>Integration options:</p>
         <ul>
-          <li>REST API with comprehensive documentation</li>
-          <li>Webhook support for real-time updates</li>
-          <li>ATS integrations (Greenhouse, Lever, BambooHR)</li>
-          <li>Calendar integrations (Google, Outlook)</li>
-          <li>SSO support (SAML, OAuth)</li>
-          <li>Custom branding and white-label options</li>
+          <li>1. REST API with comprehensive documentation.</li>
+          <li>2. Webhook support for real-time updates.</li>
+          <li>3. ATS integrations (Greenhouse, Lever, BambooHR).</li>
+          <li>4. Calendar integrations (Google, Outlook).</li>
+          <li>5. SSO support (SAML, OAuth).</li>
+          <li>6. Custom branding and white-label options.</li>
         </ul>
         <p>
           Our API allows you to programmatically manage interviews, retrieve

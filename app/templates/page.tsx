@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EnhancedTemplateModal from "@/components/enhancedTemplateModel";
 import ConfirmDelete from "@/components/ConfirmDelete";
 import type { Id } from "@/convex/_generated/dataModel";
@@ -41,6 +41,8 @@ import {
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 import Navbar from "@/components/Navbar";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 interface Template {
   _id?: string;
@@ -94,6 +96,17 @@ const getDifficultyColor = (
 };
 
 export default function HomePage() {
+  const { userId, isLoaded } = useAuth();
+  const router = useRouter();
+  // Redirect to home if user is not authenticated
+  // or if userId is not available
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      toast.error("You must be logged in to access this page");
+      router.push("/");
+    }
+  }, [isLoaded, userId, router]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const templates = useQuery(api.templets.getTempletes);
   const deleteTemplate = useMutation(api.templets.deleteTempletes);

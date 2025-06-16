@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Filter, Mail, Calendar, Code, MoreVertical, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,9 @@ import CandidateCard from "./candidateCard";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Navbar from "@/components/Navbar";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 interface Candidate {
   id: string;
@@ -45,6 +48,16 @@ export default function Page() {
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(
     null
   );
+  const { userId, isLoaded } = useAuth();
+  const router = useRouter();
+  // Redirect to home if user is not authenticated
+  // or if userId is not available
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      toast.error("You must be logged in to access this page");
+      router.push("/");
+    }
+  }, [isLoaded, userId, router]);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [searchTerm, setSearchTerm] = useState("");
 

@@ -44,11 +44,15 @@ export default function DocsPage() {
         </nav>
       )}
 
-      <div className="flex">
-        <Sidebar />
-        <div className="flex-1">
-          <Header />
+      <div className="flex min-h-[calc(100vh-3.5rem)]">
+        {/* Sticky Sidebar */}
+        <div className="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
+          <Sidebar />
+        </div>
 
+        {/* Main Content Area */}
+        <div className="flex-1 min-w-0">
+          <Header />
           <main className="relative">
             <TracingBeamDocs />
           </main>

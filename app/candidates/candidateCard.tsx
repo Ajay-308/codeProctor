@@ -63,7 +63,7 @@ const interviewStatusColors = {
   today: {
     bg: "bg-blue-50",
     border: "border-blue-200",
-    text: "text-blue-800",
+    text: "text-black",
     icon: "text-blue-600",
     badge: "bg-blue-100 text-blue-800 border-blue-300",
   },
@@ -112,25 +112,28 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
     };
   }, []);
 
+  // Utility function to normalize dates to start of day for comparison
+  const normalizeDate = useCallback((date: Date) => {
+    const normalized = new Date(date);
+    normalized.setHours(0, 0, 0, 0);
+    return normalized;
+  }, []);
+
   useEffect(() => {
     if (!interviews || !Array.isArray(interviews)) return;
-
-    const getDateOnly = (date: Date) => {
-      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    };
 
     const candidateInterviews = interviews.filter(
       (interview) => interview.candidateId === candidate.id
     );
 
     const dates = candidateInterviews.map((interview) => {
-      return getDateOnly(new Date(interview.startTime));
+      return normalizeDate(new Date(interview.startTime));
     });
 
     if (isMounted.current) {
       setScheduledDates(dates);
     }
-  }, [interviews, candidate.id]);
+  }, [interviews, candidate.id, normalizeDate]);
 
   const handleCardClick = () => {
     if (activeView === null && onClick) {
@@ -158,16 +161,64 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
     setActiveView(null);
   };
 
+  const isSameDay = useCallback(
+    (date1: Date, date2: Date) => {
+      const normalized1 = normalizeDate(date1);
+      const normalized2 = normalizeDate(date2);
+      return normalized1.getTime() === normalized2.getTime();
+    },
+    [normalizeDate]
+  );
+
+  const isDateScheduled = useCallback(
+    (date: Date) => {
+      const normalizedDate = normalizeDate(date);
+      return scheduledDates.some(
+        (scheduledDate) => scheduledDate.getTime() === normalizedDate.getTime()
+      );
+    },
+    [scheduledDates, normalizeDate]
+  );
+
   const handleSubmitSchedule = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
-      if (!formData.date) return;
+      if (!formData.date) {
+        toast.error("Please select a date.");
+        return;
+      }
+
+      const selectedDate = normalizeDate(formData.date);
+
+      // Enhanced check for existing interviews
+      if (isDateScheduled(selectedDate)) {
+        toast.error(
+          "Interview already scheduled on this day. Please select a different date."
+        );
+        return;
+      }
+      if (interviews && Array.isArray(interviews)) {
+        const candidateInterviews = interviews.filter(
+          (interview) => interview.candidateId === candidate.id
+        );
+
+        const hasExistingInterview = candidateInterviews.some((interview) => {
+          const interviewDate = normalizeDate(new Date(interview.startTime));
+          return interviewDate.getTime() === selectedDate.getTime();
+        });
+
+        if (hasExistingInterview) {
+          toast.error(
+            "Interview already exists on this date. Please choose another date."
+          );
+          return;
+        }
+      }
 
       const interviewDate = new Date(formData.date);
       const [hours, minutes] = formData.time.split(":").map(Number);
-
       interviewDate.setHours(hours, minutes);
       const startTime = interviewDate.getTime();
 
@@ -181,9 +232,9 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
           streamCallId: "default-stream-id",
           interviewerIds: ["interviewer1", "interviewer2"],
         });
-        toast.success("Interview Scheduled Successfully");
-        setActiveView(null);
 
+        toast.success("Interview scheduled successfully!");
+        setActiveView(null);
         setFormData({
           date: new Date(),
           time: "09:00",
@@ -191,26 +242,18 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
         });
       } catch (error) {
         console.error("Failed to schedule interview:", error);
+        toast.error("Failed to schedule interview. Please try again.");
       }
     },
-    [candidate.id, candidate.name, formData, createInterview]
-  );
-
-  const isSameDay = useCallback((date1: Date, date2: Date) => {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  }, []);
-
-  const isDateScheduled = useCallback(
-    (date: Date) => {
-      return scheduledDates.some((scheduledDate) =>
-        isSameDay(scheduledDate, date)
-      );
-    },
-    [scheduledDates]
+    [
+      candidate.id,
+      candidate.name,
+      formData,
+      createInterview,
+      isDateScheduled,
+      interviews,
+      normalizeDate,
+    ]
   );
 
   const formatInterviewDate = (timestamp: number) => {
@@ -226,16 +269,22 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
     return `${dayOfWeek}, ${month} ${day} · ${time}`;
   };
 
-  const isTodayDate = useCallback((date: Date) => {
-    const today = new Date();
-    return isSameDay(today, date);
-  }, []);
+  const isTodayDate = useCallback(
+    (date: Date) => {
+      const today = new Date();
+      return isSameDay(today, date);
+    },
+    [isSameDay]
+  );
 
-  const isTomorrowDate = useCallback((date: Date) => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return isSameDay(tomorrow, date);
-  }, []);
+  const isTomorrowDate = useCallback(
+    (date: Date) => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      return isSameDay(tomorrow, date);
+    },
+    [isSameDay]
+  );
 
   const isThisWeekDate = useCallback((date: Date) => {
     const today = new Date();
@@ -260,13 +309,14 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
     }
   }, []);
 
-  const isPastOrToday = useCallback((date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const compareDate = new Date(date);
-    compareDate.setHours(0, 0, 0, 0);
-    return compareDate < today;
-  }, []);
+  const isPastOrToday = useCallback(
+    (date: Date) => {
+      const today = normalizeDate(new Date());
+      const compareDate = normalizeDate(date);
+      return compareDate.getTime() <= today.getTime();
+    },
+    [normalizeDate]
+  );
 
   // Filter and sort interviews for this candidate
   const candidateInterviews = Array.isArray(interviews)
@@ -561,15 +611,30 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
                   notAvailable: (date) => isPastOrToday(date),
                 }}
                 modifiersClassNames={{
-                  scheduled: "bg-green-100 text-green-800 font-medium",
+                  scheduled: "bg-red-100 text-red-800 font-medium line-through",
                   notAvailable: "bg-amber-100 text-amber-800",
                   selected: "bg-primary text-primary-foreground",
-                  today: "border-2 border-blue-500",
+                  today:
+                    "!bg-gradient-to-br !from-blue-500 !to-purple-600 !text-white !font-bold !text-lg !scale-110 !shadow-lg !border-2 !border-white !ring-2 !ring-blue-300 !ring-offset-1",
                 }}
                 modifiersStyles={{
-                  scheduled: { backgroundColor: "#d1fae5" },
+                  scheduled: {
+                    backgroundColor: "#fecaca",
+                    textDecoration: "line-through",
+                  },
                   notAvailable: { backgroundColor: "#f3f4f6" },
                   past: { backgroundColor: "#fef3c7" },
+                  today: {
+                    background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                    color: "white",
+                    fontWeight: "bold",
+                    fontSize: "1.125rem",
+                    transform: "scale(1.1)",
+                    boxShadow:
+                      "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                    border: "2px solid white",
+                    borderRadius: "6px",
+                  },
                 }}
               />
               <div className="mt-3">

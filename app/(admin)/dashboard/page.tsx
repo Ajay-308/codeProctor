@@ -1,9 +1,9 @@
 "use client";
-
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
-import toast from "react-hot-toast";
 import LoaderUI from "@/components/LoaderUI";
 import { getCandiateInfo, groupInterviews } from "@/lib/utils";
 import Link from "next/link";
@@ -32,12 +32,25 @@ import {
 import { format } from "date-fns";
 import CommentBox from "@/components/commentBox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@clerk/nextjs";
+import toast from "react-hot-toast";
 
 type Interview = Doc<"interviews"> & {
   comments?: string[];
 };
 
 function DashboardPage() {
+  const { userId, isLoaded } = useAuth();
+  const router = useRouter();
+  // Redirect to home if user is not authenticated
+  // or if userId is not available
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      toast.error("You must be logged in to access this page");
+      router.push("/");
+    }
+  }, [isLoaded, userId, router]);
+
   const users = useQuery(api.users.getUser);
   const interviews = useQuery(api.interviews.getAllInterviews);
   const updateStatus = useMutation(api.interviews.updateInterview);
@@ -79,7 +92,7 @@ function DashboardPage() {
               </p>
             </div>
             <Link href="/schedule">
-              <Button size="lg" className="gap-2">
+              <Button size="lg" className="gap-2 cursor-pointer">
                 <PlusCircleIcon className="h-5 w-5 cursor-pointer" />
                 Schedule Interview
               </Button>

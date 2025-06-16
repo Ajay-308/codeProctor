@@ -23,7 +23,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Navbar from "@/components/Navbar";
 
 export default function SettingsPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
@@ -32,7 +31,16 @@ export default function SettingsPage() {
   const [name, setName] = useState("");
   const [clerkId, setClerkId] = useState("");
   const [userNameError, setUserNameError] = useState("");
-  const { userId } = useAuth();
+  const { userId, isLoaded } = useAuth();
+  const router = useRouter();
+  // Redirect to home if user is not authenticated
+  // or if userId is not available
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      toast.error("You must be logged in to access this page");
+      router.push("/");
+    }
+  }, [isLoaded, userId, router]);
 
   const getUserDetails = useQuery(api.users.getUserByClerkId, {
     clerkId: userId || "",
