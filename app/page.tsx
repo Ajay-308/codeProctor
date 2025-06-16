@@ -54,11 +54,6 @@ export default function LandingPage() {
     }
   }, [isLoaded, userId, user, syncUser, router]);
 
-  // Close mobile menu when clicking on a link
-  const handleNavLinkClick = () => {
-    setMobileMenuOpen(false);
-  };
-
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -68,13 +63,6 @@ export default function LandingPage() {
             <span className="text-xl font-bold">CodeProctor</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 lg:gap-20">
-            <Link
-              href="/"
-              className="text-sm font-medium hover:text-primary transition-colors"
-            >
-              Home
-            </Link>
-
             <Link
               href="/docs"
               className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
@@ -113,13 +101,6 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t py-4 px-4 bg-background animate-in slide-in-from-top">
             <nav className="flex flex-col space-y-4">
-              <Link
-                href="/"
-                className="text-sm font-medium hover:text-primary py-2"
-                onClick={handleNavLinkClick}
-              >
-                Home
-              </Link>
               <Link
                 href="/docs"
                 className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
