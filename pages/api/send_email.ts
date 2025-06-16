@@ -18,7 +18,9 @@ export default async function handler(
       pass: process.env.EMAIL_PASS,
     },
   });
-
+  const istDate = new Date(
+    new Date(interviewDate).getTime() + 5.5 * 60 * 60 * 1000
+  );
   try {
     await transporter.sendMail({
       from: `"HR Team" <${process.env.EMAIL_USER}>`,
@@ -34,7 +36,7 @@ export default async function handler(
 
       <p style="font-size: 16px;">
         📅 <strong>Date & Time:</strong><br />
-        <span style="color: #555;">${new Date(interviewDate).toLocaleString()}</span>
+        <span style="color: #555;">${istDate.toLocaleString()}</span>
       </p>
 
       <p style="font-size: 16px;">
