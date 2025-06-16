@@ -46,6 +46,12 @@ export default function Navbar() {
             >
               Templates
             </Link>
+            <Link
+              href="/docs"
+              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+            >
+              Docs
+            </Link>
           </nav>
 
           {/* User Actions */}
@@ -131,6 +137,12 @@ export default function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Templates
+            </Link>
+            <Link
+              href="/docs"
+              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+            >
+              Docs
             </Link>
             <div className="pt-4 border-t border-gray-200 flex justify-between">
               <Button

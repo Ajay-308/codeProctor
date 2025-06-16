@@ -33,7 +33,6 @@ export default function LandingPage() {
   useEffect(() => {
     if (!isLoaded || !userId || !user) return;
     if (isLoaded && userId) {
-      // Check if the user exists and has a role or not
       const checkUser = async () => {
         const res = await syncUser({
           name: user.fullName!,
@@ -68,26 +67,19 @@ export default function LandingPage() {
             <Code className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold">CodeProctor</span>
           </div>
-
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8 lg:gap-20">
             <Link
-              href="#features"
+              href="/"
               className="text-sm font-medium hover:text-primary transition-colors"
             >
-              Features
+              Home
             </Link>
+
             <Link
-              href="#how-it-works"
-              className="text-sm font-medium hover:text-primary transition-colors"
+              href="/docs"
+              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
             >
-              How It Works
-            </Link>
-            <Link
-              href="#testimonials"
-              className="text-sm font-medium hover:text-primary transition-colors"
-            >
-              Testimonials
+              Docs
             </Link>
           </nav>
 
@@ -122,25 +114,17 @@ export default function LandingPage() {
           <div className="md:hidden border-t py-4 px-4 bg-background animate-in slide-in-from-top">
             <nav className="flex flex-col space-y-4">
               <Link
-                href="#features"
+                href="/"
                 className="text-sm font-medium hover:text-primary py-2"
                 onClick={handleNavLinkClick}
               >
-                Features
+                Home
               </Link>
               <Link
-                href="#how-it-works"
-                className="text-sm font-medium hover:text-primary py-2"
-                onClick={handleNavLinkClick}
+                href="/docs"
+                className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
               >
-                How It Works
-              </Link>
-              <Link
-                href="#testimonials"
-                className="text-sm font-medium hover:text-primary py-2"
-                onClick={handleNavLinkClick}
-              >
-                Testimonials
+                Docs
               </Link>
               <div className="pt-2 border-t">
                 <SignInButton mode="modal">

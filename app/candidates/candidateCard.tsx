@@ -226,41 +226,6 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
     return `${dayOfWeek}, ${month} ${day} · ${time}`;
   };
 
-  // const getInterviewTimesForDate = useCallback(
-  //   (date: Date) => {
-  //     if (!interviews || !Array.isArray(interviews)) return [];
-
-  //     return interviews
-  //       .filter((interview) => {
-  //         const interviewDate = new Date(interview.startTime);
-  //         return (
-  //           interview.candidateId === candidate.id &&
-  //           isSameDay(interviewDate, date)
-  //         );
-  //       })
-  //       .map((interview) => {
-  //         const interviewDate = new Date(interview.startTime);
-  //         return interviewDate.toLocaleTimeString("en-US", {
-  //           hour: "numeric",
-  //           minute: "2-digit",
-  //         });
-  //       });
-  //   },
-  //   [interviews, candidate.id]
-  // );
-
-  // Fixed isPastDate function
-  // const isPastDate = useCallback((date: Date) => {
-  //   const today = new Date();
-  //   today.setHours(0, 0, 0, 0);
-
-  //   // Ensure we're working with a proper Date object
-  //   const compareDate = date instanceof Date ? new Date(date) : new Date();
-  //   compareDate.setHours(0, 0, 0, 0);
-
-  //   return compareDate < today;
-  // }, []);
-
   const isTodayDate = useCallback((date: Date) => {
     const today = new Date();
     return isSameDay(today, date);
@@ -303,23 +268,6 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
     return compareDate < today;
   }, []);
 
-  // const getDateStatus = useCallback(
-  //   (date: Date) => {
-  //     if (isDateScheduled(date)) {
-  //       if (isTodayDate(date)) return "today";
-  //       if (isTomorrowDate(date)) return "tomorrow";
-  //       if (isThisWeekDate(date)) return "thisWeek";
-  //       if (isPastDate(date)) return "past";
-  //       return "scheduled";
-  //     }
-  //     if (isPastDate(date)) {
-  //       return "not-available";
-  //     }
-  //     return "available";
-  //   },
-  //   [isDateScheduled, isPastDate, isTodayDate, isTomorrowDate, isThisWeekDate]
-  // );
-
   // Filter and sort interviews for this candidate
   const candidateInterviews = Array.isArray(interviews)
     ? interviews.filter((interview) => interview.candidateId === candidate.id)
@@ -337,70 +285,6 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
   const upcomingInterviews = sortedInterviews.filter((i) => {
     return !pastInterviews.includes(i);
   });
-
-  // Fix: Create a proper day cell renderer compatible with the Calendar component
-  // const renderDayCell = useCallback(
-  //   (day: Date, modifiers: Record<string, boolean>) => {
-  //     const status = getDateStatus(day);
-  //     const interviewTimes = getInterviewTimesForDate(day);
-  //     const hasInterviews = interviewTimes.length > 0;
-  //     const isToday = isSameDay(day, new Date());
-  //     const isPast = isPastOrToday(day);
-  //     const isSelected = modifiers.selected === true;
-
-  //     const dayKey = `${day.getFullYear()}-${day.getMonth()}-${day.getDate()}`;
-
-  //     let tooltipContent = "";
-  //     switch (status) {
-  //       case "scheduled":
-  //         tooltipContent = `Scheduled: ${interviewTimes.join(", ")}`;
-  //         break;
-  //       case "not-available":
-  //         tooltipContent = "Not Available";
-  //         break;
-  //       default:
-  //         tooltipContent = "Available";
-  //     }
-
-  //     return (
-  //       <div
-  //         key={dayKey}
-  //         className={cn(
-  //           "relative w-full h-full p-0",
-  //           status === "scheduled" && isPast
-  //             ? "!bg-amber-100 hover:bg-amber-200"
-  //             : status === "scheduled"
-  //               ? "!bg-green-100 hover:bg-green-200"
-  //               : "",
-  //           status === "not-available" && "!bg-gray-100",
-  //           isToday && "!border-2 !border-blue-500",
-  //           isSelected && "!bg-primary !text-primary-foreground"
-  //         )}
-  //         title={tooltipContent}
-  //       >
-  //         <div
-  //           className={cn(
-  //             "w-8 h-8 flex items-center justify-center text-sm rounded-full mx-auto relative",
-  //             isSelected && "!bg-primary !text-primary-foreground",
-  //             status === "scheduled" && !isSelected && isPast
-  //               ? "text-amber-800 font-medium"
-  //               : status === "scheduled" && !isSelected
-  //                 ? "text-green-800 font-medium"
-  //                 : status === "not-available" && !isSelected
-  //                   ? "text-gray-500"
-  //                   : ""
-  //           )}
-  //         >
-  //           {day.getDate()}
-  //           {hasInterviews && (
-  //             <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full bg-blue-500"></span>
-  //           )}
-  //         </div>
-  //       </div>
-  //     );
-  //   },
-  //   [getDateStatus, getInterviewTimesForDate, isSameDay, isPastOrToday]
-  // );
 
   return (
     <Card
