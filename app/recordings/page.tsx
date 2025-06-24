@@ -13,13 +13,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useGetCalls from "@/hooks/useGetCall";
-import type { CallRecording } from "@stream-io/video-react-sdk";
+import type { Call, CallRecording } from "@stream-io/video-react-sdk";
 import { useEffect, useState } from "react";
 import { FileVideo2, Search, SlidersHorizontal, VideoOff } from "lucide-react";
 import Navbar from "@/components/Navbar";
+
+type RecordingWithCall = CallRecording & { _call: Call };
+
 function RecordingsPage() {
   const { calls, isLoading } = useGetCalls();
-  const [recordings, setRecordings] = useState<CallRecording[]>([]);
+  const [recordings, setRecordings] = useState<RecordingWithCall[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
 
@@ -28,11 +31,16 @@ function RecordingsPage() {
       if (!calls) return;
 
       try {
-        // Get recordings for each call
         const callData = await Promise.all(
           calls.map((call) => call.queryRecordings())
         );
-        const allRecordings = callData.flatMap((call) => call.recordings);
+
+        const allRecordings = callData.flatMap((callRecordings, i) =>
+          callRecordings.recordings.map((rec) => ({
+            ...rec,
+            _call: calls[i], // attach the call instance to each recording
+          }))
+        );
 
         setRecordings(allRecordings);
       } catch (error) {
@@ -43,7 +51,6 @@ function RecordingsPage() {
     fetchRecordings();
   }, [calls]);
 
-  // Filter recordings based on search query
   const filteredRecordings = recordings.filter((recording) => {
     if (!searchQuery) return true;
 
@@ -57,7 +64,7 @@ function RecordingsPage() {
       recordingName.includes(searchLower) || recordingDate.includes(searchLower)
     );
   });
-  // Sort recordings based on selected order
+
   const sortedRecordings = [...filteredRecordings].sort((a, b) => {
     if (sortOrder === "newest") {
       return new Date(b.end_time).getTime() - new Date(a.end_time).getTime();
@@ -118,7 +125,36 @@ function RecordingsPage() {
           {recordings.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-4">
               {sortedRecordings.map((r) => (
-                <RecordingCard key={r.end_time} recording={r} />
+                <div key={r.filename} className="relative">
+                  <RecordingCard recording={r} />
+
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-2 right-2"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch("/api/delete-recording", {
+                          method: "DELETE",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({ recording_id: r.filename }),
+                        });
+
+                        if (!res.ok) throw new Error("Failed to delete");
+
+                        setRecordings((prev) =>
+                          prev.filter((rec) => rec.filename !== r.filename)
+                        );
+                      } catch (err) {
+                        console.error("Failed to delete recording:", err);
+                      }
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </div>
               ))}
             </div>
           ) : (
