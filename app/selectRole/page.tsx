@@ -82,7 +82,7 @@ export default function SelectRole() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl font-bold tracking-tight mb-3"
           >
-            Welcome to InterviewPro
+            Welcome to codeProctor
           </motion.h1>
           <motion.p
             initial={{ y: -20, opacity: 0 }}

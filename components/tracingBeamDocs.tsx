@@ -12,6 +12,10 @@ import {
 import { Copy, ExternalLink, Play } from "lucide-react";
 import Image from "next/image";
 import homePage from "@/app/assest/home.png";
+import doc1 from "@/app/assest/doc1.png";
+import videoImage from "@/app/assest/liveVideo.png";
+import roleImage from "@/app/assest/roleSelect.png";
+import playBack from "@/app/assest/playback.png";
 
 export function TracingBeamDocs() {
   return (
@@ -31,10 +35,10 @@ export function TracingBeamDocs() {
               {item?.image && (
                 <Image
                   width={600}
-                  height={300}
-                  src={homePage || "/placeholder.svg"}
+                  height={900}
+                  src={item.image}
                   alt={item.title}
-                  className="rounded-lg mb-8 object-cover w-full h-64"
+                  className="rounded-lg mb-8 object-cover w-full "
                 />
               )}
               {item.description}
@@ -120,8 +124,8 @@ const docsContent = [
       </>
     ),
     badge: "Introduction",
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-djENvYw3u2V4tuEnPQEWd9w4u0Tx9H.png",
+    image: doc1,
+
     actions: [
       { label: "Start Free Trial", icon: Play, variant: "default" },
       { label: "Schedule Demo", icon: ExternalLink, variant: "outline" },
@@ -153,7 +157,7 @@ const docsContent = [
       </>
     ),
     badge: "Interface",
-    image: "/placeholder.svg?height=300&width=600",
+    image: homePage,
     actions: [
       { label: "View Interface Demo", icon: ExternalLink, variant: "default" },
     ],
@@ -186,7 +190,7 @@ const docsContent = [
       </>
     ),
     badge: "Proctoring",
-    image: "/placeholder.svg?height=300&width=600",
+    image: videoImage,
     actions: [
       { label: "Security Features", icon: ExternalLink, variant: "outline" },
     ],
@@ -310,7 +314,7 @@ console.log(fibonacci(10)); // Output: 55
       </>
     ),
     badge: "Collaboration",
-    image: "/placeholder.svg?height=300&width=600",
+    image: roleImage,
     actions: [
       { label: "Team Features", icon: ExternalLink, variant: "outline" },
     ],
@@ -342,7 +346,7 @@ console.log(fibonacci(10)); // Output: 55
       </>
     ),
     badge: "Analysis",
-    image: "/placeholder.svg?height=300&width=600",
+    image: playBack,
     actions: [
       { label: "View Sample Report", icon: ExternalLink, variant: "default" },
       { label: "Analytics Dashboard", icon: ExternalLink, variant: "outline" },
