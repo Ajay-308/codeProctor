@@ -12,28 +12,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import useGetCalls from "@/hooks/useGetCall";
-import type { CallRecording } from "@stream-io/video-react-sdk";
 import { useEffect, useState } from "react";
 import { FileVideo2, Search, SlidersHorizontal, VideoOff } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { useUser } from "@clerk/nextjs"; // or your auth provider
+import useGetCallsByUserId from "@/hooks/useGetCallByUserId";
+import type { CallRecording } from "@stream-io/video-react-sdk";
+
 function RecordingsPage() {
-  const { calls, isLoading } = useGetCalls();
+  const { user } = useUser();
+  const userId = user?.id;
+
+  const { calls, isLoading } = useGetCallsByUserId(userId || "");
   const [recordings, setRecordings] = useState<CallRecording[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
 
   useEffect(() => {
     const fetchRecordings = async () => {
-      if (!calls) return;
+      if (!calls || !userId) return;
 
       try {
-        // Get recordings for each call
         const callData = await Promise.all(
           calls.map((call) => call.queryRecordings())
         );
         const allRecordings = callData.flatMap((call) => call.recordings);
-
         setRecordings(allRecordings);
       } catch (error) {
         console.log("Error fetching recordings:", error);
@@ -41,9 +44,8 @@ function RecordingsPage() {
     };
 
     fetchRecordings();
-  }, [calls]);
+  }, [calls, userId]);
 
-  // Filter recordings based on search query
   const filteredRecordings = recordings.filter((recording) => {
     if (!searchQuery) return true;
 
@@ -57,7 +59,7 @@ function RecordingsPage() {
       recordingName.includes(searchLower) || recordingDate.includes(searchLower)
     );
   });
-  // Sort recordings based on selected order
+
   const sortedRecordings = [...filteredRecordings].sort((a, b) => {
     if (sortOrder === "newest") {
       return new Date(b.end_time).getTime() - new Date(a.end_time).getTime();
@@ -71,7 +73,6 @@ function RecordingsPage() {
   return (
     <>
       <Navbar />
-
       <div className="container max-w-7xl mx-auto p-6 space-y-6">
         {/* HEADER SECTION */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
