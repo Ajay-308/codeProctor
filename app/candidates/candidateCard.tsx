@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Mail, CalendarIcon, Code, X } from "lucide-react";
+import { Mail, CalendarIcon, Code, X, Plus } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -31,6 +31,11 @@ interface Candidate {
   tags: string[];
   scheduledInterviews?: Date[];
   rejectedDates?: Date[];
+}
+
+interface InterviewerInfo {
+  name: string;
+  email: string;
 }
 
 const statusLabels: Record<
@@ -96,6 +101,9 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
 }) => {
   const [activeView, setActiveView] = useState<ActiveView>(null);
   const interviews = useQuery(api.interviews.getAllInterviews);
+  const [interviewerInfo, setInterviewerInfo] = useState<InterviewerInfo[]>([
+    { name: "", email: "" },
+  ]);
   const [formData, setFormData] = useState({
     date: new Date(),
     time: "09:00",
@@ -161,6 +169,28 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
     setActiveView(null);
   };
 
+  // Functions to handle interviewer management
+  const addInterviewer = () => {
+    setInterviewerInfo([...interviewerInfo, { name: "", email: "" }]);
+  };
+
+  const removeInterviewer = (index: number) => {
+    if (interviewerInfo.length > 1) {
+      setInterviewerInfo(interviewerInfo.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateInterviewer = (
+    index: number,
+    field: "name" | "email",
+    value: string
+  ) => {
+    const updated = interviewerInfo.map((interviewer, i) =>
+      i === index ? { ...interviewer, [field]: value } : interviewer
+    );
+    setInterviewerInfo(updated);
+  };
+
   const isSameDay = useCallback(
     (date1: Date, date2: Date) => {
       const normalized1 = normalizeDate(date1);
@@ -187,6 +217,16 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
 
       if (!formData.date) {
         toast.error("Please select a date.");
+        return;
+      }
+
+      // Validate interviewer information
+      const validInterviewers = interviewerInfo.filter(
+        (interviewer) => interviewer.name.trim() && interviewer.email.trim()
+      );
+
+      if (validInterviewers.length === 0) {
+        toast.error("Please add at least one interviewer with name and email.");
         return;
       }
 
@@ -225,6 +265,11 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
       const startTime = interviewDate.getTime();
 
       try {
+        // Extract interviewer IDs (you might need to adjust this based on your data structure)
+        const interviewerIds = validInterviewers.map(
+          (_, index) => `interviewer${index + 1}`
+        );
+
         await createInterview({
           candidateId: candidate.id,
           startTime,
@@ -232,7 +277,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
           status: "scheduled",
           title: `${candidate.name} Interview`,
           streamCallId: "default-stream-id",
-          interviewerIds: ["interviewer1", "interviewer2"],
+          interviewerIds,
         });
 
         toast.success("Interview scheduled successfully!");
@@ -248,6 +293,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
               email: candidate.email,
               interviewDate,
               link: "https://code-proctor.vercel.app/home",
+              interviewers: validInterviewers,
             }),
           });
 
@@ -269,6 +315,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
           time: "09:00",
           notes: "",
         });
+        setInterviewerInfo([{ name: "", email: "" }]);
       } catch (error) {
         console.error("Failed to schedule interview:", error);
         toast.error("Failed to schedule interview. Please try again.");
@@ -279,6 +326,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
       candidate.name,
       candidate.email,
       formData,
+      interviewerInfo,
       createInterview,
       isDateScheduled,
       interviews,
@@ -630,6 +678,60 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
             )}
 
             <form onSubmit={handleSubmitSchedule}>
+              {/* Interviewer Information Section */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Interviewers
+                  </label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addInterviewer}
+                    className="flex items-center"
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  {interviewerInfo.map((interviewer, index) => (
+                    <div key={index} className="flex space-x-2">
+                      <input
+                        type="text"
+                        placeholder="Interviewer name"
+                        value={interviewer.name}
+                        onChange={(e) =>
+                          updateInterviewer(index, "name", e.target.value)
+                        }
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      <input
+                        type="email"
+                        placeholder="interviewer@email.com"
+                        value={interviewer.email}
+                        onChange={(e) =>
+                          updateInterviewer(index, "email", e.target.value)
+                        }
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {interviewerInfo.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeInterviewer(index)}
+                          className="px-2"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <Calendar
                 mode="single"
                 selected={formData.date}
@@ -741,17 +843,6 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Select Assessment
-                </label>
-                <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                  <option>Frontend Developer Test</option>
-                  <option>Backend Developer Test</option>
-                  <option>Full Stack Developer Test</option>
-                  <option>DevOps Engineer Test</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
                   Time Limit (minutes)
                 </label>
                 <input
@@ -763,6 +854,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
+              <Button className="w-full" variant="default"></Button>
               <Button className="w-full" variant="default">
                 Send Test Invitation
               </Button>
