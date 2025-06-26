@@ -5,10 +5,22 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { name, email, interviewDate, link, interviewerId } = req.body;
-
-  if (!email || !name) {
-    return res.status(400).json({ message: "Missing required fields." });
+  const { name, email, interviewDate, link, interviewers } = req.body;
+  const interviewerList = interviewers
+    .map((interviewer: { email: string }) => interviewer.email)
+    .join(",");
+  console.log("sending email to:", email, "and cc:", interviewerList);
+  if (!email) {
+    return res.status(400).json({ message: "Missing email." });
+  }
+  if (!interviewDate) {
+    return res.status(400).json({ message: "Missing interview date." });
+  }
+  if (!link) {
+    return res.status(400).json({ message: "Missing interview link." });
+  }
+  if (!interviewers) {
+    return res.status(400).json({ message: "Missing interviewer ID." });
   }
 
   const transporter = nodemailer.createTransport({
@@ -25,7 +37,7 @@ export default async function handler(
     await transporter.sendMail({
       from: `"HR Team" <${process.env.EMAIL_USER}>`,
       to: email,
-      cc: interviewerId,
+      cc: interviewerList,
       subject: "You're Invited: Interview Scheduled!",
       html: `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; background-color: #fafafa;">
