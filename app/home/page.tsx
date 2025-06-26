@@ -29,6 +29,8 @@ import {
 
 export default function HomePage() {
   const router = useRouter();
+  // agar user login nhi hai database mai to selectRole page par redirect kar do
+
   const { isInterviewer, isLoading } = useUserRole();
   const interviews = useQuery(api.interviews.getInterview);
   const templates = useQuery(api.templets.getTempletes);
@@ -55,6 +57,14 @@ export default function HomePage() {
   ////const completedInterviews = Interview ?.
   console.log("pastInterviews", pastInterviews);
   //console.log("completedInterviews", completedInterviews);
+  useEffect(() => {
+    if (isLoaded && userId && users) {
+      const userExists = users.some((user) => user.clerkId === userId);
+      if (!userExists) {
+        router.push("/selectRole");
+      }
+    }
+  }, [isLoaded, userId, users, router]);
 
   useEffect(() => {
     if (isLoaded && !userId) {
