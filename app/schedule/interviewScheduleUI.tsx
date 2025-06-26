@@ -36,7 +36,6 @@ import {
   UsersIcon,
   VideoIcon,
   XIcon,
-  BookOpen,
 } from "lucide-react";
 import Calendar from "@/components/ui/calendar";
 import { timeSlots } from "@/constants";
@@ -51,7 +50,6 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { useRouter } from "next/navigation";
 
 interface Interview {
   _id: string;
@@ -69,7 +67,6 @@ interface Interview {
 type Id<T> = string & { __tableName: T };
 
 function InterviewScheduleUI() {
-  const router = useRouter();
   const client = useStreamVideoClient();
   const { user } = useUser();
   const [open, setOpen] = useState(false);
@@ -573,16 +570,6 @@ function InterviewScheduleUI() {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-muted">
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => router.push("/assignments/create")}
-                    >
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      Create Assignment
-                    </Button>
                   </div>
                 </div>
               </div>
