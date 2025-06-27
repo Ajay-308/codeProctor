@@ -51,9 +51,9 @@ export default function DocsPage() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 ">
           <Header />
-          <main className="relative">
+          <main className="relative overflow-y-hidden">
             <TracingBeamDocs />
           </main>
         </div>

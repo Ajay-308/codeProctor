@@ -29,22 +29,25 @@ export const TracingBeam = ({
   const y1 = useSpring(
     useTransform(scrollYProgress, [0, 0.8], [50, svgHeight]),
     {
-      stiffness: 500,
-      damping: 90,
+      stiffness: 60,
+      damping: 20,
     }
   );
   const y2 = useSpring(
-    useTransform(scrollYProgress, [0, 1], [50, svgHeight - 200]),
+    useTransform(scrollYProgress, [0.2, 0.9], [50, svgHeight - 20000]),
     {
-      stiffness: 500,
-      damping: 90,
+      stiffness: 60,
+      damping: 20,
     }
   );
 
   return (
     <motion.div
       ref={ref}
-      className={cn("relative w-full max-w-4xl mx-auto h-full", className)}
+      className={cn(
+        "relative w-full max-w-4xl mx-auto min-h-screen ",
+        className
+      )}
     >
       <div className="absolute -left-4 md:-left-20 top-3">
         <motion.div
@@ -97,7 +100,7 @@ export const TracingBeam = ({
             strokeWidth="1.25"
             className="motion-reduce:hidden"
             transition={{
-              duration: 10,
+              duration: 25,
             }}
             strokeDasharray="1 2"
             strokeLinecap="round"

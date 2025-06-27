@@ -375,7 +375,7 @@ function InterviewScheduleUI() {
 
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button size="default" className="gap-2">
+              <Button size="default" className="gap-2 cursor-pointer">
                 <PlusCircleIcon className="h-4 w-4" />
                 Schedule Interview
               </Button>
