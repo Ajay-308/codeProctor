@@ -117,6 +117,7 @@ const languageImages = {
     </svg>
   `),
 };
+
 // LeetCode problem type
 type LeetCodeProblem = {
   id: string;
@@ -200,7 +201,7 @@ function CodeEditor({
     problem: LeetCodeProblem
   ): Promise<LeetCodeProblem> => {
     return new Promise((resolve) => {
-      // Simulate processing time for large datasets
+      // Reduce delay from 500ms to 100ms for faster processing
       setTimeout(() => {
         const examples = parseExamplesFromDescription(problem.description);
         const constraints = parseConstraints(problem.description);
@@ -213,7 +214,7 @@ function CodeEditor({
           cleanedDescription: cleanedDescription,
           processed: true,
         });
-      }, 500); // Simulate processing delay
+      }, 100); // Much faster processing
     });
   };
 
@@ -295,12 +296,18 @@ function CodeEditor({
     setIsLoadingProblem(true);
 
     try {
-      // Process the problem to extract examples and constraints
-      const processedProblem = await processProblem(problem);
-      setSelectedProblem(processedProblem);
+      // Set the problem immediately to show content
+      setSelectedProblem(problem);
 
-      const starterCode = getStarterCode(processedProblem, language);
+      // Get starter code immediately
+      const starterCode = getStarterCode(problem, language);
       setCode(starterCode);
+
+      // Process the problem in the background
+      const processedProblem = await processProblem(problem);
+
+      // Update with processed version
+      setSelectedProblem(processedProblem);
 
       if (socketRef.current && isConnected) {
         socketRef.current.emit("problem-change", {
@@ -311,9 +318,7 @@ function CodeEditor({
       }
     } catch (error) {
       console.error("Error processing problem:", error);
-      // Fallback to original problem
-      setSelectedProblem(problem);
-      setCode(getStarterCode(problem, language));
+      // Problem is already set, so we just continue with unprocessed version
     } finally {
       setIsLoadingProblem(false);
     }
@@ -386,23 +391,6 @@ function CodeEditor({
     }
   };
 
-  // Show loading state
-  if (isLoadingProblem) {
-    return (
-      <div className="min-h-[calc(100vh-4rem-1px)] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <div className="text-center">
-            <h3 className="text-lg font-medium">Processing Problem</h3>
-            <p className="text-sm text-muted-foreground">
-              Parsing examples and constraints...
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       <ResizablePanelGroup
@@ -419,15 +407,22 @@ function CodeEditor({
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <h2 className="text-2xl font-semibold tracking-tight">
-                        {selectedProblem
-                          ? selectedProblem.title
-                          : "Select a Problem"}
+                        {isLoadingProblem ? (
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Loading Problem...
+                          </div>
+                        ) : selectedProblem ? (
+                          selectedProblem.title
+                        ) : (
+                          "Select a Problem"
+                        )}
                       </h2>
                       {/* Connection Status */}
                       <Badge variant={isConnected ? "default" : "destructive"}>
                         {isConnected ? "Connected" : "Disconnected"}
                       </Badge>
-                      {selectedProblem && (
+                      {selectedProblem && !isLoadingProblem && (
                         <Badge
                           className={getDifficultyColor(
                             selectedProblem.difficulty
@@ -473,6 +468,8 @@ function CodeEditor({
                                   language as keyof typeof languageImages
                                 ] ||
                                 "/placeholder.svg?height=20&width=20" ||
+                                "/placeholder.svg" ||
+                                "/placeholder.svg" ||
                                 "/placeholder.svg"
                               }
                               alt={language}
@@ -496,6 +493,8 @@ function CodeEditor({
                                     lang.id as keyof typeof languageImages
                                   ] ||
                                   "/placeholder.svg?height=20&width=20" ||
+                                  "/placeholder.svg" ||
+                                  "/placeholder.svg" ||
                                   "/placeholder.svg"
                                 }
                                 alt={lang.name}
@@ -539,102 +538,126 @@ function CodeEditor({
                   </Card>
                 )}
 
-                {selectedProblem ? (
-                  <>
-                    {/* Topics */}
-                    <Card>
-                      <CardContent className="pt-6">
-                        <div className="flex flex-wrap gap-2">
-                          {selectedProblem.topics.map((topic, index) => (
-                            <Badge key={index} variant="secondary">
-                              {topic}
-                            </Badge>
-                          ))}
+                {selectedProblem || isLoadingProblem ? (
+                  <div className="relative">
+                    {/* Loading Overlay */}
+                    {isLoadingProblem && (
+                      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+                        <div className="flex flex-col items-center gap-2">
+                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          <p className="text-sm text-muted-foreground">
+                            Processing problem...
+                          </p>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    )}
 
-                    {/* PROBLEM DESC. */}
-                    <Card>
-                      <CardHeader className="flex flex-row items-center gap-2">
-                        <BookIcon className="h-5 w-5 text-primary/80" />
-                        <CardTitle>Problem Description</CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-sm leading-relaxed">
-                        <div className="prose prose-sm dark:prose-invert max-w-none">
-                          <pre className="whitespace-pre-wrap text-sm bg-muted/50 p-4 rounded-lg">
-                            {selectedProblem.cleanedDescription ||
-                              selectedProblem.description}
-                          </pre>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* PROBLEM EXAMPLES */}
-                    {selectedProblem.parsedExamples &&
-                      selectedProblem.parsedExamples.length > 0 && (
-                        <Card>
-                          <CardHeader className="flex flex-row items-center gap-2">
-                            <LightbulbIcon className="h-5 w-5 text-yellow-500" />
-                            <CardTitle>Examples</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <ScrollArea className="h-full w-full rounded-md border">
-                              <div className="p-4 space-y-4">
-                                {selectedProblem.parsedExamples.map(
-                                  (example, index) => (
-                                    <div key={index} className="space-y-2">
-                                      <p className="font-medium text-sm">
-                                        Example {index + 1}:
-                                      </p>
-                                      <ScrollArea className="h-full w-full rounded-md">
-                                        <pre className="bg-muted/50 p-3 rounded-lg text-sm font-mono">
-                                          <div>Input: {example.input}</div>
-                                          <div>Output: {example.output}</div>
-                                          {example.explanation && (
-                                            <div className="pt-2 text-muted-foreground">
-                                              Explanation: {example.explanation}
-                                            </div>
-                                          )}
-                                        </pre>
-                                        <ScrollBar orientation="horizontal" />
-                                      </ScrollArea>
-                                    </div>
-                                  )
-                                )}
-                              </div>
-                              <ScrollBar />
-                            </ScrollArea>
+                    {/* Problem Content */}
+                    {selectedProblem && (
+                      <>
+                        {/* Topics */}
+                        <Card className={isLoadingProblem ? "opacity-50" : ""}>
+                          <CardContent className="pt-6">
+                            <div className="flex flex-wrap gap-2">
+                              {selectedProblem.topics.map((topic, index) => (
+                                <Badge key={index} variant="secondary">
+                                  {topic}
+                                </Badge>
+                              ))}
+                            </div>
                           </CardContent>
                         </Card>
-                      )}
 
-                    {/* CONSTRAINTS */}
-                    {selectedProblem.parsedConstraints &&
-                      selectedProblem.parsedConstraints.length > 0 && (
-                        <Card>
+                        {/* Rest of the problem content with opacity when loading */}
+                        <Card className={isLoadingProblem ? "opacity-50" : ""}>
                           <CardHeader className="flex flex-row items-center gap-2">
-                            <AlertCircleIcon className="h-5 w-5 text-blue-500" />
-                            <CardTitle>Constraints</CardTitle>
+                            <BookIcon className="h-5 w-5 text-primary/80" />
+                            <CardTitle>Problem Description</CardTitle>
                           </CardHeader>
-                          <CardContent>
-                            <ul className="list-disc list-inside space-y-1.5 text-sm marker:text-muted-foreground">
-                              {selectedProblem.parsedConstraints.map(
-                                (constraint, index) => (
-                                  <li
-                                    key={index}
-                                    className="text-muted-foreground"
-                                  >
-                                    {constraint}
-                                  </li>
-                                )
-                              )}
-                            </ul>
+                          <CardContent className="text-sm leading-relaxed">
+                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                              <pre className="whitespace-pre-wrap text-sm bg-muted/50 p-4 rounded-lg">
+                                {selectedProblem.cleanedDescription ||
+                                  selectedProblem.description}
+                              </pre>
+                            </div>
                           </CardContent>
                         </Card>
-                      )}
-                  </>
+
+                        {/* Examples and Constraints with same opacity treatment */}
+                        {selectedProblem.parsedExamples &&
+                          selectedProblem.parsedExamples.length > 0 && (
+                            <Card
+                              className={isLoadingProblem ? "opacity-50" : ""}
+                            >
+                              <CardHeader className="flex flex-row items-center gap-2">
+                                <LightbulbIcon className="h-5 w-5 text-yellow-500" />
+                                <CardTitle>Examples</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <ScrollArea className="h-full w-full rounded-md border">
+                                  <div className="p-4 space-y-4">
+                                    {selectedProblem.parsedExamples.map(
+                                      (example, index) => (
+                                        <div key={index} className="space-y-2">
+                                          <p className="font-medium text-sm">
+                                            Example {index + 1}:
+                                          </p>
+                                          <ScrollArea className="h-full w-full rounded-md">
+                                            <pre className="bg-muted/50 p-3 rounded-lg text-sm font-mono">
+                                              <div>Input: {example.input}</div>
+                                              <div>
+                                                Output: {example.output}
+                                              </div>
+                                              {example.explanation && (
+                                                <div className="pt-2 text-muted-foreground">
+                                                  Explanation:{" "}
+                                                  {example.explanation}
+                                                </div>
+                                              )}
+                                            </pre>
+                                            <ScrollBar orientation="horizontal" />
+                                          </ScrollArea>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                  <ScrollBar />
+                                </ScrollArea>
+                              </CardContent>
+                            </Card>
+                          )}
+
+                        {selectedProblem.parsedConstraints &&
+                          selectedProblem.parsedConstraints.length > 0 && (
+                            <Card
+                              className={isLoadingProblem ? "opacity-50" : ""}
+                            >
+                              <CardHeader className="flex flex-row items-center gap-2">
+                                <AlertCircleIcon className="h-5 w-5 text-blue-500" />
+                                <CardTitle>Constraints</CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <ul className="list-disc list-inside space-y-1.5 text-sm marker:text-muted-foreground">
+                                  {selectedProblem.parsedConstraints.map(
+                                    (constraint, index) => (
+                                      <li
+                                        key={index}
+                                        className="text-muted-foreground"
+                                      >
+                                        {constraint}
+                                      </li>
+                                    )
+                                  )}
+                                </ul>
+                              </CardContent>
+                            </Card>
+                          )}
+                      </>
+                    )}
+                  </div>
                 ) : (
+                  // No problem selected state
                   <Card>
                     <CardContent className="flex flex-col items-center justify-center py-16 text-center">
                       <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
