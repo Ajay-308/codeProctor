@@ -58,7 +58,18 @@ function MeetingSetup({ onSetupComplete }: { onSetupComplete: () => void }) {
   if (!call) return null;
 
   const handleJoin = async () => {
+    // Force browser to apply noise suppression
+    await navigator.mediaDevices.getUserMedia({
+      audio: {
+        noiseSuppression: true,
+        echoCancellation: true,
+        autoGainControl: true,
+      },
+    });
+
+    // Let Stream SDK handle mic + camera using browser defaults
     await call.join();
+
     onSetupComplete();
   };
 

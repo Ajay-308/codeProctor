@@ -84,48 +84,14 @@ function MeetingRoom() {
   const [reactions, setReactions] = useState<EmojiReaction[]>([]);
 
   const call = useCall();
-
-  // METHOD 1: Get IDs from URL parameters
-  // If you have routes like /meeting/[id] or /room/[roomId]
   const roomId = (params?.id as string) || (params?.roomId as string);
-
-  // METHOD 2: Get from query parameters
-  // If you have URLs like /meeting?roomId=123&userId=456
-  // const roomId = searchParams?.get('roomId');
-  // const userId = searchParams?.get('userId');
-  // const userName = searchParams?.get('userName');
-
-  // METHOD 3: Get from Stream Video SDK (RECOMMENDED)
-  // The call object contains the room/call information
   const streamRoomId = call?.id; // This is your Stream call ID
   const streamUserId = localParticipant?.userId;
   const streamUserName = localParticipant?.name || localParticipant?.userId;
 
-  // METHOD 4: Generate or get from your auth context
-  // You might have a user context or auth provider
-  // const { user } = useAuth(); // Your auth hook
-  // const userId = user?.id;
-  // const userName = user?.name || user?.email;
-
-  // METHOD 5: Get from localStorage/sessionStorage (if you store them)
-  // const [userId, setUserId] = useState<string>('');
-  // const [userName, setUserName] = useState<string>('');
-  //
-  // useEffect(() => {
-  //   const storedUserId = localStorage.getItem('userId');
-  //   const storedUserName = localStorage.getItem('userName');
-  //   if (storedUserId) setUserId(storedUserId);
-  //   if (storedUserName) setUserName(storedUserName);
-  // }, []);
-
-  // Use the Stream SDK values as the primary source
   const finalRoomId = streamRoomId || roomId || "default-room";
   const finalUserId = streamUserId || "anonymous-user";
   const finalUserName = streamUserName || "Anonymous";
-
-  console.log("Room ID:", finalRoomId);
-  console.log("User ID:", finalUserId);
-  console.log("User Name:", finalUserName);
 
   useEffect(() => {
     if (!call) return;
