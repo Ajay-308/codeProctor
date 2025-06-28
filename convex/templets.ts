@@ -38,7 +38,6 @@ export const addTempletes = mutation({
     const now = new Date().toISOString();
     await ctx.db.insert("templetes", {
       ...args,
-      createdAt: now,
       updatedAt: now,
       usageCount: 0,
     });
