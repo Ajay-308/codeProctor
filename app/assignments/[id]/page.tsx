@@ -23,12 +23,12 @@ export default function CandidateAssessmentPage() {
   const candidateEmail = searchParams?.get("email") || "";
 
   const candidateAssignment = useQuery(
-    api.mcqAssignments.getCandidateAssignment,
+    api.mcqAssignment.getCandidateAssignment,
     assignmentId && candidateEmail ? { assignmentId, candidateEmail } : "skip"
   );
 
-  const startAssignment = useMutation(api.mcqAssignments.startAssignment);
-  const submitAssignment = useMutation(api.mcqAssignments.submitAssignment);
+  const startAssignment = useMutation(api.mcqAssignment.startAssignment);
+  const submitAssignment = useMutation(api.mcqAssignment.submitAssignment);
 
   const [hasStarted, setHasStarted] = useState(false);
 
@@ -132,7 +132,7 @@ export default function CandidateAssessmentPage() {
                 <div className="flex justify-between">
                   <span>Your Score:</span>
                   <span className="font-medium">
-                    {candidateAssignment.score.toFixed(1)}%
+                    {(candidateAssignment.score ?? 0).toFixed(1)}%
                   </span>
                 </div>
                 <div className="flex justify-between">
