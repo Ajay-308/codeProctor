@@ -2,6 +2,7 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  // ---------------- Users ----------------
   users: defineTable({
     name: v.string(),
     email: v.string(),
@@ -13,6 +14,7 @@ export default defineSchema({
     .index("by_clerk_id", ["clerkId"])
     .index("by_user_name", ["userName"]),
 
+  // ---------------- Interviews ----------------
   interviews: defineTable({
     title: v.string(),
     description: v.optional(v.string()),
@@ -26,6 +28,8 @@ export default defineSchema({
     .index("by_candidate_id", ["candidateId"])
     .index("by_stream_call_id", ["streamCallId"])
     .index("by_interviewer_id", ["interviewerIds"]),
+
+  // ---------------- Comments ----------------
   comments: defineTable({
     content: v.string(),
     rating: v.number(),
@@ -33,69 +37,118 @@ export default defineSchema({
     interviewId: v.id("interviews"),
   }).index("by_interview_id", ["interviewId"]),
 
-  // yaha tak sab theek hai check point hai
-
-  assignments: defineTable({
+  // ---------------- MCQ Templates ----------------
+  mcqTemplates: defineTable({
     title: v.string(),
-    description: v.optional(v.string()),
-    dueDate: v.number(),
-    createdBy: v.string(),
+    description: v.string(),
+    category: v.string(),
+    difficulty: v.union(
+      v.literal("easy"),
+      v.literal("medium"),
+      v.literal("hard")
+    ),
+    timeLimit: v.number(),
     passingScore: v.number(),
-    type: v.optional(v.string()),
-    timeLimit: v.optional(v.number()),
-    status: v.optional(v.string()),
-    instructions: v.optional(v.string()),
-    candidateEmails: v.array(v.string()),
-    sendImmediately: v.boolean(),
-    reminderEnabled: v.boolean(),
     questions: v.array(
       v.object({
-        id: v.number(),
+        id: v.string(),
         question: v.string(),
-        content: v.optional(v.string()),
-        type: v.optional(v.string()),
-        points: v.optional(v.number()),
-        options: v.array(v.string()),
-        correctAnswer: v.string(),
-        metadata: v.optional(v.any()),
+        options: v.array(
+          v.object({
+            id: v.string(),
+            text: v.string(),
+            isCorrect: v.boolean(),
+          })
+        ),
+        type: v.union(v.literal("single"), v.literal("multiple")),
+        points: v.number(),
+        explanation: v.optional(v.string()),
+        difficulty: v.union(
+          v.literal("easy"),
+          v.literal("medium"),
+          v.literal("hard")
+        ),
+        category: v.string(),
       })
     ),
-
-    // ✅ Add these new fields:
-    templateId: v.optional(v.string()),
-    tags: v.optional(v.array(v.string())),
+    tags: v.array(v.string()),
+    totalPoints: v.number(),
+    usageCount: v.number(),
+    createdBy: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
   }),
 
-  questions: defineTable({
-    questionText: v.string(),
-    type: v.union(v.literal("multiple-choice"), v.literal("open-ended")),
-    options: v.optional(v.array(v.string())),
-    correctAnswer: v.string(),
-    assignmentId: v.id("assignments"),
-  }).index("by_assignment_id", ["assignmentId"]),
-
-  assignmentSubmissions: defineTable({
-    assignmentId: v.id("assignments"),
-    candidateId: v.id("users"),
-    candidateName: v.optional(v.string()),
-    submittedAt: v.number(),
-    completionTime: v.optional(v.number()),
-    score: v.number(),
-    answers: v.array(
+  // ---------------- MCQ Assignments ----------------
+  mcqAssignments: defineTable({
+    templateId: v.id("mcqTemplates"),
+    title: v.string(),
+    description: v.string(),
+    candidateEmails: v.array(v.string()),
+    dueDate: v.number(),
+    instructions: v.optional(v.string()),
+    sendImmediately: v.boolean(),
+    reminderEnabled: v.boolean(),
+    createdBy: v.string(),
+    status: v.string(),
+    timeLimit: v.number(),
+    passingScore: v.number(),
+    totalPoints: v.number(),
+    questions: v.array(
       v.object({
-        questionId: v.number(),
-        selectedAnswer: v.string(),
-        isCorrect: v.boolean(),
+        id: v.string(),
+        question: v.string(),
+        options: v.array(
+          v.object({
+            id: v.string(),
+            text: v.string(),
+            isCorrect: v.boolean(),
+          })
+        ),
+        type: v.union(v.literal("single"), v.literal("multiple")),
+        points: v.number(),
+        explanation: v.optional(v.string()),
+        difficulty: v.union(
+          v.literal("easy"),
+          v.literal("medium"),
+          v.literal("hard")
+        ),
+        category: v.string(),
       })
     ),
-  })
-    .index("by_assignment_id", ["assignmentId"])
-    .index("by_candidate_id", ["candidateId"]),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }),
 
-  //assignment templetes
+  // ---------------- Candidate Assignments ----------------
+  candidateAssignments: defineTable({
+    assignmentId: v.id("mcqAssignments"),
+    candidateEmail: v.string(),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("in_progress"),
+      v.literal("completed"),
+      v.literal("expired")
+    ),
+    startedAt: v.optional(v.number()),
+    submittedAt: v.optional(v.number()),
+    answers: v.array(
+      v.object({
+        questionId: v.string(),
+        selectedOptions: v.array(v.string()),
+        flagged: v.boolean(),
+      })
+    ),
+    score: v.optional(v.number()),
+    timeSpent: v.optional(v.number()),
+    createdAt: v.number(),
+  }),
+
+  // ---------------- Assignment Templates (DSA/Coding) ----------------
   templetes: defineTable({
     title: v.string(),
     description: v.optional(v.string()),
+    tags: v.array(v.string()),
     difficulty: v.union(
       v.literal("easy"),
       v.literal("medium"),
@@ -103,18 +156,58 @@ export default defineSchema({
       v.literal("expert")
     ),
     language: v.string(),
-    tags: v.array(v.string()),
     timeLimit: v.number(),
-
+    usageCount: v.number(),
+    updatedAt: v.string(),
     inputFormat: v.optional(v.string()),
     outputFormat: v.optional(v.string()),
     constraints: v.optional(v.string()),
     sampleInput: v.optional(v.string()),
     sampleOutput: v.optional(v.string()),
     explanation: v.optional(v.string()),
+  }),
 
-    createdAt: v.string(),
-    updatedAt: v.string(),
-    usageCount: v.number(),
+  // ---------------- Questions (linked to templetes) ----------------
+  questions: defineTable({
+    questionText: v.string(),
+    type: v.union(v.literal("multiple-choice"), v.literal("open-ended")),
+    options: v.optional(v.array(v.string())),
+    correctAnswer: v.string(),
+    templateId: v.id("templetes"),
+  }).index("by_template_id", ["templateId"]),
+
+  // ---------------- Assessments from Templates ----------------
+  assessmentSubmissions: defineTable({
+    templateId: v.id("templetes"),
+    candidateId: v.id("users"),
+    candidateName: v.optional(v.string()),
+    submittedAt: v.number(),
+    completionTime: v.optional(v.number()),
+    score: v.number(),
+    answers: v.array(
+      v.object({
+        questionId: v.string(),
+        selectedAnswer: v.string(),
+        isCorrect: v.boolean(),
+      })
+    ),
+  }).index("by_template_id", ["templateId"]),
+
+  // ---------------- Assignments (older, general) ----------------
+  assignments: defineTable({
+    createdBy: v.string(),
+    title: v.string(),
+    description: v.string(),
+    dueDate: v.number(),
+    passingScore: v.number(),
+    type: v.string(),
+    timeLimit: v.number(),
+    status: v.string(),
+    questions: v.array(v.any()),
+    templateId: v.optional(v.string()),
+    tags: v.array(v.string()),
+    candidateEmails: v.array(v.string()),
+    sendImmediately: v.boolean(),
+    reminderEnabled: v.boolean(),
   }),
 });

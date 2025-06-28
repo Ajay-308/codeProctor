@@ -13,10 +13,11 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as assignments from "../assignments.js";
 import type * as comments from "../comments.js";
 import type * as http from "../http.js";
 import type * as interviews from "../interviews.js";
+import type * as mcqAssignment from "../mcqAssignment.js";
+import type * as mcqTemplate from "../mcqTemplate.js";
 import type * as templets from "../templets.js";
 import type * as users from "../users.js";
 
@@ -29,10 +30,11 @@ import type * as users from "../users.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  assignments: typeof assignments;
   comments: typeof comments;
   http: typeof http;
   interviews: typeof interviews;
+  mcqAssignment: typeof mcqAssignment;
+  mcqTemplate: typeof mcqTemplate;
   templets: typeof templets;
   users: typeof users;
 }>;

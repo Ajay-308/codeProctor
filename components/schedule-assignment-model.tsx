@@ -37,7 +37,7 @@ interface ScheduleAssignmentModalProps {
   isScheduling?: boolean;
 }
 
-interface ScheduleData {
+export interface ScheduleData {
   candidateEmails: string[];
   dueDate: Date;
   instructions: string;
