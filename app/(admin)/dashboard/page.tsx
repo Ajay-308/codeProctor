@@ -11,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { interviewCategories as INTERVIEW_CATEGORY } from "@/constants";
 import { Badge } from "@/components/ui/badge";
+import ProtectedRoute from "@/components/protectedComponent";
 import {
   Card,
   CardContent,
@@ -76,7 +77,7 @@ function DashboardPage() {
   );
 
   return (
-    <>
+    <ProtectedRoute allowedRoles={["interviewer"]}>
       <Navbar />
 
       <div className="container mx-auto py-8 px-4 md:px-6 max-w-7xl">
@@ -281,7 +282,7 @@ function DashboardPage() {
           )}
         </div>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }
 

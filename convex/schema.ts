@@ -42,16 +42,28 @@ export default defineSchema({
     createdBy: v.string(),
     passingScore: v.number(),
     type: v.optional(v.string()),
-    timeLimit: v.optional(v.float64()),
+    timeLimit: v.optional(v.number()),
     status: v.optional(v.string()),
+    instructions: v.optional(v.string()),
+    candidateEmails: v.array(v.string()),
+    sendImmediately: v.boolean(),
+    reminderEnabled: v.boolean(),
     questions: v.array(
       v.object({
         id: v.number(),
         question: v.string(),
+        content: v.optional(v.string()),
+        type: v.optional(v.string()),
+        points: v.optional(v.number()),
         options: v.array(v.string()),
         correctAnswer: v.string(),
+        metadata: v.optional(v.any()),
       })
     ),
+
+    // ✅ Add these new fields:
+    templateId: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
   }),
 
   questions: defineTable({

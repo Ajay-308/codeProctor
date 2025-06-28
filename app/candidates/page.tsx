@@ -13,6 +13,7 @@ import Navbar from "@/components/Navbar";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import ProtectedRoute from "@/components/protectedComponent";
 
 interface Candidate {
   id: string;
@@ -91,7 +92,7 @@ export default function Page() {
   );
 
   return (
-    <>
+    <ProtectedRoute allowedRoles={["interviewer"]}>
       <Navbar />
 
       <div className="space-y-6 mt-8 mx-4">
@@ -340,6 +341,6 @@ export default function Page() {
           </div>
         )}
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

@@ -5,9 +5,51 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { UserButton } from "@clerk/nextjs";
 import { Code, Menu, X, Bell, Settings } from "lucide-react";
+import useUserRole from "@/hooks/useUserRole";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isInterviewer, isCandidate } = useUserRole();
+
+  // Define navigation items with role restrictions
+  const navigationItems = [
+    {
+      href: "/home",
+      label: "Home",
+      allowedRoles: ["interviewer", "candidate"], // Both can access
+    },
+    {
+      href: "/dashboard",
+      label: "Dashboard",
+      allowedRoles: ["interviewer"], // Only interviewers
+    },
+    {
+      href: "/candidates",
+      label: "Candidates",
+      allowedRoles: ["interviewer"], // Only interviewers
+    },
+    {
+      href: "/templates",
+      label: "Templates",
+      allowedRoles: ["interviewer"], // Only interviewers
+    },
+    {
+      href: "/docs",
+      label: "Docs",
+      allowedRoles: ["interviewer", "candidate"], // Both can access
+    },
+  ];
+
+  // Filter navigation items based on user role
+  const getVisibleNavItems = () => {
+    return navigationItems.filter((item) => {
+      if (isInterviewer) return item.allowedRoles.includes("interviewer");
+      if (isCandidate) return item.allowedRoles.includes("candidate");
+      return false;
+    });
+  };
+
+  const visibleNavItems = getVisibleNavItems();
 
   return (
     <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
@@ -22,36 +64,15 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            <Link
-              href="/home"
-              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
-            >
-              Home
-            </Link>
-            <Link
-              href="/dashboard"
-              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/candidates"
-              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
-            >
-              Candidates
-            </Link>
-            <Link
-              href="/templates"
-              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
-            >
-              Templates
-            </Link>
-            <Link
-              href="/docs"
-              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
-            >
-              Docs
-            </Link>
+            {visibleNavItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* User Actions */}
@@ -64,7 +85,6 @@ export default function Navbar() {
               >
                 <Bell className="h-5 w-5" />
               </Button>
-
               <UserButton
                 appearance={{
                   elements: {
@@ -76,7 +96,6 @@ export default function Navbar() {
                 }}
               />
             </div>
-
             {/* Mobile Menu Button */}
             <Button
               variant="ghost"
@@ -89,7 +108,7 @@ export default function Navbar() {
               ) : (
                 <Menu className="h-6 w-6" />
               )}
-            </Button>
+            </Button>{" "}
             <Link
               href="/setting"
               className="hidden md:flex items-center gap-2 text-gray-600 hover:text-black cursor-pointer"
@@ -110,40 +129,17 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white">
           <div className="container mx-auto px-4 py-4 space-y-4">
-            <Link
-              href="/dashboard"
-              className="block py-2 text-gray-600 hover:text-black"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/interviews"
-              className="block py-2 text-gray-600 hover:text-black"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Interviews
-            </Link>
-            <Link
-              href="/candidates"
-              className="block py-2 text-gray-600 hover:text-black"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Candidates
-            </Link>
-            <Link
-              href="/templates"
-              className="block py-2 text-gray-600 hover:text-black"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Templates
-            </Link>
-            <Link
-              href="/docs"
-              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
-            >
-              Docs
-            </Link>
+            {visibleNavItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="block py-2 text-gray-600 hover:text-black"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+
             <div className="pt-4 border-t border-gray-200 flex justify-between">
               <Button
                 variant="ghost"
@@ -153,6 +149,7 @@ export default function Navbar() {
                 <Bell className="h-5 w-5 mr-2" />
                 Notifications
               </Button>
+
               <Button
                 variant="ghost"
                 size="sm"

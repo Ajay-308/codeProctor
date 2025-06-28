@@ -8,6 +8,8 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useTemplateAssignment } from "@/hooks/useAssismentActions";
+import ProtectedRoute from "@/components/protectedComponent";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -121,6 +123,7 @@ export default function HomePage() {
   const [editTemplate, setEditTemplate] = useState<Template | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
   const [deleteId, setDeleteId] = useState<Id<"templetes"> | null>(null);
+  const { createAssignmentFromTemplate, isCreating } = useTemplateAssignment();
   const [templateToDelete, setTemplateToDelete] = useState<string | undefined>(
     undefined
   );
@@ -209,7 +212,7 @@ export default function HomePage() {
   };
 
   return (
-    <>
+    <ProtectedRoute allowedRoles={["interviewer"]}>
       <Navbar />
 
       <div className="space-y-8 p-6 bg-gradient-to-br from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 min-h-screen">
@@ -438,9 +441,15 @@ export default function HomePage() {
                     variant="default"
                     size="sm"
                     className="text-xs h-7 cursor-pointer px-2 bg-black hover:bg-gray-800 border-0"
+                    onClick={() => createAssignmentFromTemplate(template)}
+                    disabled={isCreating}
                   >
-                    <Code className="mr-1 h-3 w-3" />
-                    Use Template
+                    {isCreating ? (
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1" />
+                    ) : (
+                      <Code className="mr-1 h-3 w-3" />
+                    )}
+                    {isCreating ? "Creating..." : "Use Template"}
                   </Button>
                 </CardFooter>
               </Card>
@@ -672,6 +681,6 @@ export default function HomePage() {
           templateName={templateToDelete}
         />
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

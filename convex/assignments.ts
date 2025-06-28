@@ -2,31 +2,23 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 
-// Get a single assignment by ID
+// ------------------------- GET A SINGLE ASSIGNMENT -------------------------
 export const getAssignment = query({
   args: { id: v.string() },
   handler: async (ctx, args) => {
-    // Convert string ID to Convex ID
     const assignmentId = args.id as Id<"assignments">;
 
-    try {
-      const assignment = await ctx.db.get(assignmentId);
-      if (!assignment) {
-        throw new Error("Assignment not found");
-      }
-      return assignment;
-    } catch (error) {
-      console.error("Error fetching assignment:", error);
-      throw new Error("Failed to fetch assignment");
-    }
+    const assignment = await ctx.db.get(assignmentId);
+    if (!assignment) throw new Error("Assignment not found");
+
+    return assignment;
   },
 });
 
-// Get all submissions for a specific assignment
+// ------------------------- GET SUBMISSIONS FOR ASSIGNMENT -------------------------
 export const getSubmissionsForAssignment = query({
   args: { assignmentId: v.string() },
   handler: async (ctx, args) => {
-    // Convert string ID to Convex ID
     const assignmentId = args.assignmentId as Id<"assignments">;
 
     try {
@@ -38,12 +30,12 @@ export const getSubmissionsForAssignment = query({
       return submissions;
     } catch (error) {
       console.error("Error fetching submissions:", error);
-      return []; // Return empty array if query fails
+      return [];
     }
   },
 });
 
-// List all assignments (useful for assignments listing page)
+// ------------------------- LIST ALL ASSIGNMENTS -------------------------
 export const listAssignments = query({
   handler: async (ctx) => {
     const assignments = await ctx.db.query("assignments").collect();
@@ -59,6 +51,7 @@ export const listAssignments = query({
           (sum, sub) => sum + (sub.score || 0),
           0
         );
+
         const avgScore =
           submissions.length > 0 ? totalScore / submissions.length : null;
 
@@ -74,7 +67,7 @@ export const listAssignments = query({
   },
 });
 
-// Create a new assignment
+// ------------------------- CREATE ASSIGNMENT -------------------------
 export const createAssignment = mutation({
   args: {
     title: v.string(),
@@ -85,12 +78,25 @@ export const createAssignment = mutation({
     type: v.optional(v.string()),
     timeLimit: v.optional(v.number()),
     status: v.optional(v.string()),
+
+    candidateEmails: v.array(v.string()),
+    instructions: v.optional(v.string()),
+    sendImmediately: v.boolean(),
+    reminderEnabled: v.boolean(),
+
+    templateId: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
+
     questions: v.array(
       v.object({
         id: v.number(),
         question: v.string(),
+        content: v.optional(v.string()),
+        type: v.optional(v.string()),
+        points: v.optional(v.number()),
         options: v.array(v.string()),
         correctAnswer: v.string(),
+        metadata: v.optional(v.any()),
       })
     ),
   },
@@ -104,6 +110,15 @@ export const createAssignment = mutation({
       type: args.type,
       timeLimit: args.timeLimit,
       status: args.status || "draft",
+
+      candidateEmails: args.candidateEmails,
+      instructions: args.instructions,
+      sendImmediately: args.sendImmediately,
+      reminderEnabled: args.reminderEnabled,
+
+      templateId: args.templateId,
+      tags: args.tags,
+
       questions: args.questions,
     });
 
@@ -111,7 +126,7 @@ export const createAssignment = mutation({
   },
 });
 
-// Submit an assignment (for candidates)
+// ------------------------- SUBMIT ASSIGNMENT -------------------------
 export const submitAssignment = mutation({
   args: {
     assignmentId: v.id("assignments"),
