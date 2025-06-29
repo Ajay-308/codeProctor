@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
+import logo from "@/app/assest/email-logo.png";
 
 export default async function handler(
   req: NextApiRequest,
@@ -45,7 +46,7 @@ export default async function handler(
   const htmlContent = `
   <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 30px; background: #ffffff; border-radius: 12px; border: 1px solid #e0e0e0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);">
     <div style="text-align: center; margin-bottom: 30px;">
-      <img src="https://i.imgur.com/M0h3RyJ.png" alt="CodeProctor Logo" width="120" style="margin-bottom: 20px;" />
+      <img src=${logo} alt="CodeProctor Logo" width="120" style="margin-bottom: 20px;" />
       <h2 style="color: #2c3e50; font-size: 24px;">Interview Invitation 📩</h2>
     </div>
 

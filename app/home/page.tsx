@@ -33,13 +33,14 @@ export default function HomePage() {
 
   const { isInterviewer, isLoading } = useUserRole();
   const interviews = useQuery(api.interviews.getInterview);
-  const templates = useQuery(api.templets.getTempletes);
-  const templetesCount = templates?.length ?? 0;
   const { userId, isLoaded } = useAuth();
 
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<"start" | "join">("start");
   const { createInstantMeeting } = useMeetingActions();
+  // template count
+  const templateCount = useQuery(api.mcqTemplate.getMCQTemplates);
+  const templatesCount = templateCount?.length ?? 0;
 
   // candidate count , upcoming interviews , completed interviews
   const users = useQuery(api.users.getUser);
@@ -168,7 +169,7 @@ export default function HomePage() {
                         Active Templates
                       </p>
                       <h3 className="text-2xl font-bold text-gray-900">
-                        {templetesCount}
+                        {templatesCount}
                       </h3>
                     </div>
                   </div>

@@ -254,6 +254,38 @@ function InterviewScheduleUI() {
           interviewerIds,
         });
         console.log("Interview saved successfully:", interviewResponse);
+        try {
+          const candidate = users.find((u) => u.clerkId === candidateId);
+          const selectedInterviewers = users.filter((u) =>
+            interviewerIds.includes(u.clerkId)
+          );
+
+          const response = await fetch("/api/sent", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: candidate?.name,
+              email: candidate?.email,
+              interviewDate: meetingDate.toISOString(),
+              link: `${window.location.origin}/join/interview/${id}`,
+              interviewers: selectedInterviewers.map((i) => ({
+                name: i.name,
+                email: i.email,
+              })),
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to send email.");
+          }
+
+          console.log("✅ Email sent successfully");
+        } catch (emailError) {
+          console.error("❌ Email sending failed:", emailError);
+          toast.error("Interview scheduled, but failed to send email.");
+        }
       } catch (convexError) {
         console.error("Error saving interview to database:", convexError);
         toast.error("Failed to save interview. Please try again.");
