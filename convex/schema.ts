@@ -2,7 +2,6 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-  // ---------------- Users ----------------
   users: defineTable({
     name: v.string(),
     email: v.string(),
@@ -14,9 +13,8 @@ export default defineSchema({
     .index("by_clerk_id", ["clerkId"])
     .index("by_user_name", ["userName"]),
 
-  // ---------------- Interviews ----------------
   interviews: defineTable({
-    uuid: v.string(), // ✅ Declare the field
+    uuid: v.string(),
     title: v.string(),
     description: v.optional(v.string()),
     startTime: v.number(),
@@ -30,16 +28,12 @@ export default defineSchema({
     .index("by_stream_call_id", ["streamCallId"])
     .index("by_interviewer_id", ["interviewerIds"])
     .index("by_uuid", ["uuid"]),
-
-  // ---------------- Comments ----------------
   comments: defineTable({
     content: v.string(),
     rating: v.number(),
     interviewerId: v.string(),
     interviewId: v.id("interviews"),
   }).index("by_interview_id", ["interviewId"]),
-
-  // ---------------- MCQ Templates ----------------
   mcqTemplates: defineTable({
     title: v.string(),
     description: v.string(),
@@ -81,7 +75,6 @@ export default defineSchema({
     updatedAt: v.number(),
   }),
 
-  // ---------------- MCQ Assignments ----------------
   mcqAssignments: defineTable({
     templateId: v.id("mcqTemplates"),
     title: v.string(),
@@ -122,7 +115,6 @@ export default defineSchema({
     updatedAt: v.number(),
   }),
 
-  // ---------------- Candidate Assignments ----------------
   candidateAssignments: defineTable({
     assignmentId: v.id("mcqAssignments"),
     candidateEmail: v.string(),
@@ -146,7 +138,6 @@ export default defineSchema({
     createdAt: v.number(),
   }),
 
-  // ---------------- Assignment Templates (DSA/Coding) ----------------
   templetes: defineTable({
     title: v.string(),
     description: v.optional(v.string()),
@@ -195,7 +186,6 @@ export default defineSchema({
     ),
   }).index("by_template_id", ["templateId"]),
 
-  // ---------------- Assignments (older, general) ----------------
   assignments: defineTable({
     createdBy: v.string(),
     title: v.string(),

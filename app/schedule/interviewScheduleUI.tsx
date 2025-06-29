@@ -77,6 +77,11 @@ function InterviewScheduleUI() {
     interviewerId: user?.id ?? "",
   });
   console.log("Interviews:", interviews);
+  console.log("🔍 DEBUG INFO:");
+  console.log("User ID:", user?.id);
+  console.log("Raw interviews data:", interviews);
+  console.log("Interviews type:", typeof interviews);
+  console.log("Interviews length:", interviews?.length);
   const users = useQuery(api.users.getUser) ?? [];
   const createInterview = useMutation(
     api.action.interview.createInterviewWithUUID

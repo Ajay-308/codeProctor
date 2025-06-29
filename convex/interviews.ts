@@ -47,14 +47,14 @@ export const getInterviewByInterviewerId = query({
   args: { interviewerId: v.string() },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthoried user");
+    if (!identity) throw new Error("Unauthorized user");
 
-    return await ctx.db
-      .query("interviews")
-      .withIndex("by_interviewer_id", (q) =>
-        q.eq("interviewerIds", [args.interviewerId])
-      )
-      .collect();
+    const allInterviews = await ctx.db.query("interviews").collect();
+
+    // Manually filter interviews where the interviewer is included
+    return allInterviews.filter((interview) =>
+      interview.interviewerIds.includes(args.interviewerId)
+    );
   },
 });
 
