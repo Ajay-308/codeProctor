@@ -283,7 +283,7 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
         toast.success("Interview scheduled successfully!");
 
         try {
-          const res = await fetch("/api/send_email", {
+          const res = await fetch("/api/sent", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

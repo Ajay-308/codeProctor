@@ -25,9 +25,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Clock, Users, Send, X } from "lucide-react";
+import { CalendarIcon, Users, Send, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 interface ScheduleAssignmentModalProps {
   open: boolean;
@@ -58,33 +59,62 @@ export default function ScheduleAssignmentModal({
   const [sendImmediately, setSendImmediately] = useState(true);
   const [reminderEnabled, setReminderEnabled] = useState(true);
 
-  const handleSchedule = async () => {
-    if (!dueDate) {
-      return;
-    }
-
-    const emails = candidateEmails
-      .split(",")
-      .map((email) => email.trim())
-      .filter((email) => email.length > 0);
-
-    if (emails.length === 0) {
-      return;
-    }
-
-    await onSchedule({
-      candidateEmails: emails,
-      dueDate,
-      instructions,
-      sendImmediately,
-      reminderEnabled,
-    });
-  };
-
   const emailList = candidateEmails
     .split(",")
     .map((email) => email.trim())
     .filter((email) => email.length > 0);
+
+  const handleSchedule = async () => {
+    if (!dueDate || emailList.length === 0) return;
+
+    try {
+      const emailResults = await Promise.all(
+        emailList.map(async (email) => {
+          const res = await fetch("/api/send_email", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: email.split("@")[0], // fallback name
+              email,
+              interviewDate: dueDate,
+              link: "https://code-proctor.vercel.app/home",
+            }),
+          });
+
+          if (!res.ok) {
+            toast.error(`❌ Failed to send to ${email}`);
+            return false;
+          }
+          return true;
+        })
+      );
+
+      const successCount = emailResults.filter(Boolean).length;
+
+      await onSchedule({
+        candidateEmails: emailList,
+        dueDate,
+        instructions,
+        sendImmediately,
+        reminderEnabled,
+      });
+
+      // Reset form fields
+      setCandidateEmails("");
+      setDueDate(undefined);
+      setInstructions("");
+      setSendImmediately(true);
+      setReminderEnabled(true);
+
+      toast.success(`✅ Assignment sent to ${successCount} candidate(s)!`);
+      onOpenChange(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong while scheduling.");
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -106,7 +136,7 @@ export default function ScheduleAssignmentModal({
             <Label htmlFor="candidates">Candidate Emails</Label>
             <Textarea
               id="candidates"
-              placeholder="Enter candidate emails separated by commas&#10;example@company.com, candidate2@company.com"
+              placeholder="Enter candidate emails separated by commas"
               value={candidateEmails}
               onChange={(e) => setCandidateEmails(e.target.value)}
               rows={3}
@@ -154,7 +184,7 @@ export default function ScheduleAssignmentModal({
                 <Calendar
                   mode="single"
                   selected={dueDate}
-                  onSelect={setDueDate as (date: Date | undefined) => void}
+                  onSelect={setDueDate}
                   disabled={(date: Date) => date < new Date()}
                   initialFocus
                 />
@@ -225,29 +255,6 @@ export default function ScheduleAssignmentModal({
                     <SelectItem value="disabled">Disabled</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-            </div>
-          </div>
-
-          {/* Summary */}
-          <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-            <h4 className="font-medium text-sm">Summary</h4>
-            <div className="space-y-1 text-xs text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Users className="h-3 w-3" />
-                <span>{emailList.length} candidate(s) selected</span>
-              </div>
-              {dueDate && (
-                <div className="flex items-center gap-2">
-                  <Clock className="h-3 w-3" />
-                  <span>Due: {format(dueDate, "PPP")}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <Send className="h-3 w-3" />
-                <span>
-                  {sendImmediately ? "Send immediately" : "Schedule for later"}
-                </span>
               </div>
             </div>
           </div>

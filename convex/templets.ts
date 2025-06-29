@@ -24,10 +24,10 @@ export const addTempletes = mutation({
     language: v.string(),
     tags: v.array(v.string()),
     timeLimit: v.number(),
-    updatedAt: v.optional(v.string()), // ✅ Add this
-    createdAt: v.optional(v.string()), // ✅ Add this
-    usageCount: v.optional(v.number()), // ✅ Add this
-    explanation: v.optional(v.string()), // ✅ Add these new fields if used
+    updatedAt: v.optional(v.string()), 
+    createdAt: v.optional(v.string()), 
+    usageCount: v.optional(v.number()), 
+    explanation: v.optional(v.string()), 
     inputFormat: v.optional(v.string()),
     outputFormat: v.optional(v.string()),
     sampleInput: v.optional(v.string()),

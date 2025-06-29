@@ -5,42 +5,43 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { name, email, interviewDate, link, interviewers } = req.body;
-  const interviewerList = interviewers
-    .map((interviewer: { email: string }) => interviewer.email)
-    .join(",");
-  console.log("sending email to:", email, "and cc:", interviewerList);
-  if (!email) {
-    return res.status(400).json({ message: "Missing email." });
-  }
-  if (!interviewDate) {
-    return res.status(400).json({ message: "Missing interview date." });
-  }
-  if (!link) {
-    return res.status(400).json({ message: "Missing interview link." });
-  }
-  if (!interviewers) {
-    return res.status(400).json({ message: "Missing interviewer ID." });
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
 
+  const { name, email, interviewDate, link } = req.body;
+
+  if (!email || !interviewDate || !link) {
+    return res.status(400).json({ message: "Missing required fields." });
+  }
+
+  // Support comma-separated string or array of emails
+  const recipients: string[] = Array.isArray(email)
+    ? email
+    : email.split(",").map((e: string) => e.trim());
+
   const transporter = nodemailer.createTransport({
-    service: "Gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // SSL
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
   });
+
   const istDate = new Date(
     new Date(interviewDate).getTime() + 5.5 * 60 * 60 * 1000
   );
+
   try {
-    await transporter.sendMail({
-      from: `"HR Team" <${process.env.EMAIL_USER}>`,
-      to: email,
-      cc: interviewerList,
-      subject: "You're Invited: Interview Scheduled!",
-      html: `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; background-color: #fafafa;">
+    for (const recipient of recipients) {
+      await transporter.sendMail({
+        from: `"codeProctor Team" <${process.env.EMAIL_USER}>`,
+        to: recipient,
+        subject: "You're Invited: Interview Scheduled!",
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; background-color: #fafafa;">
       <h2 style="color: #2c3e50;">Hi ${name},</h2>
 
       <p style="font-size: 16px;">
@@ -71,12 +72,15 @@ export default async function handler(
         – The HR Team at CodeProctor
       </p>
     </div>
-  `,
-    });
+        `,
+      });
 
-    res.status(200).json({ message: "Interview email sent successfully." });
+      console.log(`✅ Sent to ${recipient}`);
+    }
+
+    return res.status(200).json({ message: "Emails sent to all recipients." });
   } catch (error) {
-    console.error("Email error:", error);
-    res.status(500).json({ message: "Failed to send email." });
+    console.error("❌ Email sending error:", error);
+    return res.status(500).json({ message: "Failed to send email." });
   }
 }
