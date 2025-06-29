@@ -1,48 +1,39 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// jitne bhi interview hai present sare dedo
+// Queries
 export const getAllInterviews = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
 
-    const interviews = await ctx.db.query("interviews").collect();
-
-    return interviews;
+    return await ctx.db.query("interviews").collect();
   },
 });
 
-// jitne bhi interview present hai usme se ek interview ka data dedo
 export const getInterview = query({
   handler: async (ctx) => {
     const userIdentity = await ctx.auth.getUserIdentity();
     if (!userIdentity) throw new Error("user not authenticated");
 
-    const interviews = await ctx.db
+    return await ctx.db
       .query("interviews")
       .withIndex("by_candidate_id", (q) =>
         q.eq("candidateId", userIdentity.subject)
       )
       .collect();
-
-    return interviews!;
   },
 });
 
-// stream call ke id se interview ka data ded
-// interviews.ts
 export const getInterviewByStreamId = query({
   args: { streamCallId: v.string() },
   handler: async (ctx, args) => {
-    const idToSearch = args.streamCallId;
-
-    const result = await ctx.db
+    return await ctx.db
       .query("interviews")
-      .withIndex("by_stream_call_id", (q) => q.eq("streamCallId", idToSearch))
+      .withIndex("by_stream_call_id", (q) =>
+        q.eq("streamCallId", args.streamCallId)
+      )
       .first();
-
-    return result;
   },
 });
 
@@ -52,30 +43,45 @@ export const debugAllInterviews = query({
   },
 });
 
-// interview create kardo
-export const createInterview = mutation({
-  args: {
-    title: v.string(),
-    description: v.optional(v.string()),
-    startTime: v.number(),
-    status: v.string(),
-    streamCallId: v.string(),
-    candidateId: v.string(),
-    interviewerIds: v.array(v.string()),
-  },
+export const getInterviewByInterviewerId = query({
+  args: { interviewerId: v.string() },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthoried user");
 
-    if (!identity) throw new Error("Unauthorized");
-
-    return await ctx.db.insert("interviews", {
-      ...args,
-    });
+    return await ctx.db
+      .query("interviews")
+      .withIndex("by_interviewer_id", (q) =>
+        q.eq("interviewerIds", [args.interviewerId])
+      )
+      .collect();
   },
 });
 
-// once again redeploy
-// interview update karde
+export const getInterviewByUUID = query({
+  args: { uuid: v.string() },
+  handler: async (ctx, { uuid }) => {
+    return await ctx.db
+      .query("interviews")
+      .withIndex("by_uuid", (q) => q.eq("uuid", uuid))
+      .first();
+  },
+});
+
+export const getInterviewByUuid = getInterviewByUUID; // alias
+
+export const debugAllInterviewswithId = query({
+  handler: async (ctx) => {
+    const all = await ctx.db.query("interviews").collect();
+    console.log(
+      "INTERVIEWS:",
+      all.map((i) => i.uuid)
+    );
+    return all;
+  },
+});
+
+// Mutations
 export const updateInterview = mutation({
   args: {
     id: v.id("interviews"),
@@ -86,22 +92,5 @@ export const updateInterview = mutation({
       status: args.status,
       ...(args.status === "completed" ? { endTime: Date.now() } : {}),
     });
-  },
-});
-
-export const getInterviewByInterviewerId = query({
-  args: { interviewerId: v.string() },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthoried user");
-
-    const interviews = await ctx.db
-      .query("interviews")
-      .withIndex("by_interviewer_id", (q) =>
-        q.eq("interviewerIds", [args.interviewerId])
-      )
-      .collect();
-
-    return interviews;
   },
 });

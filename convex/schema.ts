@@ -16,6 +16,7 @@ export default defineSchema({
 
   // ---------------- Interviews ----------------
   interviews: defineTable({
+    uuid: v.string(), // ✅ Declare the field
     title: v.string(),
     description: v.optional(v.string()),
     startTime: v.number(),
@@ -27,7 +28,8 @@ export default defineSchema({
   })
     .index("by_candidate_id", ["candidateId"])
     .index("by_stream_call_id", ["streamCallId"])
-    .index("by_interviewer_id", ["interviewerIds"]),
+    .index("by_interviewer_id", ["interviewerIds"])
+    .index("by_uuid", ["uuid"]),
 
   // ---------------- Comments ----------------
   comments: defineTable({

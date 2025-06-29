@@ -78,7 +78,9 @@ function InterviewScheduleUI() {
   });
   console.log("Interviews:", interviews);
   const users = useQuery(api.users.getUser) ?? [];
-  const createInterview = useMutation(api.interviews.createInterview);
+  const createInterview = useMutation(
+    api.action.interview.createInterviewWithUUID
+  );
   const updateInterview = useMutation(api.interviews.updateInterview);
 
   const candidates = users?.filter((u) => u.role === "candidate");
@@ -757,6 +759,9 @@ function InterviewScheduleUI() {
                         | "ongoing"
                         | "completed"
                         | "cancelled",
+
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      uuid: (interview as any).uuid ?? interview._id,
                     }}
                   />
                 ))}
@@ -785,6 +790,8 @@ function InterviewScheduleUI() {
                           | "ongoing"
                           | "completed"
                           | "cancelled",
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        uuid: (interview as any).uuid ?? interview._id,
                       }}
                     />
                   ))}
@@ -817,6 +824,8 @@ function InterviewScheduleUI() {
                           | "ongoing"
                           | "completed"
                           | "cancelled",
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        uuid: (interview as any).uuid ?? interview._id,
                       }}
                     />
                   ))}
@@ -847,6 +856,8 @@ function InterviewScheduleUI() {
                           | "ongoing"
                           | "completed"
                           | "cancelled",
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        uuid: (interview as any).uuid ?? interview._id,
                       }}
                     />
                   ))}

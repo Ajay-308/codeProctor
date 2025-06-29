@@ -112,8 +112,9 @@ const CandidateCard: React.FC<CandidateCardProps> = ({
   const [scheduledDates, setScheduledDates] = useState<Date[]>([]);
   const isMounted = useRef(true);
 
-  const createInterview = useMutation(api.interviews.createInterview);
-
+  const createInterview = useMutation(
+    api.action.interview.createInterviewWithUUID
+  );
   useEffect(() => {
     return () => {
       isMounted.current = false;

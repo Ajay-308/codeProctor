@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer from "nodemailer";
-import logo from "@/app/assest/email-logo.png";
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,24 +15,6 @@ export default async function handler(
     return res.status(400).json({ message: "Missing required fields." });
   }
 
-  const candidateEmail = email;
-  const interviewerEmails =
-    Array.isArray(interviewers) && interviewers.length > 0
-      ? interviewers.map((i) => i.email)
-      : [];
-
-  const allRecipients = [candidateEmail, ...interviewerEmails];
-
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // SSL
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
   const istDate = new Date(
     new Date(interviewDate).getTime() + 5.5 * 60 * 60 * 1000
   );
@@ -43,74 +24,105 @@ export default async function handler(
     timeStyle: "short",
   });
 
-  const htmlContent = `
-  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 30px; background: #ffffff; border-radius: 12px; border: 1px solid #e0e0e0; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);">
-    <div style="text-align: center; margin-bottom: 30px;">
-      <img src=${logo} alt="CodeProctor Logo" width="120" style="margin-bottom: 20px;" />
-      <h2 style="color: #2c3e50; font-size: 24px;">Interview Invitation 📩</h2>
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const logoUrl = "https://code-proctor.vercel.app/assest/email-logo.png";
+
+  const candidateEmailContent = `
+    <div style="background: #f3f4f6; padding: 30px;">
+      <div style="max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="${logoUrl}" alt="CodeProctor Logo" width="100" style="margin-bottom: 10px;" />
+          <h2 style="color: #1f2937;">Interview Invitation 📩</h2>
+        </div>
+        <p style="font-size: 16px; color: #374151;">
+          Hi <strong>${name}</strong>,
+        </p>
+        <p style="font-size: 16px; color: #374151;">
+          Your interview has been scheduled via <strong>CodeProctor</strong>. Please review the details below:
+        </p>
+        <div style="background-color: #f9fafb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+          <p><strong>📅 Date & Time (IST):</strong><br />${formattedDate}</p>
+          <p style="margin-top: 10px;"><strong>🔗 Link:</strong><br />
+            <a href="${link}" style="color: #2563eb;">${link}</a>
+          </p>
+        </div>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${link}" style="background-color: #2563eb; color: white; padding: 14px 28px; font-size: 16px; border-radius: 6px; text-decoration: none;">
+            🔗 Join Interview
+          </a>
+        </div>
+        <p style="font-size: 13px; color: #9ca3af; text-align: center;">– The CodeProctor Team</p>
+      </div>
     </div>
+  `;
 
-    <p style="font-size: 16px; color: #333;">
-      Hi <strong>${name}</strong>,
-    </p>
-    <p style="font-size: 16px; color: #333;">
-      You have an interview scheduled through <strong>CodeProctor</strong>. Here are the details:
-    </p>
-
-    <div style="background: #f5f7fa; border-radius: 8px; padding: 15px 20px; margin: 20px 0;">
-      <p style="margin: 0; font-size: 15px;"><strong>📅 Date & Time (IST):</strong><br />${formattedDate}</p>
-      <p style="margin: 10px 0 0;"><strong>🔗 Interview Link:</strong><br /><a href="${link}" style="color: #1a73e8; text-decoration: none;">${link}</a></p>
+  const interviewerEmailContent = (interviewerName: string) => `
+    <div style="background: #f3f4f6; padding: 30px;">
+      <div style="max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="${logoUrl}" alt="CodeProctor Logo" width="100" style="margin-bottom: 10px;" />
+          <h2 style="color: #1f2937;">You're Assigned to Interview 🎙️</h2>
+        </div>
+        <p style="font-size: 16px; color: #374151;">
+          Hello <strong>${interviewerName}</strong>,
+        </p>
+        <p style="font-size: 16px; color: #374151;">
+          You're assigned to conduct the following interview:
+        </p>
+        <div style="background-color: #f9fafb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+          <p><strong>📅 Date & Time (IST):</strong><br />${formattedDate}</p>
+          <p style="margin-top: 10px;"><strong>🔗 Link:</strong><br />
+            <a href="${link}" style="color: #2563eb;">${link}</a>
+          </p>
+        </div>
+        <p style="font-size: 15px; color: #4b5563;">
+          <strong>Candidate:</strong> ${name} (${email})
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${link}" style="background-color: #16a34a; color: white; padding: 14px 28px; font-size: 16px; border-radius: 6px; text-decoration: none;">
+            🎯 Start Interview
+          </a>
+        </div>
+        <p style="font-size: 13px; color: #9ca3af; text-align: center;">– The CodeProctor Team</p>
+      </div>
     </div>
-
-    ${
-      interviewerEmails.length > 0
-        ? `
-      <div style="margin: 20px 0;">
-        <p style="font-size: 15px; font-weight: 600; margin-bottom: 8px;">👤 Interviewers:</p>
-        <ul style="padding-left: 20px; color: #444;">
-          ${interviewers
-            .map(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (i: any) =>
-                `<li style="margin-bottom: 5px;"><strong>${i.name}</strong> (${i.email})</li>`
-            )
-            .join("")}
-        </ul>
-      </div>`
-        : ""
-    }
-
-    <p style="font-size: 15px; color: #555; margin-top: 25px;">
-      Please be prepared and join the interview on time.
-    </p>
-
-    <div style="text-align: center; margin: 35px 0;">
-      <a href="${link}" style="background-color: #4f46e5; color: white; padding: 14px 28px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 6px; display: inline-block;">
-        🔗 Join Interview
-      </a>
-    </div>
-
-    <p style="font-size: 13px; color: #999; text-align: center;">
-      – The CodeProctor Team
-    </p>
-  </div>
-`;
+  `;
 
   try {
-    for (const recipient of allRecipients) {
-      await transporter.sendMail({
-        from: `"CodeProctor Team" <${process.env.EMAIL_USER}>`,
-        to: recipient,
-        subject: "🎯 Interview Scheduled – CodeProctor",
-        html: htmlContent,
-      });
+    // Send email to candidate
+    await transporter.sendMail({
+      from: `"CodeProctor Team" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "🎯 Your Interview is Scheduled – CodeProctor",
+      html: candidateEmailContent,
+    });
+    console.log(`✅ Candidate email sent to ${email}`);
 
-      console.log(`✅ Sent to ${recipient}`);
+    // Send email to each interviewer
+    if (Array.isArray(interviewers)) {
+      for (const i of interviewers) {
+        await transporter.sendMail({
+          from: `"CodeProctor Team" <${process.env.EMAIL_USER}>`,
+          to: i.email,
+          subject: "📢 Interview Assignment – CodeProctor",
+          html: interviewerEmailContent(i.name),
+        });
+        console.log(`✅ Interviewer email sent to ${i.email}`);
+      }
     }
 
     return res.status(200).json({ message: "Emails sent successfully." });
   } catch (error) {
     console.error("❌ Email sending error:", error);
-    return res.status(500).json({ message: "Failed to send email." });
+    return res.status(500).json({ message: "Failed to send emails." });
   }
 }
