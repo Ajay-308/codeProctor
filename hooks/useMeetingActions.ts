@@ -10,7 +10,9 @@ export const useMeetingActions = () => {
   const streamClient = useStreamVideoClient();
   const { userId } = useAuth();
   const currentUserId = userId ?? "";
-  const createInterviewMutation = useMutation(api.interviews.createInterview);
+  const createInterviewMutation = useMutation(
+    api.action.interview.createInterviewWithUUID
+  );
   const createInstantMeeting = async () => {
     if (!streamClient) {
       toast.error("stream client not found");
