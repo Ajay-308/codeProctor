@@ -1,16 +1,14 @@
-// app/api/interviews/stream/[id]/route.ts
 import { api } from "@/convex/_generated/api";
 import { ConvexHttpClient } from "convex/browser";
 import { NextRequest, NextResponse } from "next/server";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
-  console.log("fetching interview by id;", id);
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+  const id = url.pathname.split("/").pop();
+
+  console.log("Fetching interview by stream ID:", id);
 
   if (!id) {
     return NextResponse.json(
@@ -26,7 +24,7 @@ export async function GET(
         streamCallId: `default:${id}`,
       }
     );
-    console.log("inteview fetched:", interview);
+    console.log("Interview fetched:", interview);
 
     if (!interview) {
       return NextResponse.json(
