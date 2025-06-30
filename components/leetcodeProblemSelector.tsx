@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, Code, Hash, Star, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -79,28 +79,36 @@ export default function LeetCodeProblemSelector({
   onSelectProblem,
 }: LeetCodeProblemSelectorProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
-  const [topicFilter, setTopicFilter] = useState<string>("all");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [topicFilter, setTopicFilter] = useState("all");
   const [selectedProblem, setSelectedProblem] =
     useState<LeetCodeProblem | null>(null);
 
-  // Get unique topics for filter
+  useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedSearchTerm(searchTerm), 300);
+    return () => clearTimeout(timeout);
+  }, [searchTerm]);
+
   const allTopics = useMemo(() => {
     const topics = new Set<string>();
-    mockProblems.forEach((problem) => {
-      problem.topics.forEach((topic) => topics.add(topic));
-    });
+    mockProblems.forEach((problem) =>
+      problem.topics.forEach((t) => topics.add(t))
+    );
     return Array.from(topics).sort();
   }, []);
 
-  // Filter problems based on search and filters
   const filteredProblems = useMemo(() => {
     return mockProblems.filter((problem) => {
       const matchesSearch =
-        problem.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        problem.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        problem.topics.some((topic) =>
-          topic.toLowerCase().includes(searchTerm.toLowerCase())
+        problem.title
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase()) ||
+        problem.description
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase()) ||
+        problem.topics.some((t) =>
+          t.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
         );
 
       const matchesDifficulty =
@@ -112,7 +120,7 @@ export default function LeetCodeProblemSelector({
 
       return matchesSearch && matchesDifficulty && matchesTopic;
     });
-  }, [searchTerm, difficultyFilter, topicFilter]);
+  }, [debouncedSearchTerm, difficultyFilter, topicFilter]);
 
   const handleSelectProblem = (problem: LeetCodeProblem) => {
     onSelectProblem(problem);
