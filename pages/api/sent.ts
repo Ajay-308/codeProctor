@@ -56,6 +56,7 @@ export default async function handler(
           </p>
         </div>
         <div style="text-align: center; margin: 30px 0;">
+                  <p style="font-size:16px; color: #374151;">Please make sure You login in as candidate to start the interview.</p>
           <a href="${link}" style="background-color: #2563eb; color: white; padding: 14px 28px; font-size: 16px; border-radius: 6px; text-decoration: none;">
             🔗 Join Interview
           </a>
@@ -88,6 +89,7 @@ export default async function handler(
           <strong>Candidate:</strong> ${name} (${email})
         </p>
         <div style="text-align: center; margin: 30px 0;">
+
           <a href="${link}" style="background-color: #16a34a; color: white; padding: 14px 28px; font-size: 16px; border-radius: 6px; text-decoration: none;">
             🎯 Start Interview
           </a>
