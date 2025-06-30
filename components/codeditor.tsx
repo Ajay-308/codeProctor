@@ -8,7 +8,6 @@ import {
   ResizablePanelGroup,
 } from "./ui/resizable";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
-import { useRoomSync } from "@/hooks/useSync";
 import {
   Select,
   SelectContent,
@@ -172,19 +171,11 @@ function CodeEditor({
   userId: string;
   userName: string;
 }) {
-  const {
-    connectedUsers,
-    currentCode,
-    currentLanguage,
-    sendCodeChange,
-    sendQuestionChange,
-    currentQuestionId,
-  } = useRoomSync({ roomId, userId, userName });
   const [selectedProblem, setSelectedProblem] =
     useState<LeetCodeProblem | null>(null);
   const [language, setLanguage] = useState<string>("javascript");
   const [code, setCode] = useState("");
-  const [, setConnectedUsers] = useState<CollaborativeUser[]>([]);
+  const [connectedUsers, setConnectedUsers] = useState<CollaborativeUser[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [showProblemSelector, setShowProblemSelector] = useState(false);
   const [isLoadingProblem, setIsLoadingProblem] = useState(false);
@@ -192,74 +183,18 @@ function CodeEditor({
   const socketRef = useRef<Socket | null>(null);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const isRemoteChange = useRef(false);
-  useEffect(() => {
-    if (selectedProblem && currentLanguage) {
-      const snippet = selectedProblem.codeSnippets.find(
-        (s) => s.lang.toLowerCase() === currentLanguage.toLowerCase()
-      );
-      if (snippet && currentCode.trim() === "") {
-        sendCodeChange(snippet.code);
-      }
-    }
-  }, [selectedProblem, currentLanguage, currentCode, sendCodeChange]);
-  const handleProblemSelect = async (problem: LeetCodeProblem) => {
-    setIsLoadingProblem(true);
-    try {
-      const examples = parseExamplesFromDescription(problem.description);
-      const constraints = parseConstraints(problem.description);
-      const cleanedDescription = cleanDescription(problem.description);
-      const processedProblem = {
-        ...problem,
-        parsedExamples: examples,
-        parsedConstraints: constraints,
-        cleanedDescription,
-        processed: true,
-      };
-      setSelectedProblem(processedProblem);
-      sendQuestionChange(processedProblem.id);
-      const snippet = processedProblem.codeSnippets.find(
-        (s) => s.lang.toLowerCase() === currentLanguage.toLowerCase()
-      );
-      sendCodeChange(snippet?.code || "");
-    } finally {
-      setIsLoadingProblem(false);
-    }
+
+  // Get starter code for selected language
+  const getStarterCode = (problem: LeetCodeProblem, lang: string): string => {
+    const snippet = problem.codeSnippets.find(
+      (s) =>
+        s.lang.toLowerCase() === lang.toLowerCase() ||
+        (lang === "javascript" && s.lang.toLowerCase() === "js") ||
+        (lang === "cpp" && s.lang.toLowerCase() === "c++") ||
+        (lang === "csharp" && s.lang.toLowerCase() === "c#")
+    );
+    return snippet?.code || `// No starter code available for ${lang}`;
   };
-  useEffect(() => {
-    const fetchAndSetProblem = async () => {
-      if (!currentQuestionId) return;
-
-      setIsLoadingProblem(true);
-      try {
-        const res = await fetch(`/api/getProblemById?id=${currentQuestionId}`);
-        if (!res.ok) throw new Error("Problem fetch failed");
-        const problem = await res.json();
-
-        const examples = parseExamplesFromDescription(problem.description);
-        const constraints = parseConstraints(problem.description);
-        const cleanedDescription = cleanDescription(problem.description);
-
-        const processedProblem = {
-          ...problem,
-          parsedExamples: examples,
-          parsedConstraints: constraints,
-          cleanedDescription,
-          processed: true,
-        };
-
-        setSelectedProblem(processedProblem);
-      } catch (err) {
-        console.error("Failed to sync problem", err);
-      } finally {
-        setIsLoadingProblem(false);
-      }
-    };
-
-    fetchAndSetProblem();
-    if (selectedProblem) {
-      processProblem(selectedProblem);
-    }
-  }, [currentQuestionId, selectedProblem]);
 
   // Process problem data
   const processProblem = async (
@@ -357,37 +292,37 @@ function CodeEditor({
     }
   };
 
-  // const handleProblemSelect = async (problem: LeetCodeProblem) => {
-  //   setIsLoadingProblem(true);
+  const handleProblemSelect = async (problem: LeetCodeProblem) => {
+    setIsLoadingProblem(true);
 
-  //   try {
-  //     // Set the problem immediately to show content
-  //     setSelectedProblem(problem);
+    try {
+      // Set the problem immediately to show content
+      setSelectedProblem(problem);
 
-  //     // Get starter code immediately
-  //     const starterCode = getStarterCode(problem, language);
-  //     setCode(starterCode);
+      // Get starter code immediately
+      const starterCode = getStarterCode(problem, language);
+      setCode(starterCode);
 
-  //     // Process the problem in the background
-  //     const processedProblem = await processProblem(problem);
+      // Process the problem in the background
+      const processedProblem = await processProblem(problem);
 
-  //     // Update with processed version
-  //     setSelectedProblem(processedProblem);
+      // Update with processed version
+      setSelectedProblem(processedProblem);
 
-  //     if (socketRef.current && isConnected) {
-  //       socketRef.current.emit("problem-change", {
-  //         roomId,
-  //         problemId: processedProblem.id,
-  //         userId,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("Error processing problem:", error);
-  //     // Problem is already set, so we just continue with unprocessed version
-  //   } finally {
-  //     setIsLoadingProblem(false);
-  //   }
-  // };
+      if (socketRef.current && isConnected) {
+        socketRef.current.emit("problem-change", {
+          roomId,
+          problemId: processedProblem.id,
+          userId,
+        });
+      }
+    } catch (error) {
+      console.error("Error processing problem:", error);
+      // Problem is already set, so we just continue with unprocessed version
+    } finally {
+      setIsLoadingProblem(false);
+    }
+  };
 
   const handleLanguageChange = (newLang: string) => {
     setLanguage(newLang);
@@ -787,17 +722,6 @@ function CodeEditor({
       />
     </>
   );
-}
-
-function getStarterCode(
-  selectedProblem: LeetCodeProblem,
-  language: string
-): string {
-  if (!selectedProblem || !selectedProblem.codeSnippets) return "";
-  const snippet = selectedProblem.codeSnippets.find(
-    (s) => s.lang.toLowerCase() === language.toLowerCase()
-  );
-  return snippet ? snippet.code : "";
 }
 
 export default CodeEditor;

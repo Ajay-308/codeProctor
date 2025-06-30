@@ -23,7 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
-// LeetCode problems data structure
+// Sample LeetCode problems data structure
 type LeetCodeProblem = {
   id: string;
   title: string;
@@ -135,19 +135,7 @@ export default function LeetCodeProblemSelector({
   const handleSelectProblem = (problem: LeetCodeProblem) => {
     onSelectProblem(problem);
     onOpenChange(false);
-    setSelectedProblem(null); // Reset selected problem when closing
   };
-
-  // Reset filters when dialog opens
-  useEffect(() => {
-    if (open) {
-      setSearchTerm("");
-      setDebouncedSearchTerm("");
-      setDifficultyFilter("all");
-      setTopicFilter("all");
-      setSelectedProblem(null);
-    }
-  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -221,10 +209,7 @@ export default function LeetCodeProblemSelector({
                   <Card
                     key={problem.id}
                     className="absolute top-0 left-0 w-full cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-violet-200 dark:hover:border-violet-800"
-                    style={{
-                      transform: `translateY(${virtualRow.start}px)`,
-                      height: `${virtualRow.size}px`,
-                    }}
+                    style={{ transform: `translateY(${virtualRow.start}px)` }}
                     onClick={() => setSelectedProblem(problem)}
                   >
                     <CardHeader className="pb-3">
@@ -301,7 +286,7 @@ export default function LeetCodeProblemSelector({
           </div>
         </div>
 
-        {/* Problem Preview Dialog */}
+        {/* Lazy-loaded Preview Dialog */}
         {selectedProblem && (
           <Dialog open={true} onOpenChange={() => setSelectedProblem(null)}>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
@@ -310,6 +295,7 @@ export default function LeetCodeProblemSelector({
                   {selectedProblem.title}
                 </DialogTitle>
               </DialogHeader>
+
               <div className="flex flex-col h-[calc(90vh-180px)]">
                 <div className="flex items-center gap-4 mb-4">
                   <Badge
@@ -335,6 +321,7 @@ export default function LeetCodeProblemSelector({
                     ))}
                   </div>
                 </div>
+
                 <div className="flex-1 overflow-auto">
                   <div className="prose dark:prose-invert max-w-none">
                     <pre className="whitespace-pre-wrap text-sm bg-slate-50 dark:bg-slate-900 p-4 rounded-lg">
@@ -342,6 +329,7 @@ export default function LeetCodeProblemSelector({
                     </pre>
                   </div>
                 </div>
+
                 <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
                   <Button
                     variant="outline"
