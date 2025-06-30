@@ -115,7 +115,6 @@ function MeetingRoom() {
     if (!call) return;
 
     const handleCustomEvent = (event: CustomEventPayload) => {
-      console.log("Received custom event:", event);
       if (
         event.custom &&
         typeof event.custom === "object" &&
@@ -133,7 +132,6 @@ function MeetingRoom() {
           userName: reactionData.userName ?? "",
           timestamp: Date.now(),
         };
-        console.log("Adding new reaction:", newReaction);
         setReactions((prev) => [...prev, newReaction]);
         setTimeout(() => {
           setReactions((prev) => prev.filter((r) => r.id !== newReaction.id));
@@ -199,7 +197,6 @@ function MeetingRoom() {
       if (call) {
         try {
           const recordings = await call.queryRecordings();
-          console.log("Recordings data structure:", recordings);
           const isActiveRecording =
             recordings &&
             recordings.recordings &&
@@ -263,7 +260,6 @@ function MeetingRoom() {
     if (!call || !localParticipant) return;
 
     try {
-      console.log("Sending reaction:", emoji);
       await call.sendCustomEvent({
         type: "emoji_reaction",
         emoji: emoji,
@@ -271,7 +267,6 @@ function MeetingRoom() {
         userName: localParticipant.name || localParticipant.userId,
         timestamp: Date.now(),
       });
-      console.log("Reaction sent successfully");
       setShowEmoji(false);
       toast.success(`Sent ${emoji} reaction!`);
     } catch (error) {

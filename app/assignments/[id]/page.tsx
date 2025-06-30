@@ -8,6 +8,7 @@ import CandidateMCQAssessment from "@/components/candidate-mcq-assignment";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, AlertTriangle } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel";
+import toast from "react-hot-toast";
 
 type MCQAnswer = {
   questionId: string;
@@ -52,14 +53,14 @@ export default function CandidateAssessmentPage() {
     timeSpent: number
   ) => {
     try {
-      const result = await submitAssignment({
+      await submitAssignment({
         assignmentId,
         candidateEmail,
         answers,
         timeSpent,
       });
 
-      console.log("Assessment submitted:", result);
+      toast.success("assessment submitted successfully!");
     } catch (error) {
       console.error("Failed to submit assessment:", error);
     }

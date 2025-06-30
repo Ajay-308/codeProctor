@@ -74,8 +74,6 @@ export default async function handler(
     </div>
         `,
       });
-
-      console.log(`✅ Sent to ${recipient}`);
     }
 
     return res.status(200).json({ message: "Emails sent to all recipients." });

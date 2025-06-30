@@ -51,8 +51,6 @@ export default function handler(
   res: NextApiResponseWithSocket
 ) {
   if (!res.socket.server.io) {
-    console.log("Initializing Socket.io...");
-
     const io = new Server(res.socket.server, {
       cors: {
         origin: ["https://code-proctor.vercel.app", "http://localhost:3000"],
@@ -65,8 +63,6 @@ export default function handler(
     res.socket.server.io = io;
 
     io.on("connection", (socket) => {
-      console.log("User connected:", socket.id);
-
       socket.on("join-room", ({ roomId, userId, userName }) => {
         socket.join(roomId);
 
@@ -154,7 +150,6 @@ export default function handler(
       });
 
       socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
         rooms.forEach((room, roomId) => {
           const userToRemove = Array.from(room.users.values()).find(
             (user) => user.socketId === socket.id

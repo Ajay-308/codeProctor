@@ -12,19 +12,11 @@ function EndCallButton() {
   const localParticipant = useLocalParticipant();
 
   const updateInterviewStatus = useMutation(api.interviews.updateInterview);
-  const allInterviews = useQuery(api.interviews.debugAllInterviews);
-  console.log("All interviews in database:", allInterviews);
 
   // Extract the UUID part from the CID to try both options
   const callUuid = call?.id || "";
   const callCid = call?.cid || "";
   const callIdPart = callCid.includes(":") ? callCid.split(":")[1] : callCid;
-
-  console.log("Debug IDs:", {
-    callUuid,
-    callCid,
-    callIdPart,
-  });
 
   // Try both ID formats
   const interviewByFullCid = useQuery(api.interviews.getInterviewByStreamId, {
@@ -41,13 +33,6 @@ function EndCallButton() {
 
   // Use the first non-null result
   const interview = interviewByFullCid || interviewByIdPart || interviewByUuid;
-
-  console.log("Interview results:", {
-    byFullCid: interviewByFullCid,
-    byIdPart: interviewByIdPart,
-    byUuid: interviewByUuid,
-  });
-
   if (!call) return null;
 
   if (!interview || !interview._id) {

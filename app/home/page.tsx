@@ -26,6 +26,7 @@ import {
   Loader2 as Loader2Icon,
   FileIcon,
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function HomePage() {
   const router = useRouter();
@@ -49,15 +50,10 @@ export default function HomePage() {
   const Interview = useQuery(api.interviews.getInterviewByInterviewerId, {
     interviewerId: userId ?? "",
   });
-  console.log("Interview", Interview);
   const upcomingInterviews =
     Interview?.filter((i) => i.status === "upcoming").length ?? 0;
-  console.log("upcoming Interviews", upcomingInterviews);
   const pastInterviews =
     Interview?.filter((i) => i.status === "completed").length ?? 0;
-  ////const completedInterviews = Interview ?.
-  console.log("pastInterviews", pastInterviews);
-  //console.log("completedInterviews", completedInterviews);
   useEffect(() => {
     if (isLoaded && userId && users) {
       const userExists = users.some((user) => user.clerkId === userId);
@@ -222,7 +218,7 @@ export default function HomePage() {
               title={modalType === "join" ? "Join Meeting" : "Start Meeting"}
               isJoinMeeting={modalType === "join"}
               onSubmit={() => {
-                console.log("Meeting submitted");
+                toast.success("Meeting submitted");
               }}
               isLoading={false}
             />

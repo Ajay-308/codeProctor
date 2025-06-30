@@ -69,7 +69,6 @@ export const successfulInterviews = query({
         };
       }
     );
-    console.log(result);
 
     return result;
   },

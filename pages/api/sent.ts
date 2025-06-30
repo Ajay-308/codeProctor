@@ -105,7 +105,6 @@ export default async function handler(
       subject: "🎯 Your Interview is Scheduled – CodeProctor",
       html: candidateEmailContent,
     });
-    console.log(`✅ Candidate email sent to ${email}`);
 
     // Send email to each interviewer
     if (Array.isArray(interviewers)) {
@@ -116,7 +115,6 @@ export default async function handler(
           subject: "📢 Interview Assignment – CodeProctor",
           html: interviewerEmailContent(i.name),
         });
-        console.log(`✅ Interviewer email sent to ${i.email}`);
       }
     }
 

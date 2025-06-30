@@ -10,18 +10,12 @@ interface EmojiReaction {
   timestamp: number;
 }
 
-export const CustomSpeakerLayout = ({
-  reactions,
-}: {
-  reactions: EmojiReaction[];
-}) => {
+export const CustomSpeakerLayout = ({}: { reactions: EmojiReaction[] }) => {
   const { useParticipants, useLocalParticipant, useDominantSpeaker } =
     useCallStateHooks();
   const participants = useParticipants();
   const localParticipant = useLocalParticipant();
   const dominantSpeaker = useDominantSpeaker();
-  console.log(reactions);
-
   const mainSpeaker = dominantSpeaker || localParticipant;
   const otherParticipants = participants.filter(
     (p) => p.sessionId !== mainSpeaker?.sessionId
