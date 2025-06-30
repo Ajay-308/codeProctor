@@ -45,11 +45,11 @@ export const FloatingReactions = ({
                 ease: "easeOut",
                 times: [0, 0.15, 0.3, 0.7, 0.85, 1],
               }}
-              className="absolute text-6xl font-bold drop-shadow-lg"
+              className="absolute text-4xl md:text-6xl font-bold drop-shadow-lg"
             >
               {reaction.emoji}
               {/* User name below emoji */}
-              <div className="text-sm text-white bg-black/50 px-2 py-1 rounded-full mt-2 text-center whitespace-nowrap">
+              <div className="text-xs md:text-sm text-white bg-black/50 px-2 py-1 rounded-full mt-2 text-center whitespace-nowrap">
                 {reaction.userName}
               </div>
             </motion.div>

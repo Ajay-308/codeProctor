@@ -20,6 +20,7 @@ import {
   Monitor,
   SmileIcon,
   PhoneOff,
+  X,
 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -46,6 +47,7 @@ import {
 } from "./tooltip";
 import toast from "react-hot-toast";
 import { FloatingReactions } from "./FlootingReaction";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 // Reaction interface
 interface CustomEventPayload {
@@ -58,6 +60,7 @@ interface CustomEventPayload {
     timestamp?: number;
   };
 }
+
 interface EmojiReaction {
   id: string;
   emoji: string;
@@ -68,11 +71,16 @@ interface EmojiReaction {
 
 function MeetingRoom() {
   const router = useRouter();
-  const params = useParams(); // Get URL parameters
-  //const searchParams = useSearchParams(); // Get query parameters
-
+  const params = useParams();
   const [layout, setLayout] = useState<"grid" | "speaker">("grid");
   const [showParticipants, setShowParticipants] = useState(false);
+  const [, setShowCodeEditor] = useState(true);
+  const [mobileView, setMobileView] = useState<"video" | "code">("video");
+
+  // Media queries for responsive design
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isTablet = useMediaQuery("(max-width: 1024px)");
+
   const { useCallCallingState, useLocalParticipant } = useCallStateHooks();
   const callingState = useCallCallingState();
   const localParticipant = useLocalParticipant();
@@ -85,7 +93,7 @@ function MeetingRoom() {
 
   const call = useCall();
   const roomId = (params?.id as string) || (params?.roomId as string);
-  const streamRoomId = call?.id; // This is your Stream call ID
+  const streamRoomId = call?.id;
   const streamUserId = localParticipant?.userId;
   const streamUserName = localParticipant?.name || localParticipant?.userId;
 
@@ -93,12 +101,21 @@ function MeetingRoom() {
   const finalUserId = streamUserId || "anonymous-user";
   const finalUserName = streamUserName || "Anonymous";
 
+  // Set mobile view to video by default on mobile devices
+  useEffect(() => {
+    if (isMobile) {
+      setMobileView("video");
+      setShowCodeEditor(false);
+    } else {
+      setShowCodeEditor(true);
+    }
+  }, [isMobile]);
+
   useEffect(() => {
     if (!call) return;
 
     const handleCustomEvent = (event: CustomEventPayload) => {
       console.log("Received custom event:", event);
-
       if (
         event.custom &&
         typeof event.custom === "object" &&
@@ -116,10 +133,8 @@ function MeetingRoom() {
           userName: reactionData.userName ?? "",
           timestamp: Date.now(),
         };
-
         console.log("Adding new reaction:", newReaction);
         setReactions((prev) => [...prev, newReaction]);
-
         setTimeout(() => {
           setReactions((prev) => prev.filter((r) => r.id !== newReaction.id));
         }, 6000);
@@ -127,16 +142,13 @@ function MeetingRoom() {
     };
 
     call.on("custom", handleCustomEvent);
-
     return () => {
       call.off("custom", handleCustomEvent);
     };
   }, [call]);
 
-  // Handle mic toggle
   const toggleMic = () => {
     if (!call) return;
-
     if (isMicMuted) {
       call.microphone.enable();
     } else {
@@ -188,12 +200,10 @@ function MeetingRoom() {
         try {
           const recordings = await call.queryRecordings();
           console.log("Recordings data structure:", recordings);
-
           const isActiveRecording =
             recordings &&
             recordings.recordings &&
             recordings.recordings.length > 0;
-
           setIsRecording(isActiveRecording);
         } catch (error) {
           console.error("Error fetching recording state:", error);
@@ -206,7 +216,6 @@ function MeetingRoom() {
 
   const toggleCamera = () => {
     if (!call) return;
-
     if (isCameraOff) {
       call.camera.enable();
     } else {
@@ -217,7 +226,6 @@ function MeetingRoom() {
 
   const toggleScreenShare = async () => {
     if (!call) return;
-
     try {
       if (isScreenSharing) {
         await call.screenShare.disable();
@@ -232,7 +240,6 @@ function MeetingRoom() {
 
   const endCall = async () => {
     if (!call) return;
-
     try {
       await call.leave();
       router.push("/");
@@ -257,7 +264,6 @@ function MeetingRoom() {
 
     try {
       console.log("Sending reaction:", emoji);
-
       await call.sendCustomEvent({
         type: "emoji_reaction",
         emoji: emoji,
@@ -265,7 +271,6 @@ function MeetingRoom() {
         userName: localParticipant.name || localParticipant.userId,
         timestamp: Date.now(),
       });
-
       console.log("Reaction sent successfully");
       setShowEmoji(false);
       toast.success(`Sent ${emoji} reaction!`);
@@ -275,17 +280,9 @@ function MeetingRoom() {
     }
   };
 
-  // Don't render CodeEditor if we don't have the required IDs
-  if (!finalRoomId || !finalUserId) {
-    console.warn("Missing required IDs for CodeEditor:", {
-      finalRoomId,
-      finalUserId,
-    });
-  }
-
   if (callingState !== CallingState.JOINED) {
     return (
-      <div className="h-96 flex items-center justify-center bg-gradient-to-br from-background to-background/80">
+      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-background to-background/80">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -301,13 +298,282 @@ function MeetingRoom() {
     );
   }
 
+  // Mobile Layout
+  if (isMobile) {
+    return (
+      <div className="h-screen bg-gradient-to-br from-background to-background/80 flex flex-col overflow-hidden">
+        {/* Mobile Header */}
+        <div className="flex items-center justify-between p-3 bg-background/90 backdrop-blur border-b border-border/20 shrink-0">
+          <div className="flex gap-1">
+            <Button
+              variant={mobileView === "video" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setMobileView("video")}
+              className="text-sm px-4 py-2 h-9 rounded-full"
+            >
+              Video
+            </Button>
+            <Button
+              variant={mobileView === "code" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setMobileView("code")}
+              className="text-sm px-4 py-2 h-9 rounded-full"
+            >
+              Code
+            </Button>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowParticipants(!showParticipants)}
+            className="h-9 w-9 p-0 rounded-full"
+          >
+            <UsersIcon className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Mobile Content */}
+        <div className="flex-1 relative overflow-hidden">
+          <AnimatePresence mode="wait">
+            {mobileView === "video" ? (
+              <motion.div
+                key="video"
+                initial={{ x: -300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -300, opacity: 0 }}
+                transition={{ type: "spring", damping: 20 }}
+                className="absolute inset-0 p-2"
+              >
+                <div className="h-full rounded-xl overflow-hidden bg-black/5 border border-border/20">
+                  {layout === "grid" ? (
+                    <CustomGridLayout reactions={reactions} />
+                  ) : (
+                    <CustomSpeakerLayout reactions={reactions} />
+                  )}
+                  <div className="absolute inset-0 pointer-events-none z-30">
+                    <FloatingReactions reactions={reactions} />
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="code"
+                initial={{ x: 300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 300, opacity: 0 }}
+                transition={{ type: "spring", damping: 20 }}
+                className="absolute inset-0"
+              >
+                {/* Mobile Code Editor Container with proper overflow handling */}
+                <div className="h-full w-full overflow-hidden bg-background">
+                  {finalRoomId && finalUserId ? (
+                    <div className="h-full w-full relative">
+                      {/* Mobile-optimized wrapper for CodeEditor */}
+                      <div className="absolute inset-0 overflow-auto">
+                        <div className="min-h-full w-full">
+                          <div className="mobile-code-editor-wrapper">
+                            <CodeEditor
+                              roomId={finalRoomId}
+                              userId={finalUserId}
+                              userName={finalUserName}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full p-4">
+                      <div className="text-center">
+                        <LoaderIcon className="h-8 w-8 animate-spin mx-auto mb-2 text-primary" />
+                        <p className="text-sm text-muted-foreground">
+                          Loading code editor...
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Mobile Participants Overlay */}
+          <AnimatePresence>
+            {showParticipants && (
+              <motion.div
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 20 }}
+                className="absolute inset-0 bg-background/98 backdrop-blur-sm z-50 flex flex-col"
+              >
+                <div className="flex items-center justify-between p-4 border-b border-border/20 shrink-0">
+                  <h3 className="font-semibold text-lg">Participants</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowParticipants(false)}
+                    className="h-9 w-9 p-0 rounded-full"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+                <div className="flex-1 overflow-hidden">
+                  <CallParticipantsList
+                    onClose={() => setShowParticipants(false)}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Mobile Emoji Panel */}
+          <AnimatePresence>
+            {showEmoji && (
+              <motion.div
+                initial={{ y: 20, opacity: 0, scale: 0.9 }}
+                animate={{ y: -90, opacity: 1, scale: 1 }}
+                exit={{ y: 20, opacity: 0, scale: 0.9 }}
+                className="absolute bottom-24 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-md rounded-2xl p-4 shadow-2xl z-40 max-w-[85vw]"
+              >
+                <div className="grid grid-cols-4 gap-3">
+                  {emojis.map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => sendReaction(emoji)}
+                      className="text-3xl hover:scale-110 active:scale-95 transition-all duration-200 p-3 rounded-xl hover:bg-slate-800/50 touch-manipulation"
+                      title={`Send ${emoji} reaction`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Mobile Controls */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="p-4 bg-background/95 backdrop-blur-sm border-t border-border/20 shrink-0 safe-area-inset-bottom"
+        >
+          <div className="flex items-center justify-center gap-3 max-w-sm mx-auto">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full w-14 h-14 touch-manipulation shadow-lg",
+                isMicMuted
+                  ? "bg-red-500/90 hover:bg-red-600/90 text-white shadow-red-500/25"
+                  : "bg-slate-800/80 hover:bg-slate-700/80 text-white shadow-slate-800/25"
+              )}
+              onClick={toggleMic}
+            >
+              {isMicMuted ? (
+                <MicOff className="h-6 w-6" />
+              ) : (
+                <Mic className="h-6 w-6" />
+              )}
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full w-14 h-14 touch-manipulation shadow-lg",
+                isCameraOff
+                  ? "bg-red-500/90 hover:bg-red-600/90 text-white shadow-red-500/25"
+                  : "bg-slate-800/80 hover:bg-slate-700/80 text-white shadow-slate-800/25"
+              )}
+              onClick={toggleCamera}
+            >
+              {isCameraOff ? (
+                <VideoOff className="h-6 w-6" />
+              ) : (
+                <Video className="h-6 w-6" />
+              )}
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full w-14 h-14 touch-manipulation shadow-lg",
+                showEmoji
+                  ? "bg-blue-500/90 hover:bg-blue-600/90 text-white shadow-blue-500/25"
+                  : "bg-slate-800/80 hover:bg-slate-700/80 text-white shadow-slate-800/25"
+              )}
+              onClick={() => setShowEmoji(!showEmoji)}
+            >
+              <SmileIcon className="h-6 w-6" />
+            </Button>
+
+            <Button
+              variant="destructive"
+              size="icon"
+              className="rounded-full w-14 h-14 bg-red-600/90 hover:bg-red-700/90 touch-manipulation shadow-lg shadow-red-600/25"
+              onClick={endCall}
+            >
+              <PhoneOff className="h-6 w-6" />
+            </Button>
+
+            {/* More options for mobile */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full w-12 h-12 bg-slate-800/80 hover:bg-slate-700/80 text-white touch-manipulation shadow-lg shadow-slate-800/25"
+                >
+                  <LayoutListIcon className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="center"
+                className="bg-slate-900/95 backdrop-blur-md border border-slate-700/50 shadow-xl rounded-xl mb-4 min-w-[180px]"
+              >
+                <DropdownMenuItem
+                  onClick={() => setLayout("grid")}
+                  className="hover:bg-slate-800/80 rounded-lg text-white py-3 px-4 text-base"
+                >
+                  Grid View
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLayout("speaker")}
+                  className="hover:bg-slate-800/80 rounded-lg text-white py-3 px-4 text-base"
+                >
+                  Speaker View
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={toggleScreenShare}
+                  className="hover:bg-slate-800/80 rounded-lg text-white py-3 px-4 text-base"
+                >
+                  {isScreenSharing ? "Stop Sharing" : "Share Screen"}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={toggleRecording}
+                  className="hover:bg-slate-800/80 rounded-lg text-white py-3 px-4 text-base"
+                >
+                  {isRecording ? "Stop Recording" : "Start Recording"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Desktop/Tablet Layout
   return (
     <div className="h-[calc(100vh-4rem-1px)] bg-gradient-to-br from-background to-background/80">
-      <ResizablePanelGroup direction="horizontal">
+      <ResizablePanelGroup direction={isTablet ? "vertical" : "horizontal"}>
         <ResizablePanel
-          defaultSize={35}
-          minSize={25}
-          maxSize={100}
+          defaultSize={isTablet ? 50 : 35}
+          minSize={isTablet ? 30 : 25}
+          maxSize={isTablet ? 70 : 100}
           className="relative"
         >
           {/* VIDEO LAYOUT */}
@@ -322,14 +588,14 @@ function MeetingRoom() {
               ) : (
                 <CustomSpeakerLayout reactions={reactions} />
               )}
-
               <div className="absolute inset-0 pointer-events-none z-30">
                 <FloatingReactions reactions={reactions} />
               </div>
             </div>
 
+            {/* Desktop Participants Panel */}
             <AnimatePresence>
-              {showParticipants && (
+              {showParticipants && !isTablet && (
                 <motion.div
                   initial={{ x: 300, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
@@ -343,8 +609,36 @@ function MeetingRoom() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Tablet Participants Overlay */}
+            <AnimatePresence>
+              {showParticipants && isTablet && (
+                <motion.div
+                  initial={{ y: "100%", opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: "100%", opacity: 0 }}
+                  transition={{ type: "spring", damping: 20 }}
+                  className="absolute inset-0 bg-background/95 backdrop-blur z-40"
+                >
+                  <div className="flex items-center justify-between p-4 border-b">
+                    <h3 className="font-semibold">Participants</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowParticipants(false)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <CallParticipantsList
+                    onClose={() => setShowParticipants(false)}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
 
+          {/* Desktop Emoji Panel */}
           <AnimatePresence>
             {showEmoji && (
               <motion.div
@@ -368,6 +662,8 @@ function MeetingRoom() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Desktop Controls */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -429,7 +725,6 @@ function MeetingRoom() {
                 </Tooltip>
               </TooltipProvider>
 
-              {/* Reactions Button */}
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -517,7 +812,6 @@ function MeetingRoom() {
                 </Tooltip>
               </TooltipProvider>
 
-              {/* Layout Toggle */}
               <div className="ml-2 pl-2 border-l border-slate-700">
                 <TooltipProvider>
                   <Tooltip>
@@ -556,7 +850,6 @@ function MeetingRoom() {
                 </TooltipProvider>
               </div>
 
-              {/* Participants Toggle */}
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -583,8 +876,10 @@ function MeetingRoom() {
 
         <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize={65} minSize={25}>
-          {/* Only render CodeEditor if we have the required props */}
+        <ResizablePanel
+          defaultSize={isTablet ? 50 : 65}
+          minSize={isTablet ? 30 : 25}
+        >
           {finalRoomId && finalUserId ? (
             <CodeEditor
               roomId={finalRoomId}

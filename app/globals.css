@@ -154,3 +154,63 @@ html {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .mobile-code-editor-wrapper {
+    @apply w-full h-full;
+  }
+
+  /* Ensure proper text wrapping and scrolling on mobile */
+  @media (max-width: 768px) {
+    .mobile-code-editor-wrapper {
+      @apply overflow-x-auto overflow-y-auto;
+    }
+
+    /* Style for code blocks and pre elements */
+    .mobile-code-editor-wrapper pre {
+      @apply text-xs leading-relaxed whitespace-pre-wrap break-words;
+      font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    /* Style for problem descriptions and text content */
+    .mobile-code-editor-wrapper p,
+    .mobile-code-editor-wrapper div {
+      @apply text-sm leading-relaxed break-words;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    /* Style for tables */
+    .mobile-code-editor-wrapper table {
+      @apply text-xs;
+      max-width: 100%;
+      table-layout: fixed;
+      word-wrap: break-word;
+    }
+
+    .mobile-code-editor-wrapper td,
+    .mobile-code-editor-wrapper th {
+      @apply break-words;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    /* Ensure horizontal scrolling for wide content */
+    .mobile-code-editor-wrapper .monaco-editor,
+    .mobile-code-editor-wrapper .code-container {
+      @apply overflow-x-auto;
+      min-width: 100%;
+    }
+  }
+}
+
+/* Safe area support for mobile devices */
+@supports (padding: max(0px)) {
+  .safe-area-inset-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
