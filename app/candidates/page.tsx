@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Filter, Mail, Calendar, Code, MoreVertical, X } from "lucide-react";
+import type React from "react";
+import { useState, useEffect } from "react";
+import { Filter, Mail, Calendar, Code, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,15 +52,15 @@ export default function Page() {
   );
   const { userId, isLoaded } = useAuth();
   const router = useRouter();
+
   // Redirect to home if user is not authenticated
-  // or if userId is not available
   useEffect(() => {
     if (isLoaded && !userId) {
       toast.error("You must be logged in to access this page");
       router.push("/");
     }
   }, [isLoaded, userId, router]);
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+
   const [searchTerm, setSearchTerm] = useState("");
 
   const users = useQuery(api.users.getUser) || [];
@@ -69,8 +70,8 @@ export default function Page() {
 
   const candidates: Candidate[] = candidateUsers.map((user) => {
     const scoreData = scores.find((s) => s.candidateId === user.clerkId);
-
     const roundScore = Math.round((scoreData?.score ?? 0) * 100);
+
     return {
       id: user.clerkId,
       name: user.name,
@@ -94,7 +95,6 @@ export default function Page() {
   return (
     <ProtectedRoute allowedRoles={["interviewer"]}>
       <Navbar />
-
       <div className="space-y-6 mt-8 mx-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -120,22 +120,6 @@ export default function Page() {
             placeholder="Search candidates..."
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <div className="flex items-center gap-2 ml-auto">
-            <Button
-              variant={viewMode === "list" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setViewMode("list")}
-            >
-              List
-            </Button>
-            <Button
-              variant={viewMode === "grid" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setViewMode("grid")}
-            >
-              Grid
-            </Button>
-          </div>
         </div>
 
         {users.length === 0 ? (
@@ -145,101 +129,6 @@ export default function Page() {
         ) : filteredCandidates.length === 0 ? (
           <div className="flex items-center justify-center p-8 text-gray-500">
             No candidates found matching your search.
-          </div>
-        ) : viewMode === "list" ? (
-          <div className="overflow-hidden rounded-lg border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  {[
-                    "Candidate",
-                    "Position",
-                    "Status",
-                    "Score",
-                    "Last Activity",
-                    "",
-                  ].map((head, idx) => (
-                    <th
-                      key={idx}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      {head}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {filteredCandidates.map((candidate) => (
-                  <tr
-                    key={candidate.id}
-                    className="hover:bg-gray-50 cursor-pointer"
-                    onClick={() => setSelectedCandidate(candidate)}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <Avatar>
-                          <AvatarImage
-                            src={candidate.avatarUrl}
-                            alt={candidate.name}
-                          />
-                          <AvatarFallback>
-                            {candidate.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="ml-4">
-                          <div className="font-medium text-gray-900">
-                            {candidate.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {candidate.email}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {candidate.position}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <Badge variant={statusLabels[candidate.status].variant}>
-                        {statusLabels[candidate.status].label}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {candidate.score ? (
-                        <div className="flex items-center">
-                          <div className="h-2 w-16 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full ${
-                                candidate.score >= 90
-                                  ? "bg-green-500"
-                                  : candidate.score >= 70
-                                    ? "bg-blue-500"
-                                    : "bg-yellow-500"
-                              }`}
-                              style={{ width: `${candidate.score}%` }}
-                            />
-                          </div>
-                          <span className="ml-2">{candidate.score}%</span>
-                        </div>
-                      ) : (
-                        <span>Not Given Interviews</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {new Date(candidate.lastActivity).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 text-right text-sm">
-                      <div className="flex justify-end gap-2 text-gray-400">
-                        <Mail className="h-4 w-4" />
-                        <Calendar className="h-4 w-4" />
-                        <Code className="h-4 w-4" />
-                        <MoreVertical className="h-4 w-4" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -267,7 +156,7 @@ export default function Page() {
                   <div className="mb-6 md:mb-0 md:mr-8">
                     <Avatar>
                       <AvatarImage
-                        src={selectedCandidate.avatarUrl}
+                        src={selectedCandidate.avatarUrl || "/placeholder.svg"}
                         alt={selectedCandidate.name}
                       />
                       <AvatarFallback>
