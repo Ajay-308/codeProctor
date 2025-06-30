@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Search, Code, Hash, Star, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 // Sample LeetCode problems data structure
 type LeetCodeProblem = {
@@ -122,6 +123,15 @@ export default function LeetCodeProblemSelector({
     });
   }, [debouncedSearchTerm, difficultyFilter, topicFilter]);
 
+  const parentRef = useRef(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: filteredProblems.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 200,
+    overscan: 10,
+  });
+
   const handleSelectProblem = (problem: LeetCodeProblem) => {
     onSelectProblem(problem);
     onOpenChange(false);
@@ -186,26 +196,20 @@ export default function LeetCodeProblemSelector({
           </div>
 
           {/* Problems List */}
-          <div className="flex-1 overflow-auto p-4">
-            {filteredProblems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                  <Search className="h-8 w-8 text-slate-400" />
-                </div>
-                <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-                  No problems found
-                </h3>
-                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-md">
-                  Try adjusting your search criteria or filters to find more
-                  problems.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {filteredProblems.map((problem) => (
+          <div ref={parentRef} className="flex-1 overflow-auto p-4 relative">
+            <div
+              style={{
+                height: `${rowVirtualizer.getTotalSize()}px`,
+                position: "relative",
+              }}
+            >
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const problem = filteredProblems[virtualRow.index];
+                return (
                   <Card
                     key={problem.id}
-                    className="cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-violet-200 dark:hover:border-violet-800"
+                    className="absolute top-0 left-0 w-full cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-violet-200 dark:hover:border-violet-800"
+                    style={{ transform: `translateY(${virtualRow.start}px)` }}
                     onClick={() => setSelectedProblem(problem)}
                   >
                     <CardHeader className="pb-3">
@@ -276,25 +280,22 @@ export default function LeetCodeProblemSelector({
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-            )}
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Problem Preview Modal */}
-        <Dialog
-          open={!!selectedProblem}
-          onOpenChange={() => setSelectedProblem(null)}
-        >
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold">
-                {selectedProblem?.title}
-              </DialogTitle>
-            </DialogHeader>
+        {/* Lazy-loaded Preview Dialog */}
+        {selectedProblem && (
+          <Dialog open={true} onOpenChange={() => setSelectedProblem(null)}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold">
+                  {selectedProblem.title}
+                </DialogTitle>
+              </DialogHeader>
 
-            {selectedProblem && (
               <div className="flex flex-col h-[calc(90vh-180px)]">
                 <div className="flex items-center gap-4 mb-4">
                   <Badge
@@ -344,9 +345,9 @@ export default function LeetCodeProblemSelector({
                   </Button>
                 </div>
               </div>
-            )}
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        )}
       </DialogContent>
     </Dialog>
   );
