@@ -76,12 +76,6 @@ function InterviewScheduleUI() {
   const interviews = useQuery(api.interviews.getInterviewByInterviewerId, {
     interviewerId: user?.id ?? "",
   });
-  console.log("Interviews:", interviews);
-  console.log("🔍 DEBUG INFO:");
-  console.log("User ID:", user?.id);
-  console.log("Raw interviews data:", interviews);
-  console.log("Interviews type:", typeof interviews);
-  console.log("Interviews length:", interviews?.length);
   const users = useQuery(api.users.getUser) ?? [];
   const createInterview = useMutation(
     api.action.interview.createInterviewWithUUID
@@ -154,10 +148,6 @@ function InterviewScheduleUI() {
   }, [interviews, updateInterview]);
 
   const scheduleMeeting = async () => {
-    // console.log("this is stream api key:", streamApiKey);
-    // console.log("this is stream secret key:", streamSecretKey);
-    // console.log("scheduleMeeting function called");
-
     if (!client) {
       console.error("Stream video client is not initialized");
       toast.error(
@@ -191,7 +181,6 @@ function InterviewScheduleUI() {
       return;
     }
 
-    console.log("Form validation passed:", formData);
     setIsCreating(true);
 
     try {

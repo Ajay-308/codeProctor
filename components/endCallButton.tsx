@@ -36,9 +36,6 @@ function EndCallButton() {
   if (!call) return null;
 
   if (!interview || !interview._id) {
-    console.log("Interview ID is undefined or interview data is missing.");
-    console.log("call id", call.id);
-
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground animate-pulse">

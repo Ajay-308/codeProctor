@@ -11,17 +11,12 @@ interface EmojiReaction {
 import { AnimatePresence } from "framer-motion";
 import { ParticipantTile } from "@/components/ParticipantTile";
 
-export const CustomGridLayout = ({
-  reactions,
-}: {
-  reactions: EmojiReaction[];
-}) => {
+export const CustomGridLayout = ({}: { reactions: EmojiReaction[] }) => {
   const { useParticipants, useLocalParticipant } = useCallStateHooks();
   const participants = useParticipants();
   const localParticipant = useLocalParticipant();
 
   const totalParticipants = participants.length;
-  console.log(reactions);
   // Calculate optimal grid layout
   const getGridLayout = (count: number) => {
     if (count === 1) return { cols: 1, rows: 1, maxWidth: "60%" };

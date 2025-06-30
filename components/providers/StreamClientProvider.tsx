@@ -22,7 +22,6 @@ export default function StreamClientProvider({
     // If no user is logged in, just return without initializing
     // Don't throw an error here
     if (!user) {
-      console.log("No user logged in, skipping Stream client initialization");
       return;
     }
 
