@@ -6,7 +6,7 @@ let socketInstance: Socket | null = null;
 
 export const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
-  const route = "http://localhost:3001";
+  const route = "https://codeproctor-0.onrender.com";
 
   useEffect(() => {
     if (!socketInstance) {
