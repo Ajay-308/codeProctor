@@ -48,6 +48,7 @@ import {
 import toast from "react-hot-toast";
 import { FloatingReactions } from "./FlootingReaction";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useSocket } from "@/hooks/useSocket";
 
 // Reaction interface
 interface CustomEventPayload {
@@ -90,6 +91,7 @@ function MeetingRoom() {
   const [showEmoji, setShowEmoji] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [reactions, setReactions] = useState<EmojiReaction[]>([]);
+  const socket = useSocket();
 
   const call = useCall();
   const roomId = (params?.id as string) || (params?.roomId as string);
@@ -368,7 +370,7 @@ function MeetingRoom() {
                         <div className="min-h-full w-full">
                           <div className="mobile-code-editor-wrapper">
                             <CodeEditor
-                              socket={null}
+                              socket={socket}
                               roomId={finalRoomId}
                               userId={finalUserId}
                               userName={finalUserName}
@@ -878,7 +880,7 @@ function MeetingRoom() {
         >
           {finalRoomId && finalUserId ? (
             <CodeEditor
-              socket={null}
+              socket={socket}
               roomId={finalRoomId}
               userId={finalUserId}
               userName={finalUserName}

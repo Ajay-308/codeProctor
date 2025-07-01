@@ -230,10 +230,10 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
   };
 
   useEffect(() => {
-    if (problem && !processedProblem?.processed) {
+    if (problem) {
       processProblem(problem as ExtendedProblem).then(setProcessedProblem);
     }
-  }, [problem, processedProblem?.processed]);
+  }, [problem]);
 
   const handleCodeChange = (value: string | undefined) => {
     const newCode = value || "";
