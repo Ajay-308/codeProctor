@@ -553,7 +553,7 @@ export default function LandingPage() {
 
                 {/* LinkedIn Icon */}
                 <Link
-                  href="www.linkedin.com/in/ajay308"
+                  href="https://www.linkedin.com/in/ajay308"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <svg
