@@ -16,8 +16,6 @@ import {
   MicOff,
   Video,
   VideoOff,
-  Share2,
-  Monitor,
   SmileIcon,
   PhoneOff,
   X,
@@ -87,7 +85,7 @@ function MeetingRoom() {
   const localParticipant = useLocalParticipant();
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
-  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  // const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [reactions, setReactions] = useState<EmojiReaction[]>([]);
@@ -223,19 +221,19 @@ function MeetingRoom() {
     setIsCameraOff(!isCameraOff);
   };
 
-  const toggleScreenShare = async () => {
-    if (!call) return;
-    try {
-      if (isScreenSharing) {
-        await call.screenShare.disable();
-      } else {
-        await call.screenShare.enable();
-      }
-      setIsScreenSharing(!isScreenSharing);
-    } catch (error) {
-      console.error("Error toggling screen share:", error);
-    }
-  };
+  // const toggleScreenShare = async () => {
+  //   if (!call) return;
+  //   try {
+  //     if (isScreenSharing) {
+  //       await call.screenShare.disable();
+  //     } else {
+  //       await call.screenShare.enable();
+  //     }
+  //     setIsScreenSharing(!isScreenSharing);
+  //   } catch (error) {
+  //     console.error("Error toggling screen share:", error);
+  //   }
+  // };
 
   const endCall = async () => {
     if (!call) return;
@@ -252,7 +250,7 @@ function MeetingRoom() {
     if (call) {
       setIsMicMuted(!call.microphone.enabled);
       setIsCameraOff(!call.camera.enabled);
-      setIsScreenSharing(call.screenShare.enabled);
+      // setIsScreenSharing(call.screenShare.enabled);
     }
   }, [call]);
 
@@ -544,12 +542,12 @@ function MeetingRoom() {
                 >
                   Speaker View
                 </DropdownMenuItem>
-                <DropdownMenuItem
+                {/* <DropdownMenuItem
                   onClick={toggleScreenShare}
                   className="hover:bg-slate-800/80 rounded-lg text-white py-3 px-4 text-base"
                 >
                   {isScreenSharing ? "Stop Sharing" : "Share Screen"}
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem
                   onClick={toggleRecording}
                   className="hover:bg-slate-800/80 rounded-lg text-white py-3 px-4 text-base"
@@ -744,7 +742,7 @@ function MeetingRoom() {
                 </Tooltip>
               </TooltipProvider>
 
-              <TooltipProvider>
+              {/* <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -769,7 +767,7 @@ function MeetingRoom() {
                     {isScreenSharing ? "Stop sharing" : "Share screen"}
                   </TooltipContent>
                 </Tooltip>
-              </TooltipProvider>
+              </TooltipProvider> */}
 
               <TooltipProvider>
                 <Tooltip>
