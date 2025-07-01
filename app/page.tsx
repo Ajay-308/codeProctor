@@ -519,9 +519,10 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t py-12 md:py-16 gap-4">
-        <div className="container px-4 sm:px-6 md:px-8">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <footer className="border-t py-12 md:py-16">
+        <div className="container px-4 sm:px-6 md:px-8 flex flex-col gap-12">
+          <div className="grid gap-20 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Logo and description */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <Code className="h-6 w-6 text-primary" />
@@ -532,68 +533,48 @@ export default function LandingPage() {
                 video proctoring with a powerful coding environment.
               </p>
               <div className="flex gap-4">
+                {/* Twitter Icon */}
                 <Link
-                  href="#"
+                  href="https://x.com/ajSingh308"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
+                    className="h-5 w-5"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="h-5 w-5"
                   >
                     <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
                   </svg>
                 </Link>
+
+                {/* LinkedIn Icon */}
                 <Link
-                  href="#"
+                  href="www.linkedin.com/in/ajay308"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
+                    className="h-5 w-5"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="h-5 w-5"
                   >
                     <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
                     <rect width="4" height="12" x="2" y="9" />
                     <circle cx="4" cy="4" r="2" />
                   </svg>
                 </Link>
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
-                  >
-                    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm-1.5-5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zm1.5-7a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
-                  </svg>
-                </Link>
               </div>
             </div>
-            <div className="space-y-4 ml-4">
+
+            {/* Product Links */}
+            <div className="space-y-4 xl:ml-[5rem] lg:[3rem]">
               <h3 className="text-lg font-medium">Product</h3>
               <ul className="space-y-2 text-sm">
                 <li>
@@ -606,122 +587,49 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <Link
-                    href="#pricing"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Integrations
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Changelog
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
+                    href="/docs"
                     className="text-muted-foreground hover:text-foreground"
                   >
                     Documentation
                   </Link>
                 </li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Company</h3>
-              <ul className="space-y-2 text-sm">
                 <li>
                   <Link
                     href="#"
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Careers
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Press
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Contact
+                    Api (Coming Soon)
                   </Link>
                 </li>
               </ul>
             </div>
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Legal</h3>
+
+            {/* Company Links */}
+            <div className="space-y-4 xl:ml-[5rem] lg:[3rem]">
+              <h3 className="text-lg font-medium">Support</h3>
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link
-                    href="#"
+                    href="#faq"
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    Terms of Service
+                    FAQ
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
+                    href="/report-issue"
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Cookie Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Data Processing
+                    Report Bug
                   </Link>
                 </li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
+
+          {/* Centered Footer Note */}
+          <div className="border-t pt-8 text-center text-sm text-muted-foreground">
             © {new Date().getFullYear()} CodeProctor. All rights reserved.
           </div>
         </div>
