@@ -144,7 +144,10 @@ export default function LandingPage() {
                       Get Started Free
                     </Button>
                   </SignInButton>
-                  <Link href="#demo" className="w-full sm:w-auto">
+                  <Link
+                    href="https://youtu.be/-_9ug7Vl2jg"
+                    className="w-full sm:w-auto"
+                  >
                     <Button
                       size="lg"
                       variant="outline"

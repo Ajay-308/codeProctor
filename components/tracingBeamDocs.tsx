@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Copy, ExternalLink, Play } from "lucide-react";
+import { Copy, Play } from "lucide-react";
 import Image from "next/image";
 import homePage from "@/app/assest/home.png";
 import doc1 from "@/app/assest/doc1.png";
@@ -70,7 +70,7 @@ export function TracingBeamDocs() {
               <div className="flex gap-3 mt-6">
                 {item.actions.map((action, actionIndex) => (
                   <Button
-                    className="cursor-pointer"
+                    asChild
                     key={actionIndex}
                     variant={
                       (action.variant as
@@ -82,10 +82,15 @@ export function TracingBeamDocs() {
                         | "ghost") || "default"
                     }
                   >
-                    {action.icon && (
-                      <action.icon className="h-4 w-4 cursor-pointer mr-2" />
-                    )}
-                    {action.label}
+                    <a
+                      href={action.link || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center"
+                    >
+                      {action.icon && <action.icon className="h-4 w-4 mr-2" />}
+                      {action.label}
+                    </a>
                   </Button>
                 ))}
               </div>
@@ -97,7 +102,30 @@ export function TracingBeamDocs() {
   );
 }
 
-const docsContent = [
+type DocsAction = {
+  label: string;
+  icon: React.ElementType;
+  variant:
+    | "default"
+    | "outline"
+    | "link"
+    | "secondary"
+    | "destructive"
+    | "ghost";
+  link?: string;
+};
+
+type DocsContentItem = {
+  id: string;
+  title: string;
+  description: React.ReactNode;
+  badge: string;
+  image?: import("next/image").StaticImageData;
+  codeExample?: string;
+  actions?: DocsAction[];
+};
+
+const docsContent: DocsContentItem[] = [
   {
     id: "getting-started",
     title: "Getting Started with CodeProctor",
@@ -125,11 +153,6 @@ const docsContent = [
     ),
     badge: "Introduction",
     image: doc1,
-
-    actions: [
-      { label: "Start Free Trial", icon: Play, variant: "default" },
-      { label: "Schedule Demo", icon: ExternalLink, variant: "outline" },
-    ],
   },
   {
     id: "split-screen-interface",
@@ -158,9 +181,6 @@ const docsContent = [
     ),
     badge: "Interface",
     image: homePage,
-    actions: [
-      { label: "View Interface Demo", icon: ExternalLink, variant: "default" },
-    ],
   },
   {
     id: "live-video-proctoring",
@@ -191,9 +211,6 @@ const docsContent = [
     ),
     badge: "Proctoring",
     image: videoImage,
-    actions: [
-      { label: "Security Features", icon: ExternalLink, variant: "outline" },
-    ],
   },
   {
     id: "advanced-code-editor",
@@ -233,7 +250,6 @@ console.log(fibonacci(10)); // Output: 55
 
 // The editor supports multiple languages:
 // Python, Java, C++, Go, Rust, and many more!`,
-    actions: [{ label: "Try Code Editor", icon: Play, variant: "default" }],
   },
   {
     id: "automated-assessment",
@@ -283,9 +299,6 @@ console.log(fibonacci(10)); // Output: 55
     "codeQuality": 10
   }
 }`,
-    actions: [
-      { label: "Assessment Guide", icon: ExternalLink, variant: "outline" },
-    ],
   },
   {
     id: "collaborative-interviews",
@@ -315,9 +328,6 @@ console.log(fibonacci(10)); // Output: 55
     ),
     badge: "Collaboration",
     image: roleImage,
-    actions: [
-      { label: "Team Features", icon: ExternalLink, variant: "outline" },
-    ],
   },
   {
     id: "playback-analysis",
@@ -347,10 +357,6 @@ console.log(fibonacci(10)); // Output: 55
     ),
     badge: "Analysis",
     image: playBack,
-    actions: [
-      { label: "View Sample Report", icon: ExternalLink, variant: "default" },
-      { label: "Analytics Dashboard", icon: ExternalLink, variant: "outline" },
-    ],
   },
   {
     id: "getting-started-guide",
@@ -386,8 +392,12 @@ console.log(fibonacci(10)); // Output: 55
     ),
     badge: "Quick Start",
     actions: [
-      { label: "Create Account", icon: ExternalLink, variant: "default" },
-      { label: "Watch Tutorial", icon: Play, variant: "outline" },
+      {
+        label: "Watch Tutorial",
+        icon: Play,
+        variant: "outline",
+        link: "https://youtu.be/-_9ug7Vl2jg",
+      },
     ],
   },
 ];
