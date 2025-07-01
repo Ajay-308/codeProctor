@@ -9,7 +9,6 @@ import {
   Shield,
   Users,
   BarChart3,
-  HelpCircle,
   Zap,
 } from "lucide-react";
 
@@ -38,7 +37,6 @@ const sidebarItems = [
     icon: Settings,
     href: "#getting-started-guide",
   },
-  { title: "Integration & API", icon: HelpCircle, href: "#integration-api" },
 ];
 
 export function Sidebar() {
