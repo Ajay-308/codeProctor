@@ -2,6 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import type * as monaco from "monaco-editor";
+import { useSocket } from "@/hooks/useSocket";
+import { useRoomSync } from "@/hooks/useRoomSync";
+
+// UI imports...
 import {
   ResizableHandle,
   ResizablePanel,
@@ -28,15 +32,15 @@ import {
 } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import Image from "next/image";
-import io, { type Socket } from "socket.io-client";
 import LeetCodeProblemSelector from "@/components/leetcodeProblemSelector";
 import {
   parseExamplesFromDescription,
   parseConstraints,
   cleanDescription,
 } from "@/components/problem-parser";
+import { Socket } from "socket.io-client";
 
-// Language configurations
+// Your language configs
 const languages = [
   { id: "javascript", name: "JavaScript" },
   { id: "python", name: "Python" },
@@ -118,8 +122,7 @@ const languageImages = {
   `),
 };
 
-// LeetCode problem type
-type LeetCodeProblem = {
+type ExtendedProblem = {
   id: string;
   title: string;
   url: string;
@@ -133,7 +136,6 @@ type LeetCodeProblem = {
     lang: string;
     code: string;
   }>;
-  // Parsed fields
   parsedExamples?: Array<{
     input: string;
     output: string;
@@ -144,48 +146,59 @@ type LeetCodeProblem = {
   processed?: boolean;
 };
 
-interface CollaborativeUser {
-  id: string;
-  name: string;
-  color: string;
-  cursor?: {
-    line: number;
-    column: number;
-  };
-}
-
-interface CodeSyncData {
-  code: string;
-  language: string;
-  questionId: string;
-  userId: string;
-  timestamp: number;
-}
-
-function CodeEditor({
-  roomId,
-  userId,
-  userName,
-}: {
+interface CodeEditorProps {
+  socket: Socket | null;
   roomId: string;
   userId: string;
   userName: string;
-}) {
-  const [selectedProblem, setSelectedProblem] =
-    useState<LeetCodeProblem | null>(null);
-  const [language, setLanguage] = useState<string>("javascript");
-  const [code, setCode] = useState("");
-  const [connectedUsers, setConnectedUsers] = useState<CollaborativeUser[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
+}
+
+function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
   const [showProblemSelector, setShowProblemSelector] = useState(false);
   const [isLoadingProblem, setIsLoadingProblem] = useState(false);
-
-  const socketRef = useRef<Socket | null>(null);
+  const [processedProblem, setProcessedProblem] =
+    useState<ExtendedProblem | null>(null);
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const isRemoteChange = useRef(false);
 
-  // Get starter code for selected language
-  const getStarterCode = (problem: LeetCodeProblem, lang: string): string => {
+  const socket = useSocket();
+
+  const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+
+    setIsConnected(socket.connected);
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+    };
+  }, [socket]);
+
+  // Only call useRoomSync when socket is defined to avoid type errors
+  const roomSync = useRoomSync({
+    socket,
+    userId,
+    userName,
+    roomId,
+  });
+
+  const code = roomSync ? roomSync.code : "";
+  const setCode = roomSync ? roomSync.setCode : () => {};
+  const language = roomSync ? roomSync.language : "javascript";
+  const setLanguage = roomSync ? roomSync.setLanguage : () => {};
+  const problem = roomSync ? roomSync.problem : null;
+  const setProblem = roomSync ? roomSync.setProblem : () => {};
+  const users = roomSync ? roomSync.users : [];
+
+  const getStarterCode = (problem: ExtendedProblem, lang: string): string => {
     const snippet = problem.codeSnippets.find(
       (s) =>
         s.lang.toLowerCase() === lang.toLowerCase() ||
@@ -196,12 +209,10 @@ function CodeEditor({
     return snippet?.code || `// No starter code available for ${lang}`;
   };
 
-  // Process problem data
   const processProblem = async (
-    problem: LeetCodeProblem
-  ): Promise<LeetCodeProblem> => {
+    problem: ExtendedProblem
+  ): Promise<ExtendedProblem> => {
     return new Promise((resolve) => {
-      // Reduce delay from 500ms to 100ms for faster processing
       setTimeout(() => {
         const examples = parseExamplesFromDescription(problem.description);
         const constraints = parseConstraints(problem.description);
@@ -211,114 +222,40 @@ function CodeEditor({
           ...problem,
           parsedExamples: examples,
           parsedConstraints: constraints,
-          cleanedDescription: cleanedDescription,
+          cleanedDescription,
           processed: true,
         });
-      }, 100); // Much faster processing
+      }, 100);
     });
   };
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_SOCKET_URL) {
-      socketRef.current = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
-        transports: ["websocket"],
-      });
-
-      const socket = socketRef.current;
-      if (!socket) return;
-
-      socket.emit("join-room", { roomId, userId, userName });
-
-      socket.on("connect", () => setIsConnected(true));
-      socket.on("disconnect", () => setIsConnected(false));
-      socket.on("user-joined", (users) => setConnectedUsers(users));
-      socket.on("user-left", (users) => setConnectedUsers(users));
-
-      socket.on("code-change", (data: CodeSyncData) => {
-        if (data.userId !== userId) {
-          isRemoteChange.current = true;
-          setCode(data.code);
-          if (data.language !== language) {
-            setLanguage(data.language);
-          }
-        }
-      });
-
-      socket.on(
-        "problem-change",
-        (data: { problemId: string; userId: string }) => {
-          if (data.userId !== userId) {
-            console.log("Problem changed by another user:", data.problemId);
-          }
-        }
-      );
-
-      socket.on(
-        "language-change",
-        (data: { language: string; userId: string }) => {
-          if (data.userId !== userId) {
-            setLanguage(data.language);
-            if (selectedProblem) {
-              setCode(getStarterCode(selectedProblem, data.language));
-            }
-          }
-        }
-      );
-
-      return () => {
-        socket.disconnect();
-      };
+    if (problem && !processedProblem?.processed) {
+      processProblem(problem as ExtendedProblem).then(setProcessedProblem);
     }
-  }, [roomId, userId, userName, language, selectedProblem]);
+  }, [problem, processedProblem?.processed]);
 
   const handleCodeChange = (value: string | undefined) => {
     const newCode = value || "";
-    setCode(newCode);
-
     if (isRemoteChange.current) {
       isRemoteChange.current = false;
       return;
     }
-
-    if (socketRef.current && isConnected && selectedProblem) {
-      socketRef.current.emit("code-change", {
-        roomId,
-        code: newCode,
-        language,
-        questionId: selectedProblem.id,
-        userId,
-        timestamp: Date.now(),
-      });
-    }
+    setCode(newCode);
   };
 
-  const handleProblemSelect = async (problem: LeetCodeProblem) => {
+  const handleProblemSelect = async (selectedProblem: ExtendedProblem) => {
     setIsLoadingProblem(true);
-
     try {
-      // Set the problem immediately to show content
-      setSelectedProblem(problem);
-
-      // Get starter code immediately
-      const starterCode = getStarterCode(problem, language);
+      const processed = await processProblem(selectedProblem);
+      setProcessedProblem(processed);
+      setProblem(processed);
+      const starterCode = getStarterCode(processed, language);
       setCode(starterCode);
-
-      // Process the problem in the background
-      const processedProblem = await processProblem(problem);
-
-      // Update with processed version
-      setSelectedProblem(processedProblem);
-
-      if (socketRef.current && isConnected) {
-        socketRef.current.emit("problem-change", {
-          roomId,
-          problemId: processedProblem.id,
-          userId,
-        });
-      }
     } catch (error) {
       console.error("Error processing problem:", error);
-      // Problem is already set, so we just continue with unprocessed version
+      setProcessedProblem(selectedProblem);
+      setProblem(selectedProblem);
     } finally {
       setIsLoadingProblem(false);
     }
@@ -326,17 +263,9 @@ function CodeEditor({
 
   const handleLanguageChange = (newLang: string) => {
     setLanguage(newLang);
-    if (selectedProblem) {
-      const newCode = getStarterCode(selectedProblem, newLang);
+    if (processedProblem) {
+      const newCode = getStarterCode(processedProblem, newLang);
       setCode(newCode);
-    }
-
-    if (socketRef.current && isConnected) {
-      socketRef.current.emit("language-change", {
-        roomId,
-        language: newLang,
-        userId,
-      });
     }
   };
 
@@ -346,24 +275,21 @@ function CodeEditor({
   ) => {
     editorRef.current = editor;
 
-    // Block copy/paste/cut/selectAll keyboard shortcuts
     const keysToBlock = [
-      [monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyC],
-      [monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyV],
-      [monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyX],
-      [monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyA],
+      monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyC,
+      monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyV,
+      monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyX,
+      monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyA,
     ];
-    keysToBlock.forEach(([key]) => {
+    keysToBlock.forEach((key) => {
       editor.addCommand(key, () => {});
     });
 
-    // Disable right-click context menu
     editor.onContextMenu((e) => {
       e.event.preventDefault();
       e.event.stopPropagation();
     });
 
-    // Disable native clipboard events
     const editorDOM = editor.getDomNode();
     if (editorDOM) {
       const prevent = (e: Event) => {
@@ -378,6 +304,12 @@ function CodeEditor({
     }
   };
 
+  useEffect(() => {
+    if (code !== editorRef.current?.getValue()) {
+      isRemoteChange.current = true;
+    }
+  }, [code]);
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case "easy":
@@ -390,6 +322,16 @@ function CodeEditor({
         return "bg-slate-500 text-white";
     }
   };
+
+  const displayProblem = processedProblem || (problem as ExtendedProblem);
+
+  if (!socket || !roomSync) {
+    return (
+      <div className="flex justify-center items-center h-screen text-muted-foreground">
+        Connecting to room...
+      </div>
+    );
+  }
 
   return (
     <>
@@ -412,8 +354,8 @@ function CodeEditor({
                             <Loader2 className="h-5 w-5 animate-spin" />
                             Loading Problem...
                           </div>
-                        ) : selectedProblem ? (
-                          selectedProblem.title
+                        ) : displayProblem ? (
+                          displayProblem.title
                         ) : (
                           "Select a Problem"
                         )}
@@ -422,13 +364,13 @@ function CodeEditor({
                       <Badge variant={isConnected ? "default" : "destructive"}>
                         {isConnected ? "Connected" : "Disconnected"}
                       </Badge>
-                      {selectedProblem && !isLoadingProblem && (
+                      {displayProblem && !isLoadingProblem && (
                         <Badge
                           className={getDifficultyColor(
-                            selectedProblem.difficulty
+                            displayProblem.difficulty
                           )}
                         >
-                          {selectedProblem.difficulty}
+                          {displayProblem.difficulty}
                         </Badge>
                       )}
                     </div>
@@ -442,7 +384,7 @@ function CodeEditor({
                     <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-lg">
                       <Users className="h-4 w-4" />
                       <span className="text-sm font-medium">
-                        {connectedUsers.length} online
+                        {users.length} online
                       </span>
                     </div>
 
@@ -452,7 +394,7 @@ function CodeEditor({
                       className="flex items-center gap-2"
                     >
                       <Code className="h-4 w-4" />
-                      {selectedProblem ? "Change Problem" : "Select Problem"}
+                      {displayProblem ? "Change Problem" : "Select Problem"}
                     </Button>
 
                     <Select
@@ -466,11 +408,7 @@ function CodeEditor({
                               src={
                                 languageImages[
                                   language as keyof typeof languageImages
-                                ] ||
-                                "/placeholder.svg?height=20&width=20" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg"
+                                ] || "/placeholder.svg"
                               }
                               alt={language}
                               width={20}
@@ -491,11 +429,7 @@ function CodeEditor({
                                 src={
                                   languageImages[
                                     lang.id as keyof typeof languageImages
-                                  ] ||
-                                  "/placeholder.svg?height=20&width=20" ||
-                                  "/placeholder.svg" ||
-                                  "/placeholder.svg" ||
-                                  "/placeholder.svg"
+                                  ] || "/placeholder.svg"
                                 }
                                 alt={lang.name}
                                 className="w-5 h-5 object-contain"
@@ -510,7 +444,7 @@ function CodeEditor({
                 </div>
 
                 {/* Active Users */}
-                {connectedUsers.length > 0 && (
+                {users.length > 0 && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg">
@@ -519,7 +453,7 @@ function CodeEditor({
                     </CardHeader>
                     <CardContent>
                       <div className="flex flex-wrap gap-2">
-                        {connectedUsers.map((user) => (
+                        {users.map((user) => (
                           <Badge
                             key={user.id}
                             variant="outline"
@@ -538,7 +472,7 @@ function CodeEditor({
                   </Card>
                 )}
 
-                {selectedProblem || isLoadingProblem ? (
+                {displayProblem || isLoadingProblem ? (
                   <div className="relative">
                     {/* Loading Overlay */}
                     {isLoadingProblem && (
@@ -553,13 +487,13 @@ function CodeEditor({
                     )}
 
                     {/* Problem Content */}
-                    {selectedProblem && (
+                    {displayProblem && (
                       <>
                         {/* Topics */}
                         <Card className={isLoadingProblem ? "opacity-50" : ""}>
                           <CardContent className="pt-6">
                             <div className="flex flex-wrap gap-2">
-                              {selectedProblem.topics.map((topic, index) => (
+                              {displayProblem.topics?.map((topic, index) => (
                                 <Badge key={index} variant="secondary">
                                   {topic}
                                 </Badge>
@@ -568,7 +502,7 @@ function CodeEditor({
                           </CardContent>
                         </Card>
 
-                        {/* Rest of the problem content with opacity when loading */}
+                        {/* Problem Description */}
                         <Card className={isLoadingProblem ? "opacity-50" : ""}>
                           <CardHeader className="flex flex-row items-center gap-2">
                             <BookIcon className="h-5 w-5 text-primary/80" />
@@ -577,16 +511,16 @@ function CodeEditor({
                           <CardContent className="text-sm leading-relaxed">
                             <div className="prose prose-sm dark:prose-invert max-w-none">
                               <pre className="whitespace-pre-wrap text-sm bg-muted/50 p-4 rounded-lg">
-                                {selectedProblem.cleanedDescription ||
-                                  selectedProblem.description}
+                                {displayProblem.cleanedDescription ||
+                                  displayProblem.description}
                               </pre>
                             </div>
                           </CardContent>
                         </Card>
 
-                        {/* Examples and Constraints with same opacity treatment */}
-                        {selectedProblem.parsedExamples &&
-                          selectedProblem.parsedExamples.length > 0 && (
+                        {/* Examples */}
+                        {displayProblem.parsedExamples &&
+                          displayProblem.parsedExamples.length > 0 && (
                             <Card
                               className={isLoadingProblem ? "opacity-50" : ""}
                             >
@@ -597,7 +531,7 @@ function CodeEditor({
                               <CardContent>
                                 <ScrollArea className="h-full w-full rounded-md border">
                                   <div className="p-4 space-y-4">
-                                    {selectedProblem.parsedExamples.map(
+                                    {displayProblem.parsedExamples.map(
                                       (example, index) => (
                                         <div key={index} className="space-y-2">
                                           <p className="font-medium text-sm">
@@ -628,8 +562,9 @@ function CodeEditor({
                             </Card>
                           )}
 
-                        {selectedProblem.parsedConstraints &&
-                          selectedProblem.parsedConstraints.length > 0 && (
+                        {/* Constraints */}
+                        {displayProblem.parsedConstraints &&
+                          displayProblem.parsedConstraints.length > 0 && (
                             <Card
                               className={isLoadingProblem ? "opacity-50" : ""}
                             >
@@ -639,7 +574,7 @@ function CodeEditor({
                               </CardHeader>
                               <CardContent>
                                 <ul className="list-disc list-inside space-y-1.5 text-sm marker:text-muted-foreground">
-                                  {selectedProblem.parsedConstraints.map(
+                                  {displayProblem.parsedConstraints.map(
                                     (constraint, index) => (
                                       <li
                                         key={index}
