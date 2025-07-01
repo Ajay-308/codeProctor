@@ -368,6 +368,7 @@ function MeetingRoom() {
                         <div className="min-h-full w-full">
                           <div className="mobile-code-editor-wrapper">
                             <CodeEditor
+                              socket={null}
                               roomId={finalRoomId}
                               userId={finalUserId}
                               userName={finalUserName}
@@ -877,6 +878,7 @@ function MeetingRoom() {
         >
           {finalRoomId && finalUserId ? (
             <CodeEditor
+              socket={null}
               roomId={finalRoomId}
               userId={finalUserId}
               userName={finalUserName}
