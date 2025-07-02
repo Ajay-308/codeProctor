@@ -490,15 +490,16 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                <Link href="/signin" className="w-full sm:w-auto">
+                <SignInButton mode="modal">
                   <Button
                     size="lg"
-                    className="bg-white text-primary hover:bg-white/90 cursor-pointer w-full"
+                    className="bg-white text-primary hover:bg-white/90 cursor-pointer w-full sm:w-auto"
                   >
                     Get Started Free
                   </Button>
-                </Link>
-                <Link href="/contact" className="w-full sm:w-auto">
+                </SignInButton>
+
+                <Link href="tel:+91-9891724379" className="w-full sm:w-auto">
                   <Button
                     size="lg"
                     variant="outline"
