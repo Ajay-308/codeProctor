@@ -53,7 +53,9 @@ function DashboardPage() {
   }, [isLoaded, userId, router]);
 
   const users = useQuery(api.users.getUser);
-  const interviews = useQuery(api.interviews.getAllInterviews);
+  const interviews = useQuery(api.interviews.getInterviewByInterviewerId, {
+    interviewerId: userId as Id<"users">,
+  });
   const updateStatus = useMutation(api.interviews.updateInterview);
 
   const handleStatusUpdate = async (
