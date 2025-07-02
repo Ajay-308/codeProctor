@@ -9,6 +9,7 @@ export default defineSchema({
     role: v.optional(v.union(v.literal("candidate"), v.literal("interviewer"))),
     userName: v.string(),
     clerkId: v.string(),
+    skills: v.optional(v.array(v.string())), // Added skills field
   })
     .index("by_clerk_id", ["clerkId"])
     .index("by_user_name", ["userName"]),
@@ -28,12 +29,14 @@ export default defineSchema({
     .index("by_stream_call_id", ["streamCallId"])
     .index("by_interviewer_id", ["interviewerIds"])
     .index("by_uuid", ["uuid"]),
+
   comments: defineTable({
     content: v.string(),
     rating: v.number(),
     interviewerId: v.string(),
     interviewId: v.id("interviews"),
   }).index("by_interview_id", ["interviewId"]),
+
   mcqTemplates: defineTable({
     title: v.string(),
     description: v.string(),

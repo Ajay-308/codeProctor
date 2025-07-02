@@ -53,7 +53,6 @@ export default function Page() {
   const { userId, isLoaded } = useAuth();
   const router = useRouter();
 
-  // Redirect to home if user is not authenticated
   useEffect(() => {
     if (isLoaded && !userId) {
       toast.error("You must be logged in to access this page");
@@ -81,7 +80,10 @@ export default function Page() {
       lastActivity: new Date(user._creationTime).toISOString().split("T")[0],
       avatarUrl: user.image,
       score: roundScore || 0,
-      tags: ["React", "TypeScript", "JavaScript"],
+      tags:
+        Array.isArray(user.skills) && user.skills.length > 0
+          ? user.skills
+          : ["Not specified"],
     };
   });
 

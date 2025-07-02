@@ -18,7 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Plus, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Navbar from "@/components/Navbar";
 
@@ -30,11 +31,14 @@ export default function SettingsPage() {
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
   const [clerkId, setClerkId] = useState("");
+  const [skills, setSkills] = useState<string[]>([]);
+  const [newSkill, setNewSkill] = useState("");
   const [userNameError, setUserNameError] = useState("");
+
   const { userId, isLoaded } = useAuth();
   const router = useRouter();
+
   // Redirect to home if user is not authenticated
-  // or if userId is not available
   useEffect(() => {
     if (isLoaded && !userId) {
       toast.error("You must be logged in to access this page");
@@ -45,7 +49,9 @@ export default function SettingsPage() {
   const getUserDetails = useQuery(api.users.getUserByClerkId, {
     clerkId: userId || "",
   });
+
   const updateUserDetails = useMutation(api.users.updateUser);
+
   const getUserByUserName = useQuery(api.users.getUserByUserName, {
     userName: userName,
   });
@@ -63,6 +69,7 @@ export default function SettingsPage() {
           setRole(user.role || "candidate");
           setName(user.name || "");
           setClerkId(user.clerkId || "");
+          setSkills(user.skills || []);
         }
       } catch (error) {
         console.error("Error fetching user details", error);
@@ -71,23 +78,45 @@ export default function SettingsPage() {
         setLoading(false);
       }
     };
+
     fetchUserDetails();
   }, [getUserDetails]);
+
+  const handleAddSkill = () => {
+    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
+      setSkills([...skills, newSkill.trim()]);
+      setNewSkill("");
+    }
+  };
+
+  const handleRemoveSkill = (skillToRemove: string) => {
+    setSkills(skills.filter((skill) => skill !== skillToRemove));
+  };
+
+  const handleSkillKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddSkill();
+    }
+  };
 
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       if (userName.length < 3) {
         setUserNameError("Username must be at least 3 characters long");
         setLoading(false);
         return;
       }
+
       if (userName.length > 15) {
         setUserNameError("Username must be at most 15 characters long");
         setLoading(false);
         return;
       }
+
       if (getUserByUserName && getUserByUserName.clerkId !== userId) {
         setUserNameError("Username already taken");
         setLoading(false);
@@ -102,6 +131,7 @@ export default function SettingsPage() {
         image,
         clerkId,
         userName,
+        skills,
         role:
           role === "candidate" || role === "interviewer" ? role : "candidate",
       });
@@ -124,6 +154,7 @@ export default function SettingsPage() {
       .toUpperCase()
       .substring(0, 2);
   };
+
   return (
     <>
       <Navbar />
@@ -170,7 +201,6 @@ export default function SettingsPage() {
                       placeholder="John Doe"
                     />
                   </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="userName">Username</Label>
                     <Input
@@ -187,7 +217,6 @@ export default function SettingsPage() {
                       <p className="text-sm text-red-500">{userNameError}</p>
                     )}
                   </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -202,7 +231,6 @@ export default function SettingsPage() {
                       Email cannot be changed
                     </p>
                   </div>
-
                   <div className="space-y-2">
                     <Label>Role</Label>
                     <RadioGroup
@@ -224,6 +252,57 @@ export default function SettingsPage() {
                       </div>
                     </RadioGroup>
                   </div>
+                </div>
+
+                {/* Skills Section */}
+                <div className="space-y-4">
+                  <Label>Skills</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newSkill}
+                      onChange={(e) => setNewSkill(e.target.value)}
+                      onKeyPress={handleSkillKeyPress}
+                      placeholder="Add a skill (e.g., React, Python, etc.)"
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleAddSkill}
+                      disabled={
+                        !newSkill.trim() || skills.includes(newSkill.trim())
+                      }
+                      size="icon"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  {skills.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {skills.map((skill, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="flex items-center gap-1 px-3 py-1"
+                        >
+                          {skill}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSkill(skill)}
+                            className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  {skills.length === 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      No skills added yet. Add your first skill above.
+                    </p>
+                  )}
                 </div>
 
                 {/* Buttons inside form */}

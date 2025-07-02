@@ -93,7 +93,9 @@ export const updateUser = mutation({
     clerkId: v.string(),
     userName: v.string(),
     role: v.union(v.literal("candidate"), v.literal("interviewer")),
+    skills: v.array(v.string()),
   },
+
   handler: async (ctx, args) => {
     const user = await ctx.db
       .query("users")
@@ -116,6 +118,7 @@ export const updateUser = mutation({
       image: args.image,
       userName: args.userName,
       role: args.role,
+      skills: args.skills,
     });
   },
 });
@@ -163,5 +166,12 @@ export const getUserByUserName = query({
       .unique();
 
     return user;
+  },
+});
+
+export const addSkills = mutation({
+  args: { userId: v.id("users"), skills: v.array(v.string()) },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.userId, { skills: args.skills });
   },
 });
