@@ -14,7 +14,11 @@ import {
   Video,
   X,
   Menu,
+  ExternalLink,
 } from "lucide-react";
+import { FaLinkedinIn, FaTwitter } from "react-icons/fa";
+import { IoIosMail } from "react-icons/io";
+
 import { SignInButton } from "@clerk/nextjs";
 import { api } from "@/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
@@ -396,86 +400,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Testimonials Section */}
-        <section
-          id="testimonials"
-          className="border-t py-16  md:py-20 bg-muted/30"
-        >
-          <div className="container px-4 sm:px-6 md:px-8">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">
-                  Testimonials
-                </div>
-                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                  Trusted by leading companies
-                </h2>
-                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed">
-                  See what our customers have to say about how CodeProctor has
-                  transformed their technical interview process.
-                </p>
-              </div>
-            </div>
-
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-12 py-12 md:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  quote:
-                    "CodeProctor has completely transformed our hiring process. We've reduced our time-to-hire by 40% while improving candidate quality.",
-                  author: "Sarah Johnson",
-                  role: "CTO, TechGrowth",
-                },
-                {
-                  quote:
-                    "The combination of video proctoring and code assessment in one platform gives us confidence in our technical evaluations.",
-                  author: "Michael Chen",
-                  role: "Engineering Manager, DataFlow",
-                },
-                {
-                  quote:
-                    "Our candidates love the intuitive interface, and our hiring managers appreciate the comprehensive insights we get from each interview.",
-                  author: "Jessica Williams",
-                  role: "HR Director, CloudScale",
-                },
-              ].map((testimonial, i) => (
-                <Card key={i} className="overflow-hidden">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col gap-4">
-                      <div className="flex">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <svg
-                            key={star}
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className="h-5 w-5 text-yellow-500"
-                          >
-                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                          </svg>
-                        ))}
-                      </div>
-                      <p className="text-muted-foreground">
-                        &quot;{testimonial.quote}&quot;
-                      </p>
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full bg-muted"></div>
-                        <div>
-                          <p className="font-medium">{testimonial.author}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {testimonial.role}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* CTA Section */}
         <section className="border-t  py-16 md:py-20 bg-primary text-primary-foreground">
           <div className="container px-4 sm:px-6 md:px-8">
@@ -520,118 +444,261 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t py-12 md:py-16">
-        <div className="container px-4 sm:px-6 md:px-8 flex flex-col gap-12">
-          <div className="grid gap-20 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Logo and description */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Code className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">CodeProctor</span>
+      <footer className="relative border-t bg-gradient-to-br from-slate-50 via-white to-slate-50/80 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950/80">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-800/25 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]" />
+
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+          <div className="grid gap-8 sm:gap-10 lg:gap-12 grid-cols-1 sm:grid-cols-2 lg:grid-cols-12">
+            {/* Logo and description - Takes more space on larger screens */}
+            <div className="space-y-4 sm:space-y-6 lg:col-span-5 xl:col-span-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl shadow-lg">
+                  <Code className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary/80 bg-clip-text text-transparent">
+                    CodeProctor
+                  </span>
+                  <span className="text-xs text-muted-foreground/80 font-medium tracking-wide">
+                    TECHNICAL INTERVIEWS
+                  </span>
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground">
+
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-md">
                 The all-in-one platform for technical interviews combining live
                 video proctoring with a powerful coding environment.
               </p>
-              <div className="flex gap-4">
-                {/* Twitter Icon */}
-                <Link
-                  href="https://x.com/ajSingh308"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
-                  </svg>
-                </Link>
 
-                {/* LinkedIn Icon */}
-                <Link
-                  href="https://www.linkedin.com/in/ajay308"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+              {/* Social Links */}
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-foreground/80">
+                  Follow us:
+                </span>
+                <div className="flex gap-2">
+                  <a
+                    href="https://x.com/ajSingh308"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-border/50 bg-background/50 backdrop-blur-sm text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 hover:scale-105"
+                    aria-label="Follow us on Twitter"
                   >
-                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                    <rect width="4" height="12" x="2" y="9" />
-                    <circle cx="4" cy="4" r="2" />
-                  </svg>
-                </Link>
+                    <FaTwitter className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                  </a>
+
+                  <a
+                    href="https://www.linkedin.com/in/ajay308"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-border/50 bg-background/50 backdrop-blur-sm text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 hover:scale-105"
+                    aria-label="Connect on LinkedIn"
+                  >
+                    <FaLinkedinIn className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                  </a>
+
+                  <a
+                    href="mailto:codeproctor.team@gmail.com"
+                    className="group flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-border/50 bg-background/50 backdrop-blur-sm text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 hover:scale-105"
+                    aria-label="Send us an email"
+                  >
+                    <IoIosMail className="h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+                  </a>
+                </div>
               </div>
             </div>
 
             {/* Product Links */}
-            <div className="space-y-4 xl:ml-[5rem] lg:[3rem]">
-              <h3 className="text-lg font-medium">Product</h3>
-              <ul className="space-y-2 text-sm">
+            <div className="space-y-4 sm:space-y-6 lg:col-span-2 xl:col-span-2">
+              <h3 className="text-sm sm:text-base font-semibold text-foreground tracking-wide uppercase relative">
+                Product
+                <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-primary to-primary/60 rounded-full" />
+              </h3>
+              <ul className="space-y-3">
                 <li>
-                  <Link
+                  <a
                     href="#features"
-                    className="text-muted-foreground hover:text-foreground"
+                    className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200"
                   >
-                    Features
-                  </Link>
+                    <span className="group-hover:translate-x-1 transition-transform duration-200">
+                      Features
+                    </span>
+                    <ExternalLink className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                  </a>
                 </li>
                 <li>
-                  <Link
+                  <a
                     href="/docs"
-                    className="text-muted-foreground hover:text-foreground"
+                    className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200"
                   >
-                    Documentation
-                  </Link>
+                    <span className="group-hover:translate-x-1 transition-transform duration-200">
+                      Documentation
+                    </span>
+                    <ExternalLink className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                  </a>
                 </li>
                 <li>
-                  <Link
-                    href="#"
-                    className="text-muted-foreground hover:text-foreground"
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm sm:text-base text-muted-foreground/60">
+                      API
+                    </span>
+                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 rounded-full border border-amber-200 dark:border-amber-800/50">
+                      Coming Soon
+                    </span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Support Links */}
+            <div className="space-y-4 sm:space-y-6 lg:col-span-2 xl:col-span-2">
+              <h3 className="text-sm sm:text-base font-semibold text-foreground tracking-wide uppercase relative">
+                Support
+                <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-primary to-primary/60 rounded-full" />
+              </h3>
+              <ul className="space-y-3">
+                <li>
+                  <a
+                    href="#faq"
+                    className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200"
                   >
-                    Api (Coming Soon)
-                  </Link>
+                    <span className="group-hover:translate-x-1 transition-transform duration-200">
+                      FAQ
+                    </span>
+                    <ExternalLink className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/report-issue"
+                    className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  >
+                    <span className="group-hover:translate-x-1 transition-transform duration-200">
+                      Report Bug
+                    </span>
+                    <ExternalLink className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                  </a>
                 </li>
               </ul>
             </div>
 
             {/* Company Links */}
-            <div className="space-y-4 xl:ml-[5rem] lg:[3rem]">
-              <h3 className="text-lg font-medium">Support</h3>
-              <ul className="space-y-2 text-sm">
+            <div className="space-y-4 sm:space-y-6 lg:col-span-3 xl:col-span-2">
+              <h3 className="text-sm sm:text-base font-semibold text-foreground tracking-wide uppercase relative">
+                Company
+                <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-primary to-primary/60 rounded-full" />
+              </h3>
+              <ul className="space-y-3">
                 <li>
-                  <Link
-                    href="#faq"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    FAQ
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/report-issue"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    Report Bug
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm sm:text-base text-muted-foreground/60">
+                      Blog
+                    </span>
+                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 rounded-full border border-amber-200 dark:border-amber-800/50">
+                      Coming Soon
+                    </span>
+                  </div>
                 </li>
               </ul>
             </div>
+
+            {/* Newsletter Signup - Only on larger screens */}
+            <div className="space-y-4 sm:space-y-6 lg:col-span-12 xl:col-span-2 lg:border-t lg:pt-8 xl:border-t-0 xl:pt-0">
+              <h3 className="text-sm sm:text-base font-semibold text-foreground tracking-wide uppercase relative">
+                Stay Updated
+                <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-primary to-primary/60 rounded-full" />
+              </h3>
+              <div className="space-y-3">
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  Get the latest updates and features delivered to your inbox.
+                </p>
+                <div className="flex flex-col sm:flex-row xl:flex-col gap-2">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="flex-1 px-3 py-2 text-sm bg-background/50 border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-200"
+                  />
+                  <button className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors duration-200 whitespace-nowrap">
+                    Subscribe
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Centered Footer Note */}
-          <div className="border-t pt-8 text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} CodeProctor. All rights reserved.
+          {/* Bottom section */}
+          <div className="border-t border-border/30 mt-8 sm:mt-12 lg:mt-16 pt-6 sm:pt-8 bg-gradient-to-r from-transparent via-muted/20 to-transparent">
+            <div className="flex flex-col lg:flex-row justify-between items-center gap-6 lg:gap-8">
+              {/* Left side - Logo and links */}
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 lg:gap-8">
+                {/* Mini logo */}
+                <div className="flex items-center gap-2 group">
+                  <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg border border-primary/20 group-hover:border-primary/40 transition-all duration-300">
+                    <Code className="h-4 w-4 text-primary group-hover:scale-110 transition-transform duration-300" />
+                  </div>
+                  <span className="text-sm font-semibold text-foreground/90 group-hover:text-foreground transition-colors duration-300">
+                    CodeProctor
+                  </span>
+                </div>
+
+                {/* Quick links */}
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <a
+                    href="/docs"
+                    className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-center w-5 h-5 rounded border border-border/50 bg-background/50 group-hover:border-primary/50 group-hover:bg-primary/5 transition-all duration-200">
+                      <svg
+                        className="w-3 h-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                    </div>
+                    <span className="group-hover:translate-x-0.5 transition-transform duration-200">
+                      Documentation
+                    </span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Right side - Copyright and made with love */}
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 lg:gap-8">
+                {/* Copyright */}
+                <div className="text-xs sm:text-sm text-muted-foreground/80 text-center sm:text-left">
+                  © {new Date().getFullYear()} CodeProctor. All rights
+                  reserved.
+                </div>
+
+                {/* Made with love */}
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground/70">
+                  <span>Made with</span>
+                  <span className="text-red-500 animate-pulse text-sm">❤️</span>
+                  <span>by</span>
+                  <a
+                    href="https://github.com/ajay308"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-foreground/80 hover:text-primary transition-colors duration-200 underline decoration-dotted underline-offset-2 hover:decoration-solid"
+                  >
+                    ajay308
+                  </a>
+                </div>
+
+                {/* Status indicator */}
+                <div className="flex items-center gap-2 text-xs text-muted-foreground/60 bg-background/50 px-3 py-1.5 rounded-full border border-border/30">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-sm shadow-green-500/50" />
+                  <span className="font-medium">All systems operational</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
