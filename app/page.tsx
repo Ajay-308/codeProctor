@@ -26,6 +26,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import homePhoto from "@/app/assest/home.png";
 import FAQSection from "@/components/FaqSection";
+import toast from "react-hot-toast";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -33,6 +34,16 @@ export default function LandingPage() {
   const { user } = useUser();
   const syncUser = useMutation(api.users.syncUser);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = async () => {
+    if (!email) {
+      toast.error("enter your email to subscribe");
+      return;
+    }
+    toast.success("subscribed successfully");
+    setEmail("");
+  };
 
   useEffect(() => {
     if (!isLoaded || !userId || !user) return;
@@ -616,11 +627,16 @@ export default function LandingPage() {
                   <input
                     type="email"
                     placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="flex-1 px-3 py-2 text-sm bg-background/50 border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-200"
                   />
-                  <button className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors duration-200 whitespace-nowrap">
+                  <Button
+                    onClick={handleSubscribe}
+                    className="px-4 py-2 text-sm cursor-pointer font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors duration-200 whitespace-nowrap"
+                  >
                     Subscribe
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
