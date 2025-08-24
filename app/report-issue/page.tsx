@@ -44,7 +44,7 @@ export default function ReportIssuePage() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("/api/send-feedback", {
+      const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
