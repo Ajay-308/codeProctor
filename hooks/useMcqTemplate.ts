@@ -7,7 +7,6 @@ import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import type { Id } from "@/convex/_generated/dataModel";
 
-// ---- Types ----
 interface MCQQuestion {
   question: string;
   options: string[];
@@ -66,8 +65,6 @@ interface BackendQuestion {
     isCorrect: boolean;
   }[];
 }
-
-// ---- Hook: MCQ Templates ----
 export function useMCQTemplates() {
   const { user } = useUser();
   const [isCreating, setIsCreating] = useState(false);

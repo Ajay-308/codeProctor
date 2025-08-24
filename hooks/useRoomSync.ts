@@ -1,4 +1,3 @@
-// hooks/useRoomSync.ts
 import { useEffect, useState, useCallback } from "react";
 import { Socket } from "socket.io-client";
 

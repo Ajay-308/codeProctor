@@ -5,7 +5,6 @@ import type * as monaco from "monaco-editor";
 import { useSocket } from "@/hooks/useSocket";
 import { useRoomSync } from "@/hooks/useRoomSync";
 
-// UI imports...
 import {
   ResizableHandle,
   ResizablePanel,
@@ -182,7 +181,6 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
     };
   }, [socket]);
 
-  // Only call useRoomSync when socket is defined to avoid type errors
   const roomSync = useRoomSync({
     socket,
     userId,
@@ -339,7 +337,6 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
         direction="vertical"
         className="min-h-[calc(100vh-4rem-1px)]"
       >
-        {/* QUESTION SECTION */}
         <ResizablePanel>
           <ScrollArea className="h-full">
             <div className="p-6">
@@ -360,7 +357,6 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
                           "Select a Problem"
                         )}
                       </h2>
-                      {/* Connection Status */}
                       <Badge variant={isConnected ? "default" : "destructive"}>
                         {isConnected ? "Connected" : "Disconnected"}
                       </Badge>
@@ -379,7 +375,6 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
                     </p>
                   </div>
 
-                  {/* Controls */}
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-lg">
                       <Users className="h-4 w-4" />
@@ -443,7 +438,6 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
                   </div>
                 </div>
 
-                {/* Active Users */}
                 {users.length > 0 && (
                   <Card>
                     <CardHeader>
@@ -474,7 +468,6 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
 
                 {displayProblem || isLoadingProblem ? (
                   <div className="relative">
-                    {/* Loading Overlay */}
                     {isLoadingProblem && (
                       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
                         <div className="flex flex-col items-center gap-2">
@@ -486,10 +479,8 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
                       </div>
                     )}
 
-                    {/* Problem Content */}
                     {displayProblem && (
                       <>
-                        {/* Topics */}
                         <Card className={isLoadingProblem ? "opacity-50" : ""}>
                           <CardContent className="pt-6">
                             <div className="flex flex-wrap gap-2">
@@ -502,7 +493,6 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
                           </CardContent>
                         </Card>
 
-                        {/* Problem Description */}
                         <Card className={isLoadingProblem ? "opacity-50" : ""}>
                           <CardHeader className="flex flex-row items-center gap-2">
                             <BookIcon className="h-5 w-5 text-primary/80" />
@@ -518,7 +508,6 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
                           </CardContent>
                         </Card>
 
-                        {/* Examples */}
                         {displayProblem.parsedExamples &&
                           displayProblem.parsedExamples.length > 0 && (
                             <Card
@@ -562,7 +551,6 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
                             </Card>
                           )}
 
-                        {/* Constraints */}
                         {displayProblem.parsedConstraints &&
                           displayProblem.parsedConstraints.length > 0 && (
                             <Card
@@ -622,7 +610,6 @@ function CodeEditor({ roomId, userId, userName }: CodeEditorProps) {
 
         <ResizableHandle withHandle />
 
-        {/* CODE EDITOR */}
         <ResizablePanel defaultSize={60} maxSize={100}>
           <div className="h-full relative">
             <Editor

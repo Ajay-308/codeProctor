@@ -1,7 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// Get all MCQ templates
 export const getMCQTemplates = query({
   args: {},
   handler: async (ctx) => {
@@ -10,7 +9,6 @@ export const getMCQTemplates = query({
   },
 });
 
-// Get MCQ template by ID
 export const getMCQTemplateById = query({
   args: { id: v.id("mcqTemplates") },
   handler: async (ctx, args) => {
@@ -19,7 +17,6 @@ export const getMCQTemplateById = query({
   },
 });
 
-// Create new MCQ template
 export const createMCQTemplate = mutation({
   args: {
     title: v.string(),
@@ -69,7 +66,6 @@ export const createMCQTemplate = mutation({
   },
 });
 
-// Update MCQ template
 export const updateMCQTemplate = mutation({
   args: {
     id: v.id("mcqTemplates"),
@@ -120,7 +116,6 @@ export const updateMCQTemplate = mutation({
   },
 });
 
-// Delete MCQ template
 export const deleteMCQTemplate = mutation({
   args: { id: v.id("mcqTemplates") },
   handler: async (ctx, args) => {
@@ -128,8 +123,6 @@ export const deleteMCQTemplate = mutation({
     return args.id;
   },
 });
-
-// Duplicate MCQ template
 export const duplicateMCQTemplate = mutation({
   args: { id: v.id("mcqTemplates") },
   handler: async (ctx, args) => {
@@ -154,7 +147,6 @@ export const duplicateMCQTemplate = mutation({
     return newTemplateId;
   },
 });
-// Increment usage count
 export const incrementUsageCount = mutation({
   args: { id: v.id("mcqTemplates") },
   handler: async (ctx, args) => {

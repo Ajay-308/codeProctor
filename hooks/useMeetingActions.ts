@@ -31,15 +31,14 @@ export const useMeetingActions = () => {
         },
       });
 
-      // Add this code to create the interview in your database
       await createInterviewMutation({
         title: "Instant Meeting",
         description: "Created on the fly",
         startTime: Date.now(),
         status: "in-progress",
-        streamCallId: id, // Use the ID without the "default:" prefix
-        candidateId: currentUserId, // You need to define this (current user's ID)
-        interviewerIds: [currentUserId], // You need to define this
+        streamCallId: id,
+        candidateId: currentUserId,
+        interviewerIds: [currentUserId],
       });
       router.push(`/meeting/${id}`);
       toast.success("meeting created successfully");

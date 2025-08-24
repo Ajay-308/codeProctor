@@ -1,7 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// ------------------------- CREATE MCQ ASSIGNMENT -------------------------
 export const createMCQAssignment = mutation({
   args: {
     templateId: v.id("mcqTemplates"),
@@ -63,7 +62,6 @@ export const createMCQAssignment = mutation({
   },
 });
 
-// ------------------------- GET ALL MCQ ASSIGNMENTS -------------------------
 export const getMCQAssignments = query({
   args: { createdBy: v.optional(v.string()) },
   handler: async (ctx, args) => {
@@ -77,7 +75,6 @@ export const getMCQAssignments = query({
   },
 });
 
-// ------------------------- GET MCQ ASSIGNMENT BY ID -------------------------
 export const getMCQAssignmentById = query({
   args: { id: v.id("mcqAssignments") },
   handler: async (ctx, args) => {
@@ -85,7 +82,6 @@ export const getMCQAssignmentById = query({
   },
 });
 
-// ------------------------- GET CANDIDATE ASSIGNMENT -------------------------
 export const getCandidateAssignment = query({
   args: {
     assignmentId: v.id("mcqAssignments"),
@@ -111,8 +107,6 @@ export const getCandidateAssignment = query({
     };
   },
 });
-
-// ------------------------- START ASSIGNMENT -------------------------
 export const startAssignment = mutation({
   args: {
     assignmentId: v.id("mcqAssignments"),
@@ -142,7 +136,6 @@ export const startAssignment = mutation({
   },
 });
 
-// ------------------------- SUBMIT ASSIGNMENT -------------------------
 export const submitAssignment = mutation({
   args: {
     assignmentId: v.id("mcqAssignments"),
@@ -172,7 +165,7 @@ export const submitAssignment = mutation({
     const assignment = await ctx.db.get(args.assignmentId);
     if (!assignment) throw new Error("Assignment not found");
 
-    // --- Score Calculation ---
+    //Score Calculation
     let totalScore = 0;
     let maxScore = 0;
 

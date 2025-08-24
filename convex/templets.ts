@@ -51,7 +51,7 @@ export const updateTempletes = mutation({
     id: v.id("templetes"),
     updates: v.object({
       title: v.optional(v.string()),
-      description: v.optional(v.string()), // Problem Statement
+      description: v.optional(v.string()),
       difficulty: v.optional(
         v.union(
           v.literal("easy"),

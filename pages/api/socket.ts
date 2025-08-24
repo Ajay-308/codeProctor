@@ -9,11 +9,9 @@ const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3001;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Types
 type RoomUser = {
   id: string;
   name: string;
@@ -30,7 +28,6 @@ type LeetCodeProblem = {
     lang: string;
     code: string;
   }[];
-  // Add more fields if needed
 };
 
 type Room = {

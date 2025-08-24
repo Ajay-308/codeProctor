@@ -9,7 +9,7 @@ export default defineSchema({
     role: v.optional(v.union(v.literal("candidate"), v.literal("interviewer"))),
     userName: v.string(),
     clerkId: v.string(),
-    skills: v.optional(v.array(v.string())), // Added skills field
+    skills: v.optional(v.array(v.string())),
   })
     .index("by_clerk_id", ["clerkId"])
     .index("by_user_name", ["userName"]),

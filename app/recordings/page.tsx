@@ -15,7 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import { FileVideo2, Search, SlidersHorizontal, VideoOff } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { useUser } from "@clerk/nextjs"; // or your auth provider
+import { useUser } from "@clerk/nextjs";
 import useGetCallsByUserId from "@/hooks/useGetCallByUserId";
 import type { CallRecording } from "@stream-io/video-react-sdk";
 

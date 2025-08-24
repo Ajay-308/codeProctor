@@ -68,8 +68,6 @@ export const getInterviewByUUID = query({
   },
 });
 
-export const getInterviewByUuid = getInterviewByUUID; // alias
-
 export const debugAllInterviewswithId = query({
   handler: async (ctx) => {
     const all = await ctx.db.query("interviews").collect();
@@ -81,7 +79,6 @@ export const debugAllInterviewswithId = query({
   },
 });
 
-// Mutations
 export const updateInterview = mutation({
   args: {
     id: v.id("interviews"),
