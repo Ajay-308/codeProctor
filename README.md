@@ -1,6 +1,3 @@
-*system overview*
-![image](https://github.com/user-attachments/assets/7282aff3-ab79-4377-82b2-2156753f6ef0)
-
 
 
 landing page
