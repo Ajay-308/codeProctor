@@ -14,7 +14,6 @@ export default function DocsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      {/* Top Navigation */}
       {isLoaded && userId ? (
         <Navbar />
       ) : (
@@ -45,12 +44,9 @@ export default function DocsPage() {
       )}
 
       <div className="flex min-h-[calc(100vh-3.5rem)]">
-        {/* Sticky Sidebar */}
         <div className="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
           <Sidebar />
         </div>
-
-        {/* Main Content Area */}
         <div className="flex-1 min-w-0 ">
           <Header />
           <main className="relative overflow-y-hidden">
@@ -61,5 +57,3 @@ export default function DocsPage() {
     </div>
   );
 }
-
-// local to sahi chal raha hai

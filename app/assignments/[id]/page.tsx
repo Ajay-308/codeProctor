@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 
 type MCQAnswer = {
   questionId: string;
-  selectedOptions: string[]; // Corrected from selectedOption
+  selectedOptions: string[];
   flagged: boolean;
 };
 
@@ -66,7 +66,7 @@ export default function CandidateAssessmentPage() {
     }
   };
 
-  // ------------------- Loading -------------------
+  // Loading
   if (candidateAssignment === undefined) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center">
@@ -83,7 +83,7 @@ export default function CandidateAssessmentPage() {
     );
   }
 
-  // ------------------- Not Found or Expired -------------------
+  //  Not Found or Expired
   if (!candidateAssignment || !candidateAssignment.assignment) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center">
@@ -101,7 +101,7 @@ export default function CandidateAssessmentPage() {
     );
   }
 
-  // ------------------- Already Completed -------------------
+  // Already Completed
   if (candidateAssignment.status === "completed") {
     const passed =
       candidateAssignment.score! >= candidateAssignment.assignment.passingScore;
@@ -152,7 +152,7 @@ export default function CandidateAssessmentPage() {
     );
   }
 
-  // ------------------- Start Screen -------------------
+  //  Start Screen
   if (candidateAssignment.status === "pending" && !hasStarted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center p-4">
@@ -225,7 +225,7 @@ export default function CandidateAssessmentPage() {
     );
   }
 
-  // ------------------- Active Assessment -------------------
+  //  Active Assessment
   const assessmentData = {
     id: candidateAssignment.assignment._id,
     title: candidateAssignment.assignment.title,

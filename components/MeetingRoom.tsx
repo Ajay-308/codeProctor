@@ -42,7 +42,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "./tooltip";
+} from "./ui/tooltip";
 import toast from "react-hot-toast";
 import { FloatingReactions } from "./FlootingReaction";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -221,20 +221,6 @@ function MeetingRoom() {
     setIsCameraOff(!isCameraOff);
   };
 
-  // const toggleScreenShare = async () => {
-  //   if (!call) return;
-  //   try {
-  //     if (isScreenSharing) {
-  //       await call.screenShare.disable();
-  //     } else {
-  //       await call.screenShare.enable();
-  //     }
-  //     setIsScreenSharing(!isScreenSharing);
-  //   } catch (error) {
-  //     console.error("Error toggling screen share:", error);
-  //   }
-  // };
-
   const endCall = async () => {
     if (!call) return;
     try {
@@ -250,7 +236,6 @@ function MeetingRoom() {
     if (call) {
       setIsMicMuted(!call.microphone.enabled);
       setIsCameraOff(!call.camera.enabled);
-      // setIsScreenSharing(call.screenShare.enabled);
     }
   }, [call]);
 
@@ -542,12 +527,6 @@ function MeetingRoom() {
                 >
                   Speaker View
                 </DropdownMenuItem>
-                {/* <DropdownMenuItem
-                  onClick={toggleScreenShare}
-                  className="hover:bg-slate-800/80 rounded-lg text-white py-3 px-4 text-base"
-                >
-                  {isScreenSharing ? "Stop Sharing" : "Share Screen"}
-                </DropdownMenuItem> */}
                 <DropdownMenuItem
                   onClick={toggleRecording}
                   className="hover:bg-slate-800/80 rounded-lg text-white py-3 px-4 text-base"
@@ -741,33 +720,6 @@ function MeetingRoom() {
                   <TooltipContent side="top">Reactions</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-
-              {/* <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className={cn(
-                        "rounded-full w-12 h-12",
-                        isScreenSharing
-                          ? "bg-green-500/90 hover:bg-green-600/90 text-white"
-                          : "hover:bg-slate-800"
-                      )}
-                      onClick={toggleScreenShare}
-                    >
-                      {isScreenSharing ? (
-                        <Monitor className="h-5 w-5" />
-                      ) : (
-                        <Share2 className="h-5 w-5" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    {isScreenSharing ? "Stop sharing" : "Share screen"}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider> */}
 
               <TooltipProvider>
                 <Tooltip>

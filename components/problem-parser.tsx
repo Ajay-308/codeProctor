@@ -67,19 +67,17 @@ export function parseExamplesFromDescription(
       }
     }
 
-    return examples.slice(0, 5); // Limit to 5 examples max
+    return examples.slice(0, 5);
   } catch (error) {
     console.error("Error parsing examples:", error);
     return [];
   }
 }
 
-// Extract constraints from description
 export function parseConstraints(description: string): string[] {
   const constraints: string[] = [];
 
   try {
-    // Look for constraints section
     const constraintsMatch = description.match(
       /Constraints?:\s*([\s\S]*?)(?=\n\n|\n[A-Z]|$)/i
     );
@@ -118,8 +116,8 @@ export function cleanDescription(description: string): string {
 
     // Clean up extra whitespace
     cleaned = cleaned.replace(/\n\s*\n\s*\n/g, "\n\n").trim();
-
-    return cleaned || description; // Fallback to original if cleaning removes everything
+    // Fallback to original if cleaning removes everything
+    return cleaned || description;
   } catch (error) {
     console.error("Error cleaning description:", error);
     return description;

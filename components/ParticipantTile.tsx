@@ -15,7 +15,7 @@ export const ParticipantTile = ({
   participant: StreamVideoParticipant;
   isLocal?: boolean;
 }) => {
-  const [isSpeaking] = useState(false); // You can replace with real-time speaking logic
+  const [isSpeaking] = useState(false);
 
   return (
     <motion.div
@@ -33,7 +33,6 @@ export const ParticipantTile = ({
       <div className="absolute inset-0 w-full h-full">
         <ParticipantView participant={participant} className="w-full h-full" />
 
-        {/* Force Stream video to fill entire tile */}
         <style jsx>{`
           :global(.str-video__participant-view video) {
             width: 100% !important;
@@ -43,7 +42,6 @@ export const ParticipantTile = ({
           }
         `}</style>
 
-        {/* Bottom Info Overlay */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -76,7 +74,6 @@ export const ParticipantTile = ({
           </div>
         </div>
 
-        {/* Top-left status */}
         <div className="absolute top-3 left-3">
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
         </div>

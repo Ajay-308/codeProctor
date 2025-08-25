@@ -118,23 +118,3 @@ export const groupInterviews = (
 
   return grouped;
 };
-
-// export const groupInterviews = (interview: Interview[]) => {
-//   if (!interview || interview.length === 0) return [];
-
-//   return interview.reduce((acc:any, interview) => {
-//     const date = new Date(interview.startTime).toLocaleDateString();
-//     const now = new Date();
-
-//     if (interview.status === "succeeded") {
-//       acc.Succeeded = [...(acc.succeeded || []), interview];
-//     } else if (interview.status === "failed") {
-//       acc.failed = [...(acc.failed || []), interview];
-//     } else if (isBefore(date, now)) {
-//       acc.completed = [...(acc.completed || []), interview];
-//     } else if (isAfter(date, now)) {
-//       acc.upcoming = [...(acc.upcoming || []), interview];
-//     }
-//     return acc;
-//   }, {});
-// };

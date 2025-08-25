@@ -76,7 +76,7 @@ export default function ScheduleAssignmentModal({
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              name: email.split("@")[0], // fallback name
+              name: email.split("@")[0],
               email,
               interviewDate: dueDate,
               link: "https://code-proctor.vercel.app/home",
