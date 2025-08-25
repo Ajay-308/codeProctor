@@ -23,43 +23,29 @@ export interface MCQTemplate {
   updatedAt: number;
 }
 
-export interface MCQQuestion {
-  question: string;
-  options: string[];
-  answer: string | number;
-  points: number;
-  [key: string]: unknown; // allows extra fields like id, type, etc.
-}
-
 export interface NormalizedMCQOption {
   id: string;
   text: string;
   isCorrect: boolean;
 }
-export interface NormalizedMCQQuestion {
-  id?: string;
-  question: string;
-  options: NormalizedMCQOption[];
-  answer?: string | number | null; // optional or null if not answered yet
-  correctAnswer?: string | number; // optional legacy support
-  points: number;
-  [key: string]: unknown;
-}
 
-export interface CodingTemplate {
-  _id?: string;
-  title: string;
-  description?: string;
-  tags: string[];
-  difficulty: "easy" | "medium" | "hard" | "expert";
-  language: string;
-  timeLimit: number;
-  usageCount: number;
-  updatedAt: string;
-  inputFormat?: string;
-  outputFormat?: string;
-  constraints?: string;
-  sampleInput?: string;
-  sampleOutput?: string;
-  explanation?: string;
-}
+export type NormalizedMCQQuestion = {
+  id: string;
+  type: "single" | "multiple";
+  difficulty: "easy" | "medium" | "hard";
+  category: string;
+  question: string;
+  answer: string | number;
+  points: number;
+  options: {
+    id: string;
+    text: string;
+    isCorrect: boolean;
+  }[];
+};
+
+export type MCQAnswer = {
+  questionId: string;
+  selectedOptions: string[];
+  flagged: boolean;
+};

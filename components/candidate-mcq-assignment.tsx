@@ -93,6 +93,7 @@ export default function CandidateMCQAssessment({
   }, [assessment.questions]);
 
   // Timer
+
   useEffect(() => {
     if (isSubmitted || timeRemaining <= 0) return;
 
@@ -107,6 +108,7 @@ export default function CandidateMCQAssessment({
     }, 1000);
 
     return () => clearInterval(timer);
+    // eslint-disable-next-line
   }, [timeRemaining, isSubmitted]);
 
   const formatTime = (seconds: number) => {

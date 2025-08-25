@@ -9,12 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, AlertTriangle } from "lucide-react";
 import type { Id } from "@/convex/_generated/dataModel";
 import toast from "react-hot-toast";
-
-type MCQAnswer = {
-  questionId: string;
-  selectedOptions: string[];
-  flagged: boolean;
-};
+import { MCQAnswer } from "@/types/mcq";
 
 export default function CandidateAssessmentPage() {
   const params = useParams();

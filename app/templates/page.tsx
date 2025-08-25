@@ -33,17 +33,13 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import type { Id } from "@/convex/_generated/dataModel";
 
-// Components
 import MCQTemplateModal from "@/components/mcq-template-model";
 import ScheduleAssignmentModal from "@/components/schedule-assignment-model";
 import ProtectedRoute from "@/components/protectedComponent";
 import Navbar from "@/components/Navbar";
 
-// Hooks
 import { useMCQTemplates } from "@/hooks/useMcqTemplate";
 import type { MCQTemplate } from "@/types/mcq";
-
-// Types
 import type { ScheduleData } from "@/components/schedule-assignment-model";
 
 interface NormalizedMCQOption {
