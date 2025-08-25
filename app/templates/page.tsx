@@ -39,29 +39,12 @@ import ProtectedRoute from "@/components/protectedComponent";
 import Navbar from "@/components/Navbar";
 
 import { useMCQTemplates } from "@/hooks/useMcqTemplate";
-import type { MCQTemplate } from "@/types/mcq";
+import type {
+  MCQTemplate,
+  NormalizedMCQOption,
+  NormalizedMCQQuestion,
+} from "@/types/mcq";
 import type { ScheduleData } from "@/components/schedule-assignment-model";
-
-interface NormalizedMCQOption {
-  id: string;
-  text: string;
-  isCorrect: boolean;
-}
-
-type NormalizedMCQQuestion = {
-  id: string;
-  type: "single" | "multiple";
-  difficulty: "easy" | "medium" | "hard";
-  category: string;
-  question: string;
-  answer: string | number;
-  points: number;
-  options: {
-    id: string;
-    text: string;
-    isCorrect: boolean;
-  }[];
-};
 
 const getBadgeVariant = (difficulty: string) => {
   switch (difficulty) {
@@ -679,7 +662,6 @@ export default function MCQTemplatesPage() {
           }}
         />
 
-        {/* Schedule Assignment Modal */}
         <ScheduleAssignmentModal
           open={scheduleModalOpen}
           onOpenChange={setScheduleModalOpen}

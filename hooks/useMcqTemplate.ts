@@ -40,17 +40,6 @@ interface ScheduleData {
   reminderEnabled: boolean;
 }
 
-interface SubmissionAnswer {
-  questionId: string;
-  selectedOptions: string[];
-  flagged: boolean;
-}
-
-interface SubmissionResult {
-  score: number;
-  passed: boolean;
-}
-
 interface BackendQuestion {
   id: string;
   type: "single" | "multiple";
@@ -234,77 +223,5 @@ export function useMCQTemplates() {
     deleteTemplate: handleDeleteTemplate,
     duplicateTemplate: handleDuplicateTemplate,
     createAssignmentFromTemplate,
-  };
-}
-
-// ---- Hook: MCQ Assignments ----
-export function useMCQAssignments() {
-  const { user } = useUser();
-
-  const assignments = useQuery(
-    api.mcqAssignment.getMCQAssignments,
-    user ? { createdBy: user.id } : "skip"
-  );
-
-  const startAssignment = useMutation(api.mcqAssignment.startAssignment);
-  const submitAssignment = useMutation(api.mcqAssignment.submitAssignment);
-
-  const handleStartAssignment = async (
-    assignmentId: Id<"mcqAssignments">,
-    candidateEmail: string
-  ): Promise<void> => {
-    try {
-      await startAssignment({ assignmentId, candidateEmail });
-      toast.success("Assignment started!");
-    } catch (error) {
-      toast.error("Failed to start assignment");
-      console.error("handleStartAssignment:", error);
-      throw error;
-    }
-  };
-
-  const handleSubmitAssignment = async (
-    assignmentId: Id<"mcqAssignments">,
-    candidateEmail: string,
-    answers: SubmissionAnswer[],
-    timeSpent: number
-  ): Promise<SubmissionResult> => {
-    try {
-      const result = await submitAssignment({
-        assignmentId,
-        candidateEmail,
-        answers,
-        timeSpent,
-      });
-
-      toast.success(
-        `Assignment submitted! Score: ${result.score.toFixed(1)}% ${
-          result.passed ? "(Passed)" : "(Failed)"
-        }`
-      );
-
-      return result;
-    } catch (error) {
-      toast.error("Failed to submit assignment");
-      console.error("handleSubmitAssignment:", error);
-      throw error;
-    }
-  };
-
-  return {
-    assignments,
-    startAssignment: handleStartAssignment,
-    submitAssignment: handleSubmitAssignment,
-  };
-}
-
-// ---- Hook: Combined MCQ Manager ----
-export function useMCQManagement() {
-  const templates = useMCQTemplates();
-  const assignments = useMCQAssignments();
-
-  return {
-    templates,
-    assignments,
   };
 }
