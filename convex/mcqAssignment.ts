@@ -62,26 +62,6 @@ export const createMCQAssignment = mutation({
   },
 });
 
-export const getMCQAssignments = query({
-  args: { createdBy: v.optional(v.string()) },
-  handler: async (ctx, args) => {
-    let dbQuery = ctx.db.query("mcqAssignments");
-    if (args.createdBy) {
-      dbQuery = dbQuery.filter((q) =>
-        q.eq(q.field("createdBy"), args.createdBy)
-      );
-    }
-    return await dbQuery.collect();
-  },
-});
-
-export const getMCQAssignmentById = query({
-  args: { id: v.id("mcqAssignments") },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
-});
-
 export const getCandidateAssignment = query({
   args: {
     assignmentId: v.id("mcqAssignments"),

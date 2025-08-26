@@ -1,7 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// Queries
+// sare interview
 export const getAllInterviews = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -11,6 +11,7 @@ export const getAllInterviews = query({
   },
 });
 
+// wahi interview jo ki login user se match hori hai
 export const getInterview = query({
   handler: async (ctx) => {
     const userIdentity = await ctx.auth.getUserIdentity();
@@ -37,12 +38,6 @@ export const getInterviewByStreamId = query({
   },
 });
 
-export const debugAllInterviews = query({
-  handler: async (ctx) => {
-    return await ctx.db.query("interviews").collect();
-  },
-});
-
 export const getInterviewByInterviewerId = query({
   args: { interviewerId: v.string() },
   handler: async (ctx, args) => {
@@ -55,27 +50,6 @@ export const getInterviewByInterviewerId = query({
     return allInterviews.filter((interview) =>
       interview.interviewerIds.includes(args.interviewerId)
     );
-  },
-});
-
-export const getInterviewByUUID = query({
-  args: { uuid: v.string() },
-  handler: async (ctx, { uuid }) => {
-    return await ctx.db
-      .query("interviews")
-      .withIndex("by_uuid", (q) => q.eq("uuid", uuid))
-      .first();
-  },
-});
-
-export const debugAllInterviewswithId = query({
-  handler: async (ctx) => {
-    const all = await ctx.db.query("interviews").collect();
-    console.log(
-      "INTERVIEWS:",
-      all.map((i) => i.uuid)
-    );
-    return all;
   },
 });
 

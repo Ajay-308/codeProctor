@@ -163,7 +163,7 @@ export default defineSchema({
     explanation: v.optional(v.string()),
   }),
 
-  // ---------------- Questions (linked to templetes) ----------------
+  //Questions (linked to templetes)
   questions: defineTable({
     questionText: v.string(),
     type: v.union(v.literal("multiple-choice"), v.literal("open-ended")),
@@ -172,7 +172,7 @@ export default defineSchema({
     templateId: v.id("templetes"),
   }).index("by_template_id", ["templateId"]),
 
-  // ---------------- Assessments from Templates ----------------
+  // Assessments from Templates
   assessmentSubmissions: defineTable({
     templateId: v.id("templetes"),
     candidateId: v.id("users"),
@@ -188,21 +188,4 @@ export default defineSchema({
       })
     ),
   }).index("by_template_id", ["templateId"]),
-
-  assignments: defineTable({
-    createdBy: v.string(),
-    title: v.string(),
-    description: v.string(),
-    dueDate: v.number(),
-    passingScore: v.number(),
-    type: v.string(),
-    timeLimit: v.number(),
-    status: v.string(),
-    questions: v.array(v.any()),
-    templateId: v.optional(v.string()),
-    tags: v.array(v.string()),
-    candidateEmails: v.array(v.string()),
-    sendImmediately: v.boolean(),
-    reminderEnabled: v.boolean(),
-  }),
 });

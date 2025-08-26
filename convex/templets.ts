@@ -14,7 +14,7 @@ export const getTempletes = query({
 export const addTempletes = mutation({
   args: {
     title: v.string(),
-    description: v.string(), // if required, make it optional with `v.optional`
+    description: v.string(),
     difficulty: v.union(
       v.literal("easy"),
       v.literal("medium"),
