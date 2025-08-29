@@ -61,7 +61,7 @@ interface Interview {
   status: string;
   streamCallId: string;
   candidateId: string;
-  interviewerIds: string[]; // ✅ Correct spelling
+  interviewerIds: string[];
 }
 
 type Id<T> = string & { __tableName: T };

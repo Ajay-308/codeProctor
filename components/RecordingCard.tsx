@@ -29,13 +29,11 @@ function RecordingCard({ recording }: { recording: CallRecording }) {
       ? calculateRecodingDuration(recording.start_time, recording.end_time)
       : "Unknown duration";
 
-  // Extract a recording ID or use a fallback
   const recordingId =
     recording.url?.split("/").pop()?.substring(0, 8) || "Recording";
 
   return (
     <Card className="group overflow-hidden border border-border/40 hover:border-border/80 transition-all duration-300 hover:shadow-lg">
-      {/* CARD HEADER */}
       <CardHeader className="space-y-1 pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

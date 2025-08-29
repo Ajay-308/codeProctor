@@ -72,7 +72,7 @@ export default function CandidateMCQAssessment({
 }: CandidateMCQAssessmentProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<CandidateAnswer[]>([]);
-  const [timeRemaining, setTimeRemaining] = useState(assessment.timeLimit * 60); // Convert to seconds
+  const [timeRemaining, setTimeRemaining] = useState(assessment.timeLimit * 60);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [startTime] = useState(Date.now());
