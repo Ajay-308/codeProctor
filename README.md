@@ -18,7 +18,7 @@
 ## 📸 **Preview**
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/landing-page-hero.png" alt="CodeProctor Landing Page" width="800" style="border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+  <img width="2849" height="1455" alt="image" src="https://github.com/user-attachments/assets/43ae30ec-c836-4212-bae1-850ef2d4bf70" />
 </div>
 
 ---
