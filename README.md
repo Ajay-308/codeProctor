@@ -198,8 +198,6 @@ We welcome contributions! Here's how you can help:
 
 <div align="center">
 
-![Language Stats](https://github-readme-stats.vercel.app/api/top-langs/?username=Ajay-308&repo=codeProctor&layout=compact&theme=github_dark)
-
 </div>
 
 - **📈 Active Development** - Regular updates and improvements
