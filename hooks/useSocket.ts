@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import io from "socket.io-client";
 
-let socketInstance: Socket | null = null;
+type SocketType = ReturnType<typeof io>;
+
+let socketInstance: SocketType | null = null;
 
 export const useSocket = () => {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [socket, setSocket] = useState<SocketType | null>(null);
   const route = "https://codeproctor-0.onrender.com";
 
   useEffect(() => {
     if (!socketInstance) {
-      socketInstance = io(route!, {
-        transports: ["websocket"],
-      });
+      socketInstance = io(route, { transports: ["websocket"] });
     }
     setSocket(socketInstance);
 
