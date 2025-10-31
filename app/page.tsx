@@ -699,12 +699,12 @@ export default function LandingPage() {
                   <span className="text-red-500 animate-pulse text-sm">❤️</span>
                   <span>by</span>
                   <a
-                    href="https://github.com/ajay308"
+                    href="https://github.com/Ajay-308"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-medium text-foreground/80 hover:text-primary transition-colors duration-200 underline decoration-dotted underline-offset-2 hover:decoration-solid"
                   >
-                    ajay308
+                    ajay
                   </a>
                 </div>
 
