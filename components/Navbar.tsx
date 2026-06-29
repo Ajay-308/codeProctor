@@ -139,8 +139,7 @@ export default function Navbar() {
 
             <div className="pt-4 border-t border-gray-200 space-y-2">
               <div className="px-2 py-2">
-                <UserButton
-                  afterSignOutUrl="/"
+                <UserButton               
                   appearance={{
                     elements: {
                       rootBox: "flex",
