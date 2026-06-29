@@ -597,20 +597,18 @@ export default function LandingPage() {
             <div className="space-y-4 sm:space-y-6 lg:col-span-3 xl:col-span-2">
               <h3 className="text-sm sm:text-base font-semibold text-foreground tracking-wide uppercase relative">
                 Company
-                <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-primary to-primary/60 rounded-full" />
               </h3>
-              <ul className="space-y-3">
-                <li>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm sm:text-base text-muted-foreground/60">
+              <li>
+                  <a
+                    href="/blog"
+                    className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  >
+                    <span className="group-hover:translate-x-1 transition-transform duration-200">
                       Blog
                     </span>
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 rounded-full border border-amber-200 dark:border-amber-800/50">
-                      Coming Soon
-                    </span>
-                  </div>
+                    <ExternalLink className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-200" />
+                  </a>
                 </li>
-              </ul>
             </div>
 
             {/* Newsletter Signup - Only on larger screens */}
