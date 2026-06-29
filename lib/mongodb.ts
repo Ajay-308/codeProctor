@@ -24,7 +24,10 @@ async function getCollection() {
 
 export async function getAllBlogs() {
   const collection = await getCollection();
-  const blogs = await collection.find({}).sort({ created_at: -1 }).toArray();
+  const blogs = await collection
+    .find({})
+    .sort({ created_at: -1 })
+    .toArray();
   return JSON.parse(JSON.stringify(blogs));
 }
 
