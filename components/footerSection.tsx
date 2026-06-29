@@ -53,11 +53,11 @@ export default function FooterSection() {
               <span className="text-sm font-medium text-foreground/80">Follow us:</span>
               <div className="flex gap-2">
                 {[
-                  { href: 'https://x.com/ajSingh308', icon: <FaTwitter className="h-4 w-4" />, label: 'Twitter' },
-                  { href: 'https://www.linkedin.com/in/ajay308', icon: <FaLinkedinIn className="h-4 w-4" />, label: 'LinkedIn' },
+                  { href: 'https://x.com/LinkjSingh308', icon: <FaTwitter className="h-4 w-4" />, label: 'Twitter' },
+                  { href: 'https://www.linkedin.com/in/Linkjay308', icon: <FaLinkedinIn className="h-4 w-4" />, label: 'LinkedIn' },
                   { href: 'mailto:codeproctor.team@gmail.com', icon: <IoIosMail className="h-4 w-4" />, label: 'Email' },
                 ].map(({ href, icon, label }) => (
-                  <a
+                  <Link
                     key={label}
                     href={href}
                     target={href.startsWith('mailto') ? undefined : '_blank'}
@@ -68,7 +68,7 @@ export default function FooterSection() {
                     <span className="group-hover:scale-110 transition-transform duration-200">
                       {icon}
                     </span>
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -86,10 +86,10 @@ export default function FooterSection() {
                 { href: '/docs', label: 'Documentation' },
               ].map(({ href, label }) => (
                 <li key={label}>
-                  <a href={href} className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200">
+                  <Link href={href} className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200">
                     <span className="group-hover:translate-x-1 transition-transform duration-200">{label}</span>
                     <ExternalLink className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-200" />
-                  </a>
+                  </Link>
                 </li>
               ))}
               <li>
@@ -115,10 +115,10 @@ export default function FooterSection() {
                 { href: '/report-issue', label: 'Report Bug' },
               ].map(({ href, label }) => (
                 <li key={label}>
-                  <a href={href} className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200">
+                  <Link href={href} className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200">
                     <span className="group-hover:translate-x-1 transition-transform duration-200">{label}</span>
                     <ExternalLink className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-200" />
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -152,7 +152,7 @@ export default function FooterSection() {
               </p>
               {subscribed ? (
                 <p className="text-sm text-green-600 dark:text-green-400 font-medium">
-                  ✅ You're subscribed!
+                  ✅ You&apos;re subscribed!
                 </p>
               ) : (
                 <div className="flex flex-col sm:flex-row xl:flex-col gap-2">
@@ -189,7 +189,7 @@ export default function FooterSection() {
                   CodeProctor
                 </span>
               </div>
-              <a
+              <Link
                 href="/docs"
                 className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-all duration-200"
               >
@@ -200,7 +200,7 @@ export default function FooterSection() {
                   </svg>
                 </div>
                 <span className="group-hover:translate-x-0.5 transition-transform duration-200">Documentation</span>
-              </a>
+              </Link>
             </div>
 
             {/* Right */}
@@ -212,14 +212,14 @@ export default function FooterSection() {
                 <span>Made with</span>
                 <span className="text-red-500 animate-pulse text-sm">❤️</span>
                 <span>by</span>
-                <a
-                  href="https://github.com/Ajay-308"
+                <Link
+                  href="https://github.com/Linkjay-308"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-medium text-foreground/80 hover:text-primary transition-colors duration-200 underline decoration-dotted underline-offset-2 hover:decoration-solid"
                 >
                   ajay
-                </a>
+                </Link>
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground/60 bg-background/50 px-3 py-1.5 rounded-full border border-border/30">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-sm shadow-green-500/50" />
