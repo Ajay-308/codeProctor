@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
 import dns from "dns";
+import { unstable_noStore as noStore } from "next/cache";
 
 dns.setDefaultResultOrder("ipv4first");
 
@@ -23,6 +24,7 @@ async function getCollection() {
 }
 
 export async function getAllBlogs() {
+  noStore();
   const collection = await getCollection();
   const blogs = await collection
     .find({})
@@ -33,6 +35,7 @@ export async function getAllBlogs() {
 
 export async function getBlogById(id: string) {
   const { ObjectId } = await import("mongodb");
+  noStore();
   const collection = await getCollection();
   const blog = await collection.findOne({ _id: new ObjectId(id) });
   if (!blog) return null;

@@ -32,6 +32,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: blog.blog_title, description: blog.topic };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function BlogDetailPage({
   params,
 }: {
