@@ -3,7 +3,7 @@ export function fixMathDelimiters(content: string): string {
 
   // Step 1: Single line [ \text{...} ] → $$...$$ 
   // e.g. [ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d}}\right)V ]
-  let result = content.replace(
+  const result = content.replace(
     /\[\s*(\\[a-zA-Z][^\[\]\n]+)\s*\]/g,
     (_, inner) => `\n$$\n${inner.trim()}\n$$\n`
   );

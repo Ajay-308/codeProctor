@@ -5,6 +5,7 @@ import { Code, ExternalLink } from 'lucide-react';
 import { FaTwitter, FaLinkedinIn } from 'react-icons/fa';
 import { IoIosMail } from 'react-icons/io';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function FooterSection() {
   const [email, setEmail] = useState('');
@@ -131,10 +132,10 @@ export default function FooterSection() {
             </h3>
             <ul className="space-y-3">
               <li>
-                <a href="/blog" className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200">
+                <Link href="/blog" className="group flex items-center text-sm sm:text-base text-muted-foreground hover:text-foreground transition-colors duration-200">
                   <span className="group-hover:translate-x-1 transition-transform duration-200">Blog</span>
                   <ExternalLink className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-200" />
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
