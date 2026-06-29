@@ -13,12 +13,21 @@ interface Blog {
   created_at: string;
 }
 
+interface RawBlog {
+  _id: { toString: () => string };
+  topic: string;
+  blog_title: string;
+  blog_kind: string;
+  audience: string;
+  created_at: string;
+}
+
 export default async function BlogPage() {
   let blogs: Blog[] = [];
 
   try {
     const result = await getAllBlogs();
-    blogs = result.map((blog: any) => ({
+    blogs = result.map((blog: RawBlog) => ({
       _id: blog._id.toString(),
       topic: blog.topic,
       blog_title: blog.blog_title,
@@ -34,7 +43,6 @@ export default async function BlogPage() {
     <main className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Blog Grid */}
       <section className="mx-auto max-w-6xl px-6 py-12">
         {blogs.length === 0 ? (
           <div className="rounded-lg border border-border bg-card p-12 text-center">
@@ -49,26 +57,19 @@ export default async function BlogPage() {
                 className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg"
               >
                 <div className="flex flex-col gap-4">
-                  {/* Badge */}
                   <div className="inline-flex w-fit">
                     <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
                       {blog.blog_kind}
                     </span>
                   </div>
-
-                  {/* Title */}
                   <div>
                     <h2 className="line-clamp-2 text-xl font-bold text-foreground group-hover:text-primary">
                       {blog.blog_title}
                     </h2>
                   </div>
-
-                  {/* Topic */}
                   <p className="line-clamp-2 text-sm text-muted-foreground">
                     {blog.topic}
                   </p>
-
-                  {/* Footer */}
                   <div className="flex items-center justify-between border-t border-border pt-4">
                     <span className="text-xs text-muted-foreground">
                       {blog.audience}
