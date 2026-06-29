@@ -1,13 +1,14 @@
 // socket-server.ts
+
 import express from "express";
 import http from "http";
 import cors from "cors";
-import { Server as SocketIOServer } from "socket.io";
+import { Server } from "socket.io";
 
-// Setup
 const app = express();
 const server = http.createServer(app);
-const PORT = process.env.PORT || 3001;
+
+const PORT = Number(process.env.PORT) || 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -65,20 +66,22 @@ const colors = [
   "#82E0AA",
 ];
 
-const getRandomColor = () => colors[Math.floor(Math.random() * colors.length)];
+const randomColor = () =>
+  colors[Math.floor(Math.random() * colors.length)];
 
-// Initialize socket
-const io = new SocketIOServer(server, {
+const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://code-proctor.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://code-proctor.vercel.app",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
-  transports: ["websocket", "polling"],
 });
 
 io.on("connection", (socket) => {
-  console.log("✅ User connected:", socket.id);
+  console.log(`✅ Connected: ${socket.id}`);
 
   socket.on("join-room", ({ roomId, userId, userName }) => {
     socket.join(roomId);
@@ -99,7 +102,7 @@ io.on("connection", (socket) => {
       id: userId,
       name: userName,
       socketId: socket.id,
-      color: getRandomColor(),
+      color: randomColor(),
     });
 
     socket.emit("room-state", {
@@ -109,14 +112,21 @@ io.on("connection", (socket) => {
       problem: room.currentProblem,
     });
 
-    const users = Array.from(room.users.values());
-    io.to(roomId).emit("user-joined", users);
-    console.log(`👤 ${userName} joined room ${roomId}`);
+    io.to(roomId).emit(
+      "user-joined",
+      Array.from(room.users.values())
+    );
+
+    console.log(`${userName} joined ${roomId}`);
   });
 
-  socket.on("code-change", ({ roomId, code, language, questionId, userId }) => {
-    const room = rooms.get(roomId);
-    if (room) {
+  socket.on(
+    "code-change",
+    ({ roomId, code, language, questionId, userId }) => {
+      const room = rooms.get(roomId);
+
+      if (!room) return;
+
       room.currentCode = code;
       room.currentLanguage = language;
       room.currentQuestion = questionId;
@@ -129,97 +139,129 @@ io.on("connection", (socket) => {
         timestamp: Date.now(),
       });
     }
-  });
+  );
 
   socket.on("problem-change", ({ roomId, problem, userId }) => {
     const room = rooms.get(roomId);
-    if (room) {
-      room.currentProblem = problem;
-      room.currentQuestion = problem.id;
 
-      // Also optionally reset code to default snippet
-      const snippet: { lang: string; code: string } | undefined =
-        problem.codeSnippets.find(
-          (s: { lang: string; code: string }) =>
-            s.lang.toLowerCase() === room.currentLanguage
-        );
-      if (snippet) room.currentCode = snippet.code;
+    if (!room) return;
 
-      io.to(roomId).emit("problem-change", {
-        problem,
-        userId,
-        timestamp: Date.now(),
-      });
+    room.currentProblem = problem;
+    room.currentQuestion = problem.id;
+
+    const snippet = problem.codeSnippets.find(
+      (s: { lang: string; code: string }) =>
+        s.lang.toLowerCase() === room.currentLanguage
+    );
+
+    if (snippet) {
+      room.currentCode = snippet.code;
     }
-  });
 
-  socket.on("question-change", ({ roomId, questionId, userId }) => {
-    const room = rooms.get(roomId);
-    if (room) {
-      room.currentQuestion = questionId;
-      socket.to(roomId).emit("question-change", { questionId, userId });
-    }
+    io.to(roomId).emit("problem-change", {
+      problem,
+      userId,
+      timestamp: Date.now(),
+    });
   });
 
   socket.on("language-change", ({ roomId, language, userId }) => {
     const room = rooms.get(roomId);
-    if (room) {
-      room.currentLanguage = language;
 
-      // Optionally update code to matching snippet
-      if (room.currentProblem) {
-        const snippet = room.currentProblem.codeSnippets.find(
-          (s) => s.lang.toLowerCase() === language
-        );
-        if (snippet) room.currentCode = snippet.code;
+    if (!room) return;
+
+    room.currentLanguage = language;
+
+    if (room.currentProblem) {
+      const snippet = room.currentProblem.codeSnippets.find(
+        (s) => s.lang.toLowerCase() === language
+      );
+
+      if (snippet) {
+        room.currentCode = snippet.code;
       }
-
-      socket.to(roomId).emit("language-change", { language, userId });
     }
+
+    socket.to(roomId).emit("language-change", {
+      language,
+      userId,
+    });
+  });
+
+  socket.on("question-change", ({ roomId, questionId, userId }) => {
+    const room = rooms.get(roomId);
+
+    if (!room) return;
+
+    room.currentQuestion = questionId;
+
+    socket.to(roomId).emit("question-change", {
+      questionId,
+      userId,
+    });
   });
 
   socket.on("cursor-move", ({ roomId, userId, position }) => {
-    socket.to(roomId).emit("cursor-move", { userId, position });
+    socket.to(roomId).emit("cursor-move", {
+      userId,
+      position,
+    });
   });
 
   socket.on("leave-room", ({ roomId, userId }) => {
     socket.leave(roomId);
+
     const room = rooms.get(roomId);
-    if (room) {
-      room.users.delete(userId);
-      if (room.users.size === 0) {
-        rooms.delete(roomId);
-      } else {
-        const users = Array.from(room.users.values());
-        io.to(roomId).emit("user-left", users);
-      }
+
+    if (!room) return;
+
+    room.users.delete(userId);
+
+    if (room.users.size === 0) {
+      rooms.delete(roomId);
+      return;
     }
+
+    io.to(roomId).emit(
+      "user-left",
+      Array.from(room.users.values())
+    );
   });
 
   socket.on("disconnect", () => {
-    console.log("❌ Disconnected:", socket.id);
-    rooms.forEach((room, roomId) => {
-      const userToRemove = Array.from(room.users.values()).find(
-        (user) => user.socketId === socket.id
+    console.log(`❌ Disconnected: ${socket.id}`);
+
+    for (const [roomId, room] of rooms.entries()) {
+      const user = Array.from(room.users.values()).find(
+        (u) => u.socketId === socket.id
       );
-      if (userToRemove) {
-        room.users.delete(userToRemove.id);
-        if (room.users.size === 0) {
-          rooms.delete(roomId);
-        } else {
-          const users = Array.from(room.users.values());
-          io.to(roomId).emit("user-left", users);
-        }
+
+      if (!user) continue;
+
+      room.users.delete(user.id);
+
+      if (room.users.size === 0) {
+        rooms.delete(roomId);
+      } else {
+        io.to(roomId).emit(
+          "user-left",
+          Array.from(room.users.values())
+        );
       }
-    });
+
+      break;
+    }
   });
 });
 
-// Health check
-app.get("/health", (req, res) => {
-  res.json({ status: "OK", rooms: rooms.size });
+app.get("/health", (_, res) => {
+  res.json({
+    success: true,
+    rooms: rooms.size,
+    uptime: process.uptime(),
+  });
 });
 
 server.listen(PORT, () => {
-  console.log(`🚀 Socket.IO server running at http://localhost:${PORT}`);
+  console.log(`🚀 Socket server running on port ${PORT}`);
 });
