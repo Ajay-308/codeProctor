@@ -213,7 +213,7 @@ export default function FooterSection() {
                 <span className="text-red-500 animate-pulse text-sm">❤️</span>
                 <span>by</span>
                 <Link
-                  href="https://github.com/Linkjay-308"
+                  href="https://github.com/Ajay-308"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-medium text-foreground/80 hover:text-primary transition-colors duration-200 underline decoration-dotted underline-offset-2 hover:decoration-solid"
