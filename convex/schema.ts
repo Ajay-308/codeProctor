@@ -44,7 +44,7 @@ export default defineSchema({
     difficulty: v.union(
       v.literal("easy"),
       v.literal("medium"),
-      v.literal("hard")
+      v.literal("hard"),
     ),
     timeLimit: v.number(),
     passingScore: v.number(),
@@ -57,7 +57,7 @@ export default defineSchema({
             id: v.string(),
             text: v.string(),
             isCorrect: v.boolean(),
-          })
+          }),
         ),
         type: v.union(v.literal("single"), v.literal("multiple")),
         points: v.number(),
@@ -65,10 +65,10 @@ export default defineSchema({
         difficulty: v.union(
           v.literal("easy"),
           v.literal("medium"),
-          v.literal("hard")
+          v.literal("hard"),
         ),
         category: v.string(),
-      })
+      }),
     ),
     tags: v.array(v.string()),
     totalPoints: v.number(),
@@ -101,7 +101,7 @@ export default defineSchema({
             id: v.string(),
             text: v.string(),
             isCorrect: v.boolean(),
-          })
+          }),
         ),
         type: v.union(v.literal("single"), v.literal("multiple")),
         points: v.number(),
@@ -109,10 +109,10 @@ export default defineSchema({
         difficulty: v.union(
           v.literal("easy"),
           v.literal("medium"),
-          v.literal("hard")
+          v.literal("hard"),
         ),
         category: v.string(),
-      })
+      }),
     ),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -125,7 +125,7 @@ export default defineSchema({
       v.literal("pending"),
       v.literal("in_progress"),
       v.literal("completed"),
-      v.literal("expired")
+      v.literal("expired"),
     ),
     startedAt: v.optional(v.number()),
     submittedAt: v.optional(v.number()),
@@ -134,7 +134,7 @@ export default defineSchema({
         questionId: v.string(),
         selectedOptions: v.array(v.string()),
         flagged: v.boolean(),
-      })
+      }),
     ),
     score: v.optional(v.number()),
     timeSpent: v.optional(v.number()),
@@ -149,7 +149,7 @@ export default defineSchema({
       v.literal("easy"),
       v.literal("medium"),
       v.literal("hard"),
-      v.literal("expert")
+      v.literal("expert"),
     ),
     language: v.string(),
     timeLimit: v.number(),
@@ -185,7 +185,7 @@ export default defineSchema({
         questionId: v.string(),
         selectedAnswer: v.string(),
         isCorrect: v.boolean(),
-      })
+      }),
     ),
   }).index("by_template_id", ["templateId"]),
 });

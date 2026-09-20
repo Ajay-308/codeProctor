@@ -76,7 +76,7 @@ importers:
         version: 6.4.20
       axios:
         specifier: ^1.18.1
-        version: 1.18.1
+        version: 1.18.1(supports-color@5.5.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -6411,7 +6411,7 @@ snapshots:
 
   acorn@8.15.0: {}
 
-  agent-base@6.0.2:
+  agent-base@6.0.2(supports-color@5.5.0):
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
     transitivePeerDependencies:
@@ -6530,11 +6530,11 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  axios@1.18.1:
+  axios@1.18.1(supports-color@5.5.0):
     dependencies:
       follow-redirects: 1.16.0
       form-data: 4.0.6
-      https-proxy-agent: 5.0.1
+      https-proxy-agent: 5.0.1(supports-color@5.5.0)
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
       - debug
@@ -6994,7 +6994,7 @@ snapshots:
       '@typescript-eslint/parser': 8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3)
       eslint: 9.37.0(jiti@2.6.1)(supports-color@5.5.0)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0)))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))
       eslint-plugin-react: 7.37.5(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))
@@ -7014,7 +7014,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0)))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.3(supports-color@5.5.0)
@@ -7029,14 +7029,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0)))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0)):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3)
       eslint: 9.37.0(jiti@2.6.1)(supports-color@5.5.0)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0)))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -7051,7 +7051,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.37.0(jiti@2.6.1)(supports-color@5.5.0)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0)))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0))(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.46.1(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))(supports-color@5.5.0)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@9.37.0(jiti@2.6.1)(supports-color@5.5.0))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -7535,9 +7535,9 @@ snapshots:
       statuses: 2.0.1
       toidentifier: 1.0.1
 
-  https-proxy-agent@5.0.1:
+  https-proxy-agent@5.0.1(supports-color@5.5.0):
     dependencies:
-      agent-base: 6.0.2
+      agent-base: 6.0.2(supports-color@5.5.0)
       debug: 4.4.3(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color

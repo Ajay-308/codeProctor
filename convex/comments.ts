@@ -29,7 +29,7 @@ export const getAllComments = query({
     const comments = await ctx.db
       .query("comments")
       .withIndex("by_interview_id", (q) =>
-        q.eq("interviewId", args.interviewId)
+        q.eq("interviewId", args.interviewId),
       )
       .collect();
 

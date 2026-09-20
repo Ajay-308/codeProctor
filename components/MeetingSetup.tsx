@@ -174,14 +174,14 @@ function MeetingSetup({ onSetupComplete }: { onSetupComplete: () => void }) {
                         "flex items-center justify-between p-4 rounded-lg border",
                         isCameraDisabled
                           ? "bg-muted/30"
-                          : "bg-primary/5 border-primary/20"
+                          : "bg-primary/5 border-primary/20",
                       )}
                     >
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
                             "h-12 w-12 rounded-full flex items-center justify-center",
-                            isCameraDisabled ? "bg-muted/30" : "bg-primary/10"
+                            isCameraDisabled ? "bg-muted/30" : "bg-primary/10",
                           )}
                         >
                           {isCameraDisabled ? (
@@ -197,7 +197,7 @@ function MeetingSetup({ onSetupComplete }: { onSetupComplete: () => void }) {
                               "text-sm",
                               isCameraDisabled
                                 ? "text-muted-foreground"
-                                : "text-primary"
+                                : "text-primary",
                             )}
                           >
                             {isCameraDisabled ? "Off" : "On"}
@@ -224,14 +224,14 @@ function MeetingSetup({ onSetupComplete }: { onSetupComplete: () => void }) {
                         "flex items-center justify-between p-4 rounded-lg border",
                         isMicDisabled
                           ? "bg-muted/30"
-                          : "bg-primary/5 border-primary/20"
+                          : "bg-primary/5 border-primary/20",
                       )}
                     >
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
                             "h-12 w-12 rounded-full flex items-center justify-center",
-                            isMicDisabled ? "bg-muted/30" : "bg-primary/10"
+                            isMicDisabled ? "bg-muted/30" : "bg-primary/10",
                           )}
                         >
                           {isMicDisabled ? (
@@ -247,7 +247,7 @@ function MeetingSetup({ onSetupComplete }: { onSetupComplete: () => void }) {
                               "text-sm",
                               isMicDisabled
                                 ? "text-muted-foreground"
-                                : "text-primary"
+                                : "text-primary",
                             )}
                           >
                             {isMicDisabled ? "Off" : "On"}

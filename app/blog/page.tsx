@@ -1,8 +1,8 @@
-import Link from 'next/link';
-import { getAllBlogs } from '@/lib/mongodb';
-import { ArrowRight } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-import FooterSection from '@/components/footerSection';
+import Link from "next/link";
+import { getAllBlogs } from "@/lib/mongodb";
+import { ArrowRight } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import FooterSection from "@/components/footerSection";
 
 interface Blog {
   _id: string;
@@ -24,20 +24,32 @@ interface RawBlog {
 
 export const dynamic = "force-dynamic";
 export default async function BlogPage() {
-  let blogs: Blog[] = [];
+  let blogs: Blog[] = [
+    {
+      _id: "redis-complete-notes",
+      topic: "Redis, TCP, RESP, event loops, and interview-ready notes",
+      blog_title: "Redis Complete Handwritten Notes — Phase 1 to 3",
+      blog_kind: "Redis",
+      audience: "Interview Prep",
+      created_at: new Date().toISOString(),
+    },
+  ];
 
   try {
     const result = await getAllBlogs();
-    blogs = result.map((blog: RawBlog) => ({
-      _id: blog._id.toString(),
-      topic: blog.topic,
-      blog_title: blog.blog_title,
-      blog_kind: blog.blog_kind,
-      audience: blog.audience,
-      created_at: blog.created_at,
-    }));
+    blogs = [
+      ...blogs,
+      ...result.map((blog: RawBlog) => ({
+        _id: blog._id.toString(),
+        topic: blog.topic,
+        blog_title: blog.blog_title,
+        blog_kind: blog.blog_kind,
+        audience: blog.audience,
+        created_at: blog.created_at,
+      })),
+    ];
   } catch (error) {
-    console.error('Error fetching blogs:', error);
+    console.error("Error fetching blogs:", error);
   }
 
   return (
@@ -54,7 +66,11 @@ export default async function BlogPage() {
             {blogs.map((blog) => (
               <Link
                 key={blog._id}
-                href={`/blog/${blog._id}`}
+                href={
+                  blog._id === "redis-complete-notes"
+                    ? "/blog/redis-complete-notes"
+                    : `/blog/${blog._id}`
+                }
                 className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg"
               >
                 <div className="flex flex-col gap-4">
