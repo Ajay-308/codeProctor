@@ -1,103 +1,58 @@
 import Link from "next/link";
-import { getAllBlogs } from "@/lib/mongodb";
 import { ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import FooterSection from "@/components/footerSection";
 
-interface Blog {
-  _id: string;
-  topic: string;
-  blog_title: string;
-  blog_kind: string;
-  audience: string;
-  created_at: string;
-}
+const blogs = [
+  {
+    _id: "redis-complete-notes",
+    topic: "Redis, TCP, RESP, event loops, and interview-ready notes",
+    blog_title: "Redis Complete Handwritten Notes — Phase 1 to 3",
+    blog_kind: "Redis",
+    audience: "Interview Prep",
+    created_at: new Date().toISOString(),
+  },
+];
 
-interface RawBlog {
-  _id: { toString: () => string };
-  topic: string;
-  blog_title: string;
-  blog_kind: string;
-  audience: string;
-  created_at: string;
-}
+export const dynamic = "force-static";
 
-export const dynamic = "force-dynamic";
-export default async function BlogPage() {
-  let blogs: Blog[] = [
-    {
-      _id: "redis-complete-notes",
-      topic: "Redis, TCP, RESP, event loops, and interview-ready notes",
-      blog_title: "Redis Complete Handwritten Notes — Phase 1 to 3",
-      blog_kind: "Redis",
-      audience: "Interview Prep",
-      created_at: new Date().toISOString(),
-    },
-  ];
-
-  try {
-    const result = await getAllBlogs();
-    blogs = [
-      ...blogs,
-      ...result.map((blog: RawBlog) => ({
-        _id: blog._id.toString(),
-        topic: blog.topic,
-        blog_title: blog.blog_title,
-        blog_kind: blog.blog_kind,
-        audience: blog.audience,
-        created_at: blog.created_at,
-      })),
-    ];
-  } catch (error) {
-    console.error("Error fetching blogs:", error);
-  }
-
+export default function BlogPage() {
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
 
       <section className="mx-auto max-w-6xl px-6 py-12">
-        {blogs.length === 0 ? (
-          <div className="rounded-lg border border-border bg-card p-12 text-center">
-            <p className="text-muted-foreground">No blogs available yet.</p>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {blogs.map((blog) => (
-              <Link
-                key={blog._id}
-                href={
-                  blog._id === "redis-complete-notes"
-                    ? "/blog/redis-complete-notes"
-                    : `/blog/${blog._id}`
-                }
-                className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg"
-              >
-                <div className="flex flex-col gap-4">
-                  <div className="inline-flex w-fit">
-                    <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-                      {blog.blog_kind}
-                    </span>
-                  </div>
-                  <div>
-                    <h2 className="line-clamp-2 text-xl font-bold text-foreground group-hover:text-primary">
-                      {blog.blog_title}
-                    </h2>
-                  </div>
-                  <p className="line-clamp-2 text-sm text-muted-foreground">
-                    {blog.topic}
-                  </p>
-                  <div className="flex items-center justify-between border-t border-border pt-4">
-                    <span className="text-xs text-muted-foreground">
-                      {blog.audience}
-                    </span>
-                    <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
-                  </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {blogs.map((blog) => (
+            <Link
+              key={blog._id}
+              href="/blog/redis-complete-notes"
+              className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-lg"
+            >
+              <div className="flex flex-col gap-4">
+                <div className="inline-flex w-fit">
+                  <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                    {blog.blog_kind}
+                  </span>
                 </div>
-              </Link>
-            ))}
-          </div>
-        )}
+                <div>
+                  <h2 className="line-clamp-2 text-xl font-bold text-foreground group-hover:text-primary">
+                    {blog.blog_title}
+                  </h2>
+                </div>
+                <p className="line-clamp-2 text-sm text-muted-foreground">
+                  {blog.topic}
+                </p>
+                <div className="flex items-center justify-between border-t border-border pt-4">
+                  <span className="text-xs text-muted-foreground">
+                    {blog.audience}
+                  </span>
+                  <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <FooterSection />
