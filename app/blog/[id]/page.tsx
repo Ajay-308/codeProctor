@@ -31,7 +31,7 @@ export default async function BlogDetailPage({
               </span>
             </div>
             <h1 className="text-4xl font-bold text-foreground">
-              Redis Complete Handwritten Notes — Phase 1 to 3
+              Redis Complete Handwritten Notes Phase 1 to 3
             </h1>
           </div>
         </div>
