@@ -54,7 +54,7 @@ export default function FooterSection() {
               <div className="flex gap-2">
                 {[
                   { href: 'https://x.com/LinkjSingh308', icon: <FaTwitter className="h-4 w-4" />, label: 'Twitter' },
-                  { href: 'https://www.linkedin.com/in/Linkjay308', icon: <FaLinkedinIn className="h-4 w-4" />, label: 'LinkedIn' },
+                  { href: 'https://www.linkedin.com/in/ajay308/', icon: <FaLinkedinIn className="h-4 w-4" />, label: 'LinkedIn' },
                   { href: 'mailto:codeproctor.team@gmail.com', icon: <IoIosMail className="h-4 w-4" />, label: 'Email' },
                 ].map(({ href, icon, label }) => (
                   <Link
