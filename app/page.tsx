@@ -13,7 +13,7 @@ import {
   Users,
   Video,
   X,
-  Menu
+  Menu,
 } from "lucide-react";
 import FooterSection from "@/components/footerSection";
 
@@ -57,7 +57,7 @@ export default function LandingPage() {
   }, [isLoaded, userId, user, syncUser, router]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col overflow-x-hidden">
       <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
           <div className="flex items-center gap-2">
